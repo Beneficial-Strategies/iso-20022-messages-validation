@@ -2,7 +2,7 @@
 
 using System.Reflection;
 
-namespace BeneficialStrategies.Iso20022.Validation;
+namespace BeneficialStrategies.Iso20022.Messages.Validation;
 
 /// <summary>
 /// Mechanically enforces the two-state completeness model from the FluentValidation project's own

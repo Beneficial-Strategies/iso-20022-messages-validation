@@ -4,7 +4,7 @@ using BeneficialStrategies.Iso20022.Framework;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BeneficialStrategies.Iso20022.Validation;
+namespace BeneficialStrategies.Iso20022.Messages.Validation;
 
 /// <summary>
 /// The validators are written for the interfaces (#28), so a class of someone else's that implements an interface is

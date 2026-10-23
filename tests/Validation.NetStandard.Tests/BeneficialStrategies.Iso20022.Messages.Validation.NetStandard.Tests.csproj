@@ -8,7 +8,7 @@
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>BeneficialStrategies.Iso20022.Validation</RootNamespace>
+    <RootNamespace>BeneficialStrategies.Iso20022.Messages.Validation</RootNamespace>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
@@ -29,11 +29,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FluentValidation.Xml\BeneficialStrategies.Iso20022.FluentValidation.Xml.csproj" />
-    <PackageReference Include="BeneficialStrategies.Iso20022.Factory" Version="[1.0.0-alpha, 1.1.0)" />
-    <ProjectReference Include="..\FluentValidation.Payloads\BeneficialStrategies.Iso20022.FluentValidation.Payloads.csproj" />
-    <ProjectReference Include="..\FluentValidation\BeneficialStrategies.Iso20022.FluentValidation.csproj" />
-    <PackageReference Include="BeneficialStrategies.Iso20022.Messages" Version="[1.0.0-alpha, 1.1.0)" />
+    <ProjectReference Include="..\..\src\Validation\BeneficialStrategies.Iso20022.Messages.Validation.csproj" />
+    <PackageReference Include="BeneficialStrategies.Iso20022.Messages" Version="[1.0.1-alpha, 1.1.0)" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net48'">

@@ -4,7 +4,7 @@ using IAgent= BeneficialStrategies.Iso20022.Choices.Party40Choice.IAgent;
 using CxlReasonChoice = BeneficialStrategies.Iso20022.Choices.CancellationReason33Choice;
 using CxlReasonCode = BeneficialStrategies.Iso20022.Codesets.ExternalCancellationReason1Code;
 
-namespace BeneficialStrategies.Iso20022.Validation.camt;
+namespace BeneficialStrategies.Iso20022.Messages.Validation.camt;
 
 /// <summary>
 /// Tests for <see cref="FIToFIPaymentCancellationRequestV10Validator"/>.

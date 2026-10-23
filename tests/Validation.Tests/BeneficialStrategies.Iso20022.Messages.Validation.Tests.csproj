@@ -5,7 +5,7 @@
     <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>BeneficialStrategies.Iso20022.Validation</RootNamespace>
+    <RootNamespace>BeneficialStrategies.Iso20022.Messages.Validation</RootNamespace>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FluentValidation\BeneficialStrategies.Iso20022.FluentValidation.csproj" />
+    <ProjectReference Include="..\..\src\Validation\BeneficialStrategies.Iso20022.Messages.Validation.csproj" />
     <PackageReference Include="BeneficialStrategies.Iso20022.Factory" Version="[1.0.0-alpha, 1.1.0)" />
     <PackageReference Include="BeneficialStrategies.Iso20022.Messages.Samples" Version="[1.0.0-alpha, 1.1.0)" />
   </ItemGroup>
