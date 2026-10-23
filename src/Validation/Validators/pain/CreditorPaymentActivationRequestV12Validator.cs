@@ -1,6 +1,6 @@
 // Copyright 2026 Jeff Ward, Beneficial Strategies. Usage subject to license of enclosing library.
 
-namespace BeneficialStrategies.Iso20022.Validation.pain;
+namespace BeneficialStrategies.Iso20022.Messages.Validation.pain;
 
 /// <summary>
 /// Validates <see cref="ICreditorPaymentActivationRequestV12"/> per the ISO 20022 specification.

@@ -1,6 +1,6 @@
 // Copyright 2026 Jeff Ward, Beneficial Strategies. Usage subject to license of enclosing library.
 
-namespace BeneficialStrategies.Iso20022.Validation.ChoiceValidators;
+namespace BeneficialStrategies.Iso20022.Messages.Validation.ChoiceValidators;
 
 /// <summary>
 /// Validates <see cref="IExecutionType1Choice"/> per the ISO 20022 specification.

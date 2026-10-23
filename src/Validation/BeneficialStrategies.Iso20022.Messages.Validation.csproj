@@ -6,8 +6,8 @@
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>BeneficialStrategies.Iso20022.Validation</RootNamespace>
-    <AssemblyName>BeneficialStrategies.Iso20022.FluentValidation</AssemblyName>
+    <RootNamespace>BeneficialStrategies.Iso20022.Messages.Validation</RootNamespace>
+    <AssemblyName>BeneficialStrategies.Iso20022.Messages.Validation</AssemblyName>
     <!--
       Enabled 2026-08-31: the validator CLASSES already carry rich <summary>/<remarks> content
       (which spec constraints each one enforces — see CLAUDE.md's "Adding a New Validator"
@@ -28,14 +28,19 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageId>BeneficialStrategies.Iso20022.FluentValidation</PackageId>
-    <PackageDescription>FluentValidation validators for the BeneficialStrategies.Iso20022 message domain model. Full ISO 20022 spec-compliance coverage for CAMT-reachable components; abbreviated (minimum-collection-size) coverage for the remaining components pending full review.</PackageDescription>
-    <PackageReleaseNotes>$([System.IO.File]::ReadAllText("$(MSBuildProjectDirectory)/release-notes.txt"))</PackageReleaseNotes>
+    <PackageFiles>$(MSBuildThisFileDirectory)..\..\artifacts\package\</PackageFiles>
+    <PackageId>BeneficialStrategies.Iso20022.Messages.Validation</PackageId>
+    <PackageDescription>FluentValidation validators for the interfaces of the ISO 20022 messages, components and choices: the rules the type system alone cannot express, such as cross-field rules and the check of a code against a registry. Written for the interfaces, so they validate whatever implements them: the records, objects of the Factory, or a class of your own.</PackageDescription>
+    <!-- The README and the release notes of a release are made by tools/package/prepare_package_files.py; without them (a local pack) the README of the repository is used. -->
+    <PackageReleaseNotes Condition="Exists('$(PackageFiles)release-notes.txt')">$([System.IO.File]::ReadAllText("$(PackageFiles)release-notes.txt"))</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="README.md" Pack="true" PackagePath="\"/>
+    <None Include="$(PackageFiles)README.md" Pack="true" PackagePath="\" Condition="Exists('$(PackageFiles)README.md')" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" Condition="!Exists('$(PackageFiles)README.md')" />
+    <None Include="..\..\.beneficial\icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -54,8 +59,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BeneficialStrategies.Iso20022.Primitives" Version="[1.0.0-alpha, 1.1.0)" />
-    <PackageReference Include="BeneficialStrategies.Iso20022.Messages" Version="[1.0.0-alpha, 1.1.0)" />
+    <!-- From the lowest version that works to just below the next breaking change. -->
+    <PackageReference Include="BeneficialStrategies.Iso20022.Primitives" Version="[1.0.1-alpha, 1.1.0)" />
+    <PackageReference Include="BeneficialStrategies.Iso20022.Messages" Version="[1.0.1-alpha, 1.1.0)" />
   </ItemGroup>
 
 </Project>

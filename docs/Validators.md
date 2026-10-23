@@ -1,4 +1,6 @@
-# BeneficialStrategies.Iso20022.FluentValidation
+# Writing and maintaining the validators
+
+The guidance for work on `BeneficialStrategies.Iso20022.Messages.Validation`, moved from the CLAUDE.md of the project it was written in. Paths and names below are those of the monorepo where they differ from this repository: `src/FluentValidation` is `src/Validation`, `src/FluentValidation.Tests` is `tests/Validation.Tests`, and the namespace `BeneficialStrategies.Iso20022.Validation` is `BeneficialStrategies.Iso20022.Messages.Validation`.
 
 FluentValidation validators for all 3,311 ISO 20022 message types.
 Companion package to `BeneficialStrategies.Iso20022`.
@@ -199,7 +201,7 @@ show_item_details("UUIDv4Identifier")        # pattern: [a-f0-9]{8}-...-4...-[89
 ### Step 2 — Create component validators first
 
 Place in `Validators/Components/{ComponentName}Validator.cs`.
-Namespace: `BeneficialStrategies.Iso20022.Validation.Components`.
+Namespace: `BeneficialStrategies.Iso20022.Messages.Validation.Components`.
 
 One validator class per ISO 20022 component. Component validators are **reused** across
 multiple message validators — do not duplicate them.
@@ -207,12 +209,12 @@ multiple message validators — do not duplicate them.
 ### Step 2b — Create choice validators
 
 Place in `Validators/Choices/{ChoiceName}_Validator.cs` (the trailing underscore matches the
-model type's own name — `{ChoiceName}_`). Namespace: **`BeneficialStrategies.Iso20022.Validation.ChoiceValidators`**
+model type's own name — `{ChoiceName}_`). Namespace: **`BeneficialStrategies.Iso20022.Messages.Validation.ChoiceValidators`**
 — deliberately *not* `Validation.Choices`, even though that would match the `Components`/`camt`/
 `pain` naming pattern. `Validation.Choices` collides with the model's own
 `BeneficialStrategies.Iso20022.Choices` namespace: C# resolves an unqualified `Choices.Foo`
-reference inside `BeneficialStrategies.Iso20022.Validation.Components` by checking sibling
-namespace `BeneficialStrategies.Iso20022.Validation.Choices` *before* falling back to the
+reference inside `BeneficialStrategies.Iso20022.Messages.Validation.Components` by checking sibling
+namespace `BeneficialStrategies.Iso20022.Messages.Validation.Choices` *before* falling back to the
 `using BeneficialStrategies.Iso20022.Choices;` global using — so the moment that sibling namespace
 exists at all, every pre-existing `Choices.SomeChoiceType.Variant` reference elsewhere in the
 project silently starts resolving to the wrong namespace and fails to compile. Confirmed by
@@ -227,7 +229,7 @@ implements its interface, and so does any class an implementer writes, so both a
 same failures. Never test or cast to a record in a rule (`x is Choices.Foo.Bar`); use the variant interface
 (`Choices.Foo.IBar`). `tools/validation/convert_validators.py` does the mechanical move for a validator written against records.
 `IValidator<in T>` is contravariant, so a message validator can be handed where `IValidator<TheRecord>` is expected. A DI container does not do that:
-the `.Payloads` package (`BeneficialStrategies.Iso20022.FluentValidation.Payloads`, which does not reference the records) registers the
+the `.Payloads` package (`BeneficialStrategies.Iso20022.Validation.Xml.Payloads`, which does not reference the records) registers the
 `IValidator<TheRecord>` forwarders its envelope validators need. This package references `Primitives` and `Interfaces` only.
 
 Validating a choice type is validating *which concrete variant is present and what it carries*. Use
@@ -252,7 +254,7 @@ gap elsewhere in this project; don't block finishing the choice type on writing 
 ### Step 3 — Create the message validator
 
 Place in `Validators/{area}/{MessageName}Validator.cs` (e.g. `Validators/camt/`).
-Namespace: `BeneficialStrategies.Iso20022.Validation.{area}`.
+Namespace: `BeneficialStrategies.Iso20022.Messages.Validation.{area}`.
 
 Compose component validators via `.SetValidator(new XxxValidator())` and `When(...)`.
 Implement message-level cross-field constraints (from the spec "Constraints" section)
@@ -277,9 +279,9 @@ Every test file must include:
 | Component validator | `{ComponentName}Validator` |
 | Choice validator | `{ChoiceName}_Validator` (trailing underscore matches the model type name) |
 | Message validator | `{MessageClassName}Validator` (e.g. `FIToFIPaymentCancellationRequestV10Validator`) |
-| Namespace — components | `BeneficialStrategies.Iso20022.Validation.Components` |
-| Namespace — choices | `BeneficialStrategies.Iso20022.Validation.ChoiceValidators` (not `.Choices` — see Step 2b) |
-| Namespace — messages | `BeneficialStrategies.Iso20022.Validation.{area}` (e.g. `.camt`, `.pacs`, `.pain`) |
+| Namespace — components | `BeneficialStrategies.Iso20022.Messages.Validation.Components` |
+| Namespace — choices | `BeneficialStrategies.Iso20022.Messages.Validation.ChoiceValidators` (not `.Choices` — see Step 2b) |
+| Namespace — messages | `BeneficialStrategies.Iso20022.Messages.Validation.{area}` (e.g. `.camt`, `.pacs`, `.pain`) |
 
 ## Directory Structure
 
@@ -307,7 +309,7 @@ described below — `IExternalCodeRegistry<TCode>`, `InMemoryExternalCodeRegistr
 `ExternalCodesetAbstractValidator<TCode>` — one of each, not per code set type.
 `Validators/Codesets/` holds the per-type validators
 (`Validators/Codesets/CountryCodeValidator.cs`, etc.), namespace
-`BeneficialStrategies.Iso20022.Validation.CodesetValidators` — **not** `.Codesets`, for the same
+`BeneficialStrategies.Iso20022.Messages.Validation.CodesetValidators` — **not** `.Codesets`, for the same
 reason `.Choices` was rejected in favor of `.ChoiceValidators`: `BeneficialStrategies.Iso20022.Codesets`
 is a direct child of `BeneficialStrategies.Iso20022`, so `Validation.Codesets` would shadow it for
 ancestor-scope lookups from `Validation.Components` and every other validator namespace — and

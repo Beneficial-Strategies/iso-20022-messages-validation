@@ -1,6 +1,6 @@
 // Copyright 2026 Jeff Ward, Beneficial Strategies. Usage subject to license of enclosing library.
 
-namespace BeneficialStrategies.Iso20022.Validation.camt;
+namespace BeneficialStrategies.Iso20022.Messages.Validation.camt;
 
 /// <summary>
 /// Validates <see cref="INotificationOfCaseAssignmentV06"/> (camt.030.001.06) per the ISO 20022

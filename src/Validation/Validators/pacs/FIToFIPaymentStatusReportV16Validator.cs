@@ -1,6 +1,6 @@
 // Copyright 2026 Jeff Ward, Beneficial Strategies. Usage subject to license of enclosing library.
 
-namespace BeneficialStrategies.Iso20022.Validation.pacs;
+namespace BeneficialStrategies.Iso20022.Messages.Validation.pacs;
 
 /// <summary>
 /// Validates <see cref="IFIToFIPaymentStatusReportV16"/> per the ISO 20022 specification.

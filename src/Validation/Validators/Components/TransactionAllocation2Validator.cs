@@ -2,7 +2,7 @@
 
 using System.Text.RegularExpressions;
 
-namespace BeneficialStrategies.Iso20022.Validation.Components;
+namespace BeneficialStrategies.Iso20022.Messages.Validation.Components;
 
 /// <summary>
 /// Validates <see cref="ITransactionAllocation2"/> per the ISO 20022 specification.
