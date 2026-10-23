@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using PartyId127 = BeneficialStrategies.Iso20022.Choices.PartyIdentification127Choice;
 using SfkpgPlace28 = BeneficialStrategies.Iso20022.Choices.SafekeepingPlaceFormat28Choice;
 
-namespace BeneficialStrategies.Iso20022.Validation.Components;
+namespace BeneficialStrategies.Iso20022.Messages.Validation.Components;
 
 /// <summary>
 /// Validates <see cref="IAccountAndBalance47"/> per the ISO 20022 specification.

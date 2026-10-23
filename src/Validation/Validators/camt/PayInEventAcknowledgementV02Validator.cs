@@ -1,6 +1,6 @@
 // Copyright 2026 Jeff Ward, Beneficial Strategies. Usage subject to license of enclosing library.
 
-namespace BeneficialStrategies.Iso20022.Validation.camt;
+namespace BeneficialStrategies.Iso20022.Messages.Validation.camt;
 
 /// <summary>
 /// Validates <see cref="IPayInEventAcknowledgementV02"/> (camt.063.001.02) per the ISO 20022

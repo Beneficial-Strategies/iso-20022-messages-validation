@@ -4,7 +4,7 @@ using BeneficialStrategies.Iso20022.Codesets;
 using RptgSrc1 = BeneficialStrategies.Iso20022.Choices.ReportingSource1Choice;
 using SeqRange1 = BeneficialStrategies.Iso20022.Choices.SequenceRange1Choice;
 
-namespace BeneficialStrategies.Iso20022.Validation.Components;
+namespace BeneficialStrategies.Iso20022.Messages.Validation.Components;
 
 public class AccountStatement15ValidatorTests
 {

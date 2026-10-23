@@ -3,7 +3,7 @@
 using RptgSrc1 = BeneficialStrategies.Iso20022.Choices.ReportingSource1Choice;
 using SeqRange1 = BeneficialStrategies.Iso20022.Choices.SequenceRange1Choice;
 
-namespace BeneficialStrategies.Iso20022.Validation.Components;
+namespace BeneficialStrategies.Iso20022.Messages.Validation.Components;
 
 /// <summary>
 /// Validates <see cref="IAccountStatement15"/> per the ISO 20022 specification.

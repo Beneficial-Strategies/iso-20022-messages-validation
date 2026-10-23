@@ -1,6 +1,6 @@
 // Copyright 2026 Jeff Ward, Beneficial Strategies. Usage subject to license of enclosing library.
 
-namespace BeneficialStrategies.Iso20022.Validation.Components;
+namespace BeneficialStrategies.Iso20022.Messages.Validation.Components;
 
 /// <summary>
 /// Validates <see cref="IChargesPerTransactionRecord5"/> per the ISO 20022 specification.

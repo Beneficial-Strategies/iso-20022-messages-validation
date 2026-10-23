@@ -1,6 +1,6 @@
 // Copyright 2026 Jeff Ward, Beneficial Strategies. Usage subject to license of enclosing library.
 
-namespace BeneficialStrategies.Iso20022.Validation.camt;
+namespace BeneficialStrategies.Iso20022.Messages.Validation.camt;
 
 /// <summary>
 /// Validates <see cref="ILiquidityCreditTransferV07"/> (camt.050.001.07) per the ISO 20022

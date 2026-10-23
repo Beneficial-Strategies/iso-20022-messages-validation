@@ -2,7 +2,7 @@
 
 using System.Reflection;
 
-namespace BeneficialStrategies.Iso20022.Validation;
+namespace BeneficialStrategies.Iso20022.Messages.Validation;
 
 /// <summary>
 /// Default <see cref="IExternalCodeRegistry{TCode}"/>: an in-memory set of acceptable values,

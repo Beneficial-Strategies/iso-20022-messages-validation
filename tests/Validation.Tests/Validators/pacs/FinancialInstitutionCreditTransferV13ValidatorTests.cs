@@ -1,6 +1,6 @@
 // Copyright 2026 Jeff Ward, Beneficial Strategies. Usage subject to license of enclosing library.
 
-namespace BeneficialStrategies.Iso20022.Validation.pacs;
+namespace BeneficialStrategies.Iso20022.Messages.Validation.pacs;
 
 public class FinancialInstitutionCreditTransferV13ValidatorTests
 {

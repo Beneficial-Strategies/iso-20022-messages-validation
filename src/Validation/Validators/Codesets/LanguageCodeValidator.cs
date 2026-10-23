@@ -1,6 +1,6 @@
 // Copyright 2026 Jeff Ward, Beneficial Strategies. Usage subject to license of enclosing library.
 
-namespace BeneficialStrategies.Iso20022.Validation.CodesetValidators;
+namespace BeneficialStrategies.Iso20022.Messages.Validation.CodesetValidators;
 
 /// <summary>
 /// Validates <see cref="LanguageCode"/> against the currently-acceptable language codes.

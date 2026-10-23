@@ -1,6 +1,6 @@
 // Copyright 2026 Jeff Ward, Beneficial Strategies. Usage subject to license of enclosing library.
 
-namespace BeneficialStrategies.Iso20022.Validation;
+namespace BeneficialStrategies.Iso20022.Messages.Validation;
 
 /// <summary>The variants of a choice and the validator of each, collected by <c>SetVariantValidators</c>.</summary>
 public sealed class VariantValidators<TChoice>

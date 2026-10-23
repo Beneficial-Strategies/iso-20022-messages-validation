@@ -5,7 +5,7 @@ using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace BeneficialStrategies.Iso20022.Validation;
+namespace BeneficialStrategies.Iso20022.Messages.Validation;
 
 /// <summary>
 /// Marker type used only to anchor assembly discovery for <see cref="Iso20022ServiceCollectionExtensions"/>
@@ -77,7 +77,7 @@ public static class Iso20022ServiceCollectionExtensions
     /// <summary>
     /// Registers ISO 20022 validators for only the given business areas (e.g. <c>"camt"</c>,
     /// <c>"pain"</c>) — matching the <c>Validators/{area}/</c> folder and
-    /// <c>BeneficialStrategies.Iso20022.Validation.{area}</c> namespace convention documented in
+    /// <c>BeneficialStrategies.Iso20022.Messages.Validation.{area}</c> namespace convention documented in
     /// this project's own <c>CLAUDE.md</c>.
     /// </summary>
     /// <param name="services">The service collection to register validators with.</param>
@@ -110,7 +110,7 @@ public static class Iso20022ServiceCollectionExtensions
             validatorType =>
             {
                 var ns = validatorType.Namespace ?? string.Empty;
-                const string prefix = "BeneficialStrategies.Iso20022.Validation.";
+                const string prefix = "BeneficialStrategies.Iso20022.Messages.Validation.";
                 if (!ns.StartsWith(prefix, StringComparison.Ordinal))
                 {
                     return false;
