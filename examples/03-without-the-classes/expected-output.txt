@@ -1,0 +1,2 @@
+IsValid=False
+  CountryOfBirth.ExternalCodeRegistryRule: 'ZZ' is not an acceptable value for CountryCode (ExternalCodeRegistryRule).

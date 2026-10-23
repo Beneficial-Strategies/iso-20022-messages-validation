@@ -1,0 +1,3 @@
+IsValid=True
+IsValid=False
+  MessageOrGroupCaseRule: Case identification must appear in at most one location: message-level Case, Underlying.OriginalGroupInformationAndCancellation.Case, or Underlying.TransactionInformation.Case (MessageOrGroupCaseRule / MessageOrTransactionCaseRule).
