@@ -18,7 +18,7 @@ public class References80Choice_ValidatorTests
     public void UniqueTransactionIdentifier_NoValidationErrors()
     {
         var msg = IsoDataFactory.Make<Choices.References80Choice.IUniqueTransactionIdentifier>(b => b
-            .Set(x => x.Value).To("ABCDEFGHIJKLMNOPQR12"));
+            .Set(x => x.Value).To("5493001KJTIIGC8Y1R12"));
         _sut.TestValidate(msg).ShouldNotHaveAnyValidationErrors();
     }
 }

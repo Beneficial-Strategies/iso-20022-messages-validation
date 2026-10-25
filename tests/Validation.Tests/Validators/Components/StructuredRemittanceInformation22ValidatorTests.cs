@@ -29,7 +29,7 @@ public class StructuredRemittanceInformation22ValidatorTests
                     .Set(x3 => x3.CodeOrProprietary).To(IsoDataFactory.Make<Choices.GarnishmentType1Choice.IProprietary>(b4 => b4
                         .Set(x4 => x4.Value).To("MYGARNISHMENT")))))))
             .Set(x => x.SecuritiesData).To([IsoDataFactory.Make<ISecuritiesAttributes1>(b2 => b2
-                .Set(x2 => x2.UniqueTransactionIdentifier).To("ABCDEFGHIJKLMNOPQR12"))])
+                .Set(x2 => x2.UniqueTransactionIdentifier).To("5493001KJTIIGC8Y1R12"))])
             .Set(x => x.AdditionalRemittanceInformation).To(["Extra info"]));
         _sut.TestValidate(msg).ShouldNotHaveAnyValidationErrors();
     }
