@@ -8,7 +8,7 @@ public class SecuritiesAttributes1ValidatorTests
 
     private static ISecuritiesAttributes1 ValidMessage() =>
         IsoDataFactory.Make<ISecuritiesAttributes1>(b => b
-            .Set(x => x.UniqueTransactionIdentifier).To("ABCDEFGHIJKLMNOPQR12"));
+            .Set(x => x.UniqueTransactionIdentifier).To("5493001KJTIIGC8Y1R12"));
 
     [Fact]
     public void ValidMessage_NoValidationErrors()
