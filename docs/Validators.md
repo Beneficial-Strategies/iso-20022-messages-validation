@@ -2,7 +2,7 @@
 
 The guidance for work on `BeneficialStrategies.Iso20022.Messages.Validation`, moved from the CLAUDE.md of the project it was written in. Paths and names below are those of the monorepo where they differ from this repository: `src/FluentValidation` is `src/Validation`, `src/FluentValidation.Tests` is `tests/Validation.Tests`, and the namespace `BeneficialStrategies.Iso20022.Validation` is `BeneficialStrategies.Iso20022.Messages.Validation`.
 
-FluentValidation validators for all 3,311 ISO 20022 message types.
+FluentValidation validators for the ISO 20022 messages, components and choices, in the areas listed in the README (44 message definitions so far).
 Companion package to `BeneficialStrategies.Iso20022`.
 
 ## Purpose

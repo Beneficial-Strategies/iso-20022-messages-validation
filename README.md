@@ -4,9 +4,17 @@
 
 FluentValidation validators for the interfaces of the ISO 20022 messages, components and choices: the rules the type system alone cannot express, such as cross-field rules and the check of a code against a registry.
 
-**The rules the C# type system alone cannot express**: cross-field rules ("a case identification may appear in at most one of three possible locations") and the check of a code against a registry. 1,296 validators cover the messages, components and choices of the model.
+**The rules the C# type system alone cannot express**: cross-field rules ("a case identification may appear in at most one of three possible locations") and the check of a code against a registry. The package is in **alpha**: it covers a part of the model (see "What is covered" below), not all of it.
 
 The validators are written for the **interfaces** of the model (`IValidator<IGroupHeader131>`), not for any particular class, so they validate whatever implements the interface: a class of your own, the ready-made records, or an object built at run time. The format of each member is already enforced by its type; the validators add what a type cannot say. Three examples follow, each a step further.
+
+## What is covered
+
+* **44 message definitions** in three business areas, one version of each family (chosen by the policy in `docs/Validators.md`): **pacs** (9: customer and institution credit transfer, direct debit, return, reversal, status report and request, multilateral settlement), **pain** (12: customer credit transfer and direct debit initiation, status report, reversal, payment activation, and the mandate messages) and **camt** (23: case management and investigations, limits, reservations, standing orders, liquidity transfers, currency exchange rate and general business information). Of the 3,339 message definitions of the model, the rest have no validator yet.
+* **1,184 components and 62 choices**, the ones those messages use, and 8 validators for code sets.
+* A message without a validator is still checked for the **format of each member** by its type (the primitives), so a wrong IBAN, a malformed date or a text that is too long is refused when the object is made. What is missing is the cross-field rules and the registry checks of that message.
+
+The validators of more areas (for example reda, acmt, admi, sese and semt) follow; the order depends on what people ask for, so open an issue for the message you need.
 
 ## How to use
 
@@ -139,7 +147,7 @@ The Factory also reads XML into the interfaces, so a document can be validated w
 ## More
 
 * Documentation, release notes and issues: https://github.com/Beneficial-Strategies/iso-20022-messages-validation
-* License: MIT. Status: stable.
+* License: MIT. Status: alpha.
 
 ### Registering the validators
 
