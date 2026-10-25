@@ -8,14 +8,6 @@ FluentValidation validators for the interfaces of the ISO 20022 messages, compon
 
 The validators are written for the **interfaces** of the model (`IValidator<IGroupHeader131>`), not for any particular class, so they validate whatever implements the interface: a class of your own, the ready-made records, or an object built at run time. The format of each member is already enforced by its type; the validators add what a type cannot say. Three examples follow, each a step further.
 
-## Install
-
-```
-dotnet add package BeneficialStrategies.Iso20022.Messages.Validation --prerelease
-```
-
-The package is in alpha, so the command asks for a prerelease version. It brings the interfaces ([BeneficialStrategies.Iso20022.Messages](https://www.nuget.org/packages/BeneficialStrategies.Iso20022.Messages)), the primitive types and code sets ([BeneficialStrategies.Iso20022.Primitives](https://www.nuget.org/packages/BeneficialStrategies.Iso20022.Primitives)) and FluentValidation, and nothing else. It targets netstandard2.0, net8.0 and net10.0.
-
 ## How to use
 
 ### Your own class
@@ -147,7 +139,7 @@ The Factory also reads XML into the interfaces, so a document can be validated w
 ## More
 
 * Documentation, release notes and issues: https://github.com/Beneficial-Strategies/iso-20022-messages-validation
-* License: MIT. Status: alpha.
+* License: MIT. Status: stable.
 
 ### Registering the validators
 
