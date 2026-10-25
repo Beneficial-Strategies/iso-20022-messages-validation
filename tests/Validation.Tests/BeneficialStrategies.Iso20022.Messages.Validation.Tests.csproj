@@ -29,8 +29,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Validation\BeneficialStrategies.Iso20022.Messages.Validation.csproj" />
-    <PackageReference Include="BeneficialStrategies.Iso20022.Factory" Version="[1.0.0-alpha, 1.1.0)" />
-    <PackageReference Include="BeneficialStrategies.Iso20022.Messages.Samples" Version="[1.0.0-alpha, 1.1.0)" />
+    <PackageReference Include="BeneficialStrategies.Iso20022.Factory" Version="[1.0.0-alpha, 1.1.0-a)" />
+    <PackageReference Include="BeneficialStrategies.Iso20022.Messages.Samples" Version="[1.1.0-alpha, 1.2.0-a)" />
   </ItemGroup>
 
 </Project>
