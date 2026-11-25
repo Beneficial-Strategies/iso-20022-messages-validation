@@ -100,116 +100,126 @@ public class FIToFIPaymentStatusReportV16Validator : AbstractValidator<IFIToFIPa
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
-        RuleFor(x => x.GroupHeader).SetValidator(groupHeaderValidator!);
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.GroupHeader).NotNull().WithMessage("FIToFIPaymentStatusReportV16.GroupHeader is required (1..1).");
 
-        RuleForEach(x => x.OriginalGroupInformationAndStatus)
-            .SetValidator(originalGroupInformationAndStatusValidator!);
-        RuleForEach(x => x.TransactionInformationAndStatus).SetValidator(transactionInformationAndStatusValidator!);
-        RuleForEach(x => x.SupplementaryData).SetValidator(supplementaryDataValidator!);
+        // The rules below read these members, so they run only when they are present.
+        When(
+            x => x.GroupHeader is not null,
+            () =>
+            {
+                RuleFor(x => x.GroupHeader).SetValidator(groupHeaderValidator!);
 
-        // ── OriginalGroupInformationAbsenceRule ──────────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.OriginalGroupInformationAndStatus.Count() != 0
-                || x.TransactionInformationAndStatus.All(t => t.OriginalGroupInformation is not null)
-            )
-            .WithName("OriginalGroupInformationAbsenceRule")
-            .WithMessage(
-                "FIToFIPaymentStatusReportV16: if OriginalGroupInformationAndStatus is absent, every "
-                    + "TransactionInformationAndStatus[*].OriginalGroupInformation must be present "
-                    + "(OriginalGroupInformationAbsenceRule)."
-            );
+                RuleForEach(x => x.OriginalGroupInformationAndStatus)
+                    .SetValidator(originalGroupInformationAndStatusValidator!);
+                RuleForEach(x => x.TransactionInformationAndStatus).SetValidator(transactionInformationAndStatusValidator!);
+                RuleForEach(x => x.SupplementaryData).SetValidator(supplementaryDataValidator!);
 
-        // ── OriginalGroupInformationSinglePresenceRule ───────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.OriginalGroupInformationAndStatus.Count() != 1
-                || x.TransactionInformationAndStatus.All(t => t.OriginalGroupInformation is null)
-            )
-            .WithName("OriginalGroupInformationSinglePresenceRule")
-            .WithMessage(
-                "FIToFIPaymentStatusReportV16: if OriginalGroupInformationAndStatus is present "
-                    + "exactly once, every TransactionInformationAndStatus[*].OriginalGroupInformation "
-                    + "must be absent (OriginalGroupInformationSinglePresenceRule)."
-            );
+                // ── OriginalGroupInformationAbsenceRule ──────────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.OriginalGroupInformationAndStatus.Count() != 0
+                        || x.TransactionInformationAndStatus.All(t => t.OriginalGroupInformation is not null)
+                    )
+                    .WithName("OriginalGroupInformationAbsenceRule")
+                    .WithMessage(
+                        "FIToFIPaymentStatusReportV16: if OriginalGroupInformationAndStatus is absent, every "
+                            + "TransactionInformationAndStatus[*].OriginalGroupInformation must be present "
+                            + "(OriginalGroupInformationAbsenceRule)."
+                    );
 
-        // ── OriginalGroupInformationMultiplePresenceRule ─────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.OriginalGroupInformationAndStatus.Count() <= 1
-                || x.TransactionInformationAndStatus.All(t => t.OriginalGroupInformation is not null)
-            )
-            .WithName("OriginalGroupInformationMultiplePresenceRule")
-            .WithMessage(
-                "FIToFIPaymentStatusReportV16: if OriginalGroupInformationAndStatus is present more "
-                    + "than once, every TransactionInformationAndStatus[*].OriginalGroupInformation "
-                    + "must be present (OriginalGroupInformationMultiplePresenceRule)."
-            );
+                // ── OriginalGroupInformationSinglePresenceRule ───────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.OriginalGroupInformationAndStatus.Count() != 1
+                        || x.TransactionInformationAndStatus.All(t => t.OriginalGroupInformation is null)
+                    )
+                    .WithName("OriginalGroupInformationSinglePresenceRule")
+                    .WithMessage(
+                        "FIToFIPaymentStatusReportV16: if OriginalGroupInformationAndStatus is present "
+                            + "exactly once, every TransactionInformationAndStatus[*].OriginalGroupInformation "
+                            + "must be absent (OriginalGroupInformationSinglePresenceRule)."
+                    );
 
-        // ── GroupStatusAcceptedRule ───────────────────────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                !x.OriginalGroupInformationAndStatus.Any(g =>
-                    g.GroupStatus is not null && AcceptedStatuses.Contains(g.GroupStatus.Value)
-                )
-                || x.TransactionInformationAndStatus.All(t =>
-                    t.TransactionStatus != ExternalPaymentTransactionStatus1Code.Rejected
-                )
-            )
-            .WithName("GroupStatusAcceptedRule")
-            .WithMessage(
-                "FIToFIPaymentStatusReportV16: if any OriginalGroupInformationAndStatus[*].GroupStatus "
-                    + "is ACTC/ACCP/ACSP/ACSC/ACWC, every "
-                    + "TransactionInformationAndStatus[*].TransactionStatus must differ from RJCT "
-                    + "(GroupStatusAcceptedRule)."
-            );
+                // ── OriginalGroupInformationMultiplePresenceRule ─────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.OriginalGroupInformationAndStatus.Count() <= 1
+                        || x.TransactionInformationAndStatus.All(t => t.OriginalGroupInformation is not null)
+                    )
+                    .WithName("OriginalGroupInformationMultiplePresenceRule")
+                    .WithMessage(
+                        "FIToFIPaymentStatusReportV16: if OriginalGroupInformationAndStatus is present more "
+                            + "than once, every TransactionInformationAndStatus[*].OriginalGroupInformation "
+                            + "must be present (OriginalGroupInformationMultiplePresenceRule)."
+                    );
 
-        // ── GroupStatusPendingRule ────────────────────────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                !x.OriginalGroupInformationAndStatus.Any(g => g.GroupStatus == ExternalPaymentGroupStatus1Code.Pending)
-                || x.TransactionInformationAndStatus.All(t =>
-                    t.TransactionStatus != ExternalPaymentTransactionStatus1Code.Rejected
-                )
-            )
-            .WithName("GroupStatusPendingRule")
-            .WithMessage(
-                "FIToFIPaymentStatusReportV16: if any OriginalGroupInformationAndStatus[*].GroupStatus "
-                    + "is PDNG, every TransactionInformationAndStatus[*].TransactionStatus must differ "
-                    + "from RJCT (GroupStatusPendingRule)."
-            );
+                // ── GroupStatusAcceptedRule ───────────────────────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        !x.OriginalGroupInformationAndStatus.Any(g =>
+                            g.GroupStatus is not null && AcceptedStatuses.Contains(g.GroupStatus.Value)
+                        )
+                        || x.TransactionInformationAndStatus.All(t =>
+                            t.TransactionStatus != ExternalPaymentTransactionStatus1Code.Rejected
+                        )
+                    )
+                    .WithName("GroupStatusAcceptedRule")
+                    .WithMessage(
+                        "FIToFIPaymentStatusReportV16: if any OriginalGroupInformationAndStatus[*].GroupStatus "
+                            + "is ACTC/ACCP/ACSP/ACSC/ACWC, every "
+                            + "TransactionInformationAndStatus[*].TransactionStatus must differ from RJCT "
+                            + "(GroupStatusAcceptedRule)."
+                    );
 
-        // ── GroupStatusRejectedRule ───────────────────────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                !x.OriginalGroupInformationAndStatus.Any(g =>
-                    g.GroupStatus == ExternalPaymentGroupStatus1Code.Rejected
-                )
-                || x.TransactionInformationAndStatus.All(t =>
-                    t.TransactionStatus is null || t.TransactionStatus == ExternalPaymentTransactionStatus1Code.Rejected
-                )
-            )
-            .WithName("GroupStatusRejectedRule")
-            .WithMessage(
-                "FIToFIPaymentStatusReportV16: if any OriginalGroupInformationAndStatus[*].GroupStatus "
-                    + "is RJCT, every TransactionInformationAndStatus[*].TransactionStatus, when "
-                    + "present, must equal RJCT (GroupStatusRejectedRule)."
-            );
+                // ── GroupStatusPendingRule ────────────────────────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        !x.OriginalGroupInformationAndStatus.Any(g => g.GroupStatus == ExternalPaymentGroupStatus1Code.Pending)
+                        || x.TransactionInformationAndStatus.All(t =>
+                            t.TransactionStatus != ExternalPaymentTransactionStatus1Code.Rejected
+                        )
+                    )
+                    .WithName("GroupStatusPendingRule")
+                    .WithMessage(
+                        "FIToFIPaymentStatusReportV16: if any OriginalGroupInformationAndStatus[*].GroupStatus "
+                            + "is PDNG, every TransactionInformationAndStatus[*].TransactionStatus must differ "
+                            + "from RJCT (GroupStatusPendingRule)."
+                    );
 
-        // ── GroupStatusReceivedRule ───────────────────────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                !x.OriginalGroupInformationAndStatus.Any(g =>
-                    g.GroupStatus == ExternalPaymentGroupStatus1Code.Received
-                )
-                || x.TransactionInformationAndStatus.All(t => t.TransactionStatus is null)
-            )
-            .WithName("GroupStatusReceivedRule")
-            .WithMessage(
-                "FIToFIPaymentStatusReportV16: if any OriginalGroupInformationAndStatus[*].GroupStatus "
-                    + "is RCVD, every TransactionInformationAndStatus[*].TransactionStatus must be "
-                    + "absent (GroupStatusReceivedRule)."
-            );
+                // ── GroupStatusRejectedRule ───────────────────────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        !x.OriginalGroupInformationAndStatus.Any(g =>
+                            g.GroupStatus == ExternalPaymentGroupStatus1Code.Rejected
+                        )
+                        || x.TransactionInformationAndStatus.All(t =>
+                            t.TransactionStatus is null || t.TransactionStatus == ExternalPaymentTransactionStatus1Code.Rejected
+                        )
+                    )
+                    .WithName("GroupStatusRejectedRule")
+                    .WithMessage(
+                        "FIToFIPaymentStatusReportV16: if any OriginalGroupInformationAndStatus[*].GroupStatus "
+                            + "is RJCT, every TransactionInformationAndStatus[*].TransactionStatus, when "
+                            + "present, must equal RJCT (GroupStatusRejectedRule)."
+                    );
+
+                // ── GroupStatusReceivedRule ───────────────────────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        !x.OriginalGroupInformationAndStatus.Any(g =>
+                            g.GroupStatus == ExternalPaymentGroupStatus1Code.Received
+                        )
+                        || x.TransactionInformationAndStatus.All(t => t.TransactionStatus is null)
+                    )
+                    .WithName("GroupStatusReceivedRule")
+                    .WithMessage(
+                        "FIToFIPaymentStatusReportV16: if any OriginalGroupInformationAndStatus[*].GroupStatus "
+                            + "is RCVD, every TransactionInformationAndStatus[*].TransactionStatus must be "
+                            + "absent (GroupStatusReceivedRule)."
+                    );
+            }
+        );
     }
 
     /// <summary>

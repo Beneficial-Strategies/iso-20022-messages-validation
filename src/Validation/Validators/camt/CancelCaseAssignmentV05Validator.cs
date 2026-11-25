@@ -59,6 +59,10 @@ public class CancelCaseAssignmentV05Validator : AbstractValidator<ICancelCaseAss
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Assignment).NotNull().WithMessage("CancelCaseAssignmentV05.Assignment is required (1..1).");
+        RuleFor(x => x.Case).NotNull().WithMessage("CancelCaseAssignmentV05.Case is required (1..1).");
+
         RuleFor(x => x.Assignment).SetValidator(assignmentValidator);
         RuleFor(x => x.Case).SetValidator(caseValidator);
         RuleForEach(x => x.SupplementaryData).SetValidator(supplementaryDataValidator);

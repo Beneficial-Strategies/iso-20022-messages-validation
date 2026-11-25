@@ -73,6 +73,9 @@ public class MandateCopyRequestV04Validator : AbstractValidator<IMandateCopyRequ
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.GroupHeader).NotNull().WithMessage("MandateCopyRequestV04.GroupHeader is required (1..1).");
+
         RuleFor(x => x.GroupHeader).SetValidator(groupHeaderValidator);
         RuleForEach(x => x.UnderlyingCopyRequestDetails)
             .SetValidator(underlyingCopyRequestDetailsValidator);

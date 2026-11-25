@@ -67,6 +67,11 @@ public class ModifyReservationV07Validator : AbstractValidator<IModifyReservatio
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.MessageHeader).NotNull().WithMessage("ModifyReservationV07.MessageHeader is required (1..1).");
+        RuleFor(x => x.ReservationIdentification).NotNull().WithMessage("ModifyReservationV07.ReservationIdentification is required (1..1).");
+        RuleFor(x => x.NewReservationValueSet).NotNull().WithMessage("ModifyReservationV07.NewReservationValueSet is required (1..1).");
+
         RuleFor(x => x.MessageHeader).SetValidator(messageHeaderValidator);
         RuleFor(x => x.ReservationIdentification).SetValidator(reservationIdentificationValidator);
         RuleFor(x => x.NewReservationValueSet).SetValidator(newReservationValueSetValidator);

@@ -115,165 +115,175 @@ public class PaymentReturnV15Validator : AbstractValidator<IPaymentReturnV15>
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
-        RuleFor(x => x.GroupHeader).SetValidator(groupHeaderValidator!);
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.GroupHeader).NotNull().WithMessage("PaymentReturnV15.GroupHeader is required (1..1).");
 
+        // The rules below read these members, so they run only when they are present.
         When(
-            x => x.OriginalGroupInformation is not null,
-            () => RuleFor(x => x.OriginalGroupInformation).SetValidator(originalGroupInformationValidator!)
+            x => x.GroupHeader is not null,
+            () =>
+            {
+                RuleFor(x => x.GroupHeader).SetValidator(groupHeaderValidator!);
+
+                When(
+                    x => x.OriginalGroupInformation is not null,
+                    () => RuleFor(x => x.OriginalGroupInformation).SetValidator(originalGroupInformationValidator!)
+                );
+
+                RuleForEach(x => x.TransactionInformation).SetValidator(transactionInformationValidator!);
+                RuleForEach(x => x.SupplementaryData).SetValidator(supplementaryDataValidator!);
+
+                // ── GroupReturnAndTransactionInformationNotPresentRule ───────────────────────
+                RuleFor(x => x)
+                    .Must(x => x.GroupHeader.GroupReturn?.BoolValue != true || x.TransactionInformation.Count() == 0)
+                    .WithName("GroupReturnAndTransactionInformationNotPresentRule")
+                    .WithMessage(
+                        "PaymentReturnV15: if GroupHeader.GroupReturn is true, "
+                            + "TransactionInformation is not allowed (GroupReturnAndTransactionInformationNotPresentRule)."
+                    );
+
+                // ── GroupReturnAndTransactionInformationPresentRule ──────────────────────────
+                RuleFor(x => x)
+                    .Must(x => x.GroupHeader.GroupReturn?.BoolValue != false || x.TransactionInformation.Count() >= 1)
+                    .WithName("GroupReturnAndTransactionInformationPresentRule")
+                    .WithMessage(
+                        "PaymentReturnV15: if GroupHeader.GroupReturn is false, at least one "
+                            + "TransactionInformation must be present (GroupReturnAndTransactionInformationPresentRule)."
+                    );
+
+                // ── GroupReturnAndReturnReasonRule ────────────────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.GroupReturn?.BoolValue != true
+                        || (x.OriginalGroupInformation?.ReturnReasonInformation.Any(r => r.Reason is not null) ?? false)
+                    )
+                    .WithName("GroupReturnAndReturnReasonRule")
+                    .WithMessage(
+                        "PaymentReturnV15: if GroupHeader.GroupReturn is true, "
+                            + "OriginalGroupInformation.ReturnReasonInformation[*].Reason must be present (GroupReturnAndReturnReasonRule)."
+                    );
+
+                // ── InstructedAgentRule ───────────────────────────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.InstructedAgent is null
+                        || x.TransactionInformation.All(t => t.InstructedAgent is null)
+                    )
+                    .WithName("InstructedAgentRule")
+                    .WithMessage(
+                        "PaymentReturnV15: if GroupHeader.InstructedAgent is present, every "
+                            + "TransactionInformation[*].InstructedAgent must be absent (InstructedAgentRule)."
+                    );
+
+                // ── InstructingAgentRule ──────────────────────────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.InstructingAgent is null
+                        || x.TransactionInformation.All(t => t.InstructingAgent is null)
+                    )
+                    .WithName("InstructingAgentRule")
+                    .WithMessage(
+                        "PaymentReturnV15: if GroupHeader.InstructingAgent is present, every "
+                            + "TransactionInformation[*].InstructingAgent must be absent (InstructingAgentRule)."
+                    );
+
+                // ── GroupHeaderInterbankSettlementDateRule ───────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.InterbankSettlementDate is null
+                        || x.TransactionInformation.All(t => t.InterbankSettlementDate is null)
+                    )
+                    .WithName("GroupHeaderInterbankSettlementDateRule")
+                    .WithMessage(
+                        "PaymentReturnV15: if GroupHeader.InterbankSettlementDate is present, "
+                            + "every TransactionInformation[*].InterbankSettlementDate must be absent "
+                            + "(GroupHeaderInterbankSettlementDateRule)."
+                    );
+
+                // ── TransactionInterbankSettlementDateRule ───────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.InterbankSettlementDate is not null
+                        || x.TransactionInformation.All(t => t.InterbankSettlementDate is not null)
+                    )
+                    .WithName("TransactionInterbankSettlementDateRule")
+                    .WithMessage(
+                        "PaymentReturnV15: if GroupHeader.InterbankSettlementDate is absent, "
+                            + "every TransactionInformation[*].InterbankSettlementDate must be present "
+                            + "(TransactionInterbankSettlementDateRule)."
+                    );
+
+                // ── GroupReturnAndNumberOfTransactionsRule ───────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.GroupReturn?.BoolValue != false
+                        || (int.TryParse((string)x.GroupHeader.NumberOfTransactions, out var n)
+                            && n == x.TransactionInformation.Count())
+                    )
+                    .WithName("GroupReturnAndNumberOfTransactionsRule")
+                    .WithMessage(
+                        "PaymentReturnV15: if GroupHeader.GroupReturn is false, "
+                            + "GroupHeader.NumberOfTransactions must equal the count of TransactionInformation "
+                            + "(GroupReturnAndNumberOfTransactionsRule)."
+                    );
+
+                // ── TotalReturnedInterbankSettlementAmountRule ───────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.TotalReturnedInterbankSettlementAmount is null
+                        || x.TransactionInformation.All(t =>
+                            t.ReturnedInterbankSettlementAmount.Currency
+                            == x.GroupHeader.TotalReturnedInterbankSettlementAmount.Currency
+                        )
+                    )
+                    .WithName("TotalReturnedInterbankSettlementAmountRule")
+                    .WithMessage(
+                        "PaymentReturnV15: if GroupHeader.TotalReturnedInterbankSettlementAmount "
+                            + "is present, every TransactionInformation[*].ReturnedInterbankSettlementAmount "
+                            + "must share its currency (TotalReturnedInterbankSettlementAmountRule)."
+                    );
+
+                // ── TotalReturnedInterbankSettlementAmountAndSumRule ─────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.TotalReturnedInterbankSettlementAmount is null
+                        || x.GroupHeader.TotalReturnedInterbankSettlementAmount.Amount
+                            == x.TransactionInformation.Sum(t => t.ReturnedInterbankSettlementAmount.Amount)
+                    )
+                    .WithName("TotalReturnedInterbankSettlementAmountAndSumRule")
+                    .WithMessage(
+                        "PaymentReturnV15: GroupHeader.TotalReturnedInterbankSettlementAmount, "
+                            + "when present, must equal the sum of all "
+                            + "TransactionInformation[*].ReturnedInterbankSettlementAmount "
+                            + "(TotalReturnedInterbankSettlementAmountAndSumRule)."
+                    );
+
+                // ── OriginalGroupInformationRule ──────────────────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.OriginalGroupInformation is null
+                        || x.TransactionInformation.All(t => t.OriginalGroupInformation is null)
+                    )
+                    .WithName("OriginalGroupInformationRule")
+                    .WithMessage(
+                        "PaymentReturnV15: if (message-level) OriginalGroupInformation is present, "
+                            + "every TransactionInformation[*].OriginalGroupInformation must be absent "
+                            + "(OriginalGroupInformationRule)."
+                    );
+
+                // ── PaymentTypeInformationRule ────────────────────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.PaymentTypeInformation is null
+                        || x.TransactionInformation.All(t => t.PaymentTypeInformation is null)
+                    )
+                    .WithName("PaymentTypeInformationRule")
+                    .WithMessage(
+                        "PaymentReturnV15: if GroupHeader.PaymentTypeInformation is present, every "
+                            + "TransactionInformation[*].PaymentTypeInformation must be absent (PaymentTypeInformationRule)."
+                    );
+            }
         );
-
-        RuleForEach(x => x.TransactionInformation).SetValidator(transactionInformationValidator!);
-        RuleForEach(x => x.SupplementaryData).SetValidator(supplementaryDataValidator!);
-
-        // ── GroupReturnAndTransactionInformationNotPresentRule ───────────────────────
-        RuleFor(x => x)
-            .Must(x => x.GroupHeader.GroupReturn?.BoolValue != true || x.TransactionInformation.Count() == 0)
-            .WithName("GroupReturnAndTransactionInformationNotPresentRule")
-            .WithMessage(
-                "PaymentReturnV15: if GroupHeader.GroupReturn is true, "
-                    + "TransactionInformation is not allowed (GroupReturnAndTransactionInformationNotPresentRule)."
-            );
-
-        // ── GroupReturnAndTransactionInformationPresentRule ──────────────────────────
-        RuleFor(x => x)
-            .Must(x => x.GroupHeader.GroupReturn?.BoolValue != false || x.TransactionInformation.Count() >= 1)
-            .WithName("GroupReturnAndTransactionInformationPresentRule")
-            .WithMessage(
-                "PaymentReturnV15: if GroupHeader.GroupReturn is false, at least one "
-                    + "TransactionInformation must be present (GroupReturnAndTransactionInformationPresentRule)."
-            );
-
-        // ── GroupReturnAndReturnReasonRule ────────────────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.GroupReturn?.BoolValue != true
-                || (x.OriginalGroupInformation?.ReturnReasonInformation.Any(r => r.Reason is not null) ?? false)
-            )
-            .WithName("GroupReturnAndReturnReasonRule")
-            .WithMessage(
-                "PaymentReturnV15: if GroupHeader.GroupReturn is true, "
-                    + "OriginalGroupInformation.ReturnReasonInformation[*].Reason must be present (GroupReturnAndReturnReasonRule)."
-            );
-
-        // ── InstructedAgentRule ───────────────────────────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.InstructedAgent is null
-                || x.TransactionInformation.All(t => t.InstructedAgent is null)
-            )
-            .WithName("InstructedAgentRule")
-            .WithMessage(
-                "PaymentReturnV15: if GroupHeader.InstructedAgent is present, every "
-                    + "TransactionInformation[*].InstructedAgent must be absent (InstructedAgentRule)."
-            );
-
-        // ── InstructingAgentRule ──────────────────────────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.InstructingAgent is null
-                || x.TransactionInformation.All(t => t.InstructingAgent is null)
-            )
-            .WithName("InstructingAgentRule")
-            .WithMessage(
-                "PaymentReturnV15: if GroupHeader.InstructingAgent is present, every "
-                    + "TransactionInformation[*].InstructingAgent must be absent (InstructingAgentRule)."
-            );
-
-        // ── GroupHeaderInterbankSettlementDateRule ───────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.InterbankSettlementDate is null
-                || x.TransactionInformation.All(t => t.InterbankSettlementDate is null)
-            )
-            .WithName("GroupHeaderInterbankSettlementDateRule")
-            .WithMessage(
-                "PaymentReturnV15: if GroupHeader.InterbankSettlementDate is present, "
-                    + "every TransactionInformation[*].InterbankSettlementDate must be absent "
-                    + "(GroupHeaderInterbankSettlementDateRule)."
-            );
-
-        // ── TransactionInterbankSettlementDateRule ───────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.InterbankSettlementDate is not null
-                || x.TransactionInformation.All(t => t.InterbankSettlementDate is not null)
-            )
-            .WithName("TransactionInterbankSettlementDateRule")
-            .WithMessage(
-                "PaymentReturnV15: if GroupHeader.InterbankSettlementDate is absent, "
-                    + "every TransactionInformation[*].InterbankSettlementDate must be present "
-                    + "(TransactionInterbankSettlementDateRule)."
-            );
-
-        // ── GroupReturnAndNumberOfTransactionsRule ───────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.GroupReturn?.BoolValue != false
-                || (int.TryParse((string)x.GroupHeader.NumberOfTransactions, out var n)
-                    && n == x.TransactionInformation.Count())
-            )
-            .WithName("GroupReturnAndNumberOfTransactionsRule")
-            .WithMessage(
-                "PaymentReturnV15: if GroupHeader.GroupReturn is false, "
-                    + "GroupHeader.NumberOfTransactions must equal the count of TransactionInformation "
-                    + "(GroupReturnAndNumberOfTransactionsRule)."
-            );
-
-        // ── TotalReturnedInterbankSettlementAmountRule ───────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.TotalReturnedInterbankSettlementAmount is null
-                || x.TransactionInformation.All(t =>
-                    t.ReturnedInterbankSettlementAmount.Currency
-                    == x.GroupHeader.TotalReturnedInterbankSettlementAmount.Currency
-                )
-            )
-            .WithName("TotalReturnedInterbankSettlementAmountRule")
-            .WithMessage(
-                "PaymentReturnV15: if GroupHeader.TotalReturnedInterbankSettlementAmount "
-                    + "is present, every TransactionInformation[*].ReturnedInterbankSettlementAmount "
-                    + "must share its currency (TotalReturnedInterbankSettlementAmountRule)."
-            );
-
-        // ── TotalReturnedInterbankSettlementAmountAndSumRule ─────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.TotalReturnedInterbankSettlementAmount is null
-                || x.GroupHeader.TotalReturnedInterbankSettlementAmount.Amount
-                    == x.TransactionInformation.Sum(t => t.ReturnedInterbankSettlementAmount.Amount)
-            )
-            .WithName("TotalReturnedInterbankSettlementAmountAndSumRule")
-            .WithMessage(
-                "PaymentReturnV15: GroupHeader.TotalReturnedInterbankSettlementAmount, "
-                    + "when present, must equal the sum of all "
-                    + "TransactionInformation[*].ReturnedInterbankSettlementAmount "
-                    + "(TotalReturnedInterbankSettlementAmountAndSumRule)."
-            );
-
-        // ── OriginalGroupInformationRule ──────────────────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.OriginalGroupInformation is null
-                || x.TransactionInformation.All(t => t.OriginalGroupInformation is null)
-            )
-            .WithName("OriginalGroupInformationRule")
-            .WithMessage(
-                "PaymentReturnV15: if (message-level) OriginalGroupInformation is present, "
-                    + "every TransactionInformation[*].OriginalGroupInformation must be absent "
-                    + "(OriginalGroupInformationRule)."
-            );
-
-        // ── PaymentTypeInformationRule ────────────────────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.PaymentTypeInformation is null
-                || x.TransactionInformation.All(t => t.PaymentTypeInformation is null)
-            )
-            .WithName("PaymentTypeInformationRule")
-            .WithMessage(
-                "PaymentReturnV15: if GroupHeader.PaymentTypeInformation is present, every "
-                    + "TransactionInformation[*].PaymentTypeInformation must be absent (PaymentTypeInformationRule)."
-            );
     }
 
     /// <summary>

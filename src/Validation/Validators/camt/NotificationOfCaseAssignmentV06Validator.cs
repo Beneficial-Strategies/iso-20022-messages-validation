@@ -77,6 +77,12 @@ public class NotificationOfCaseAssignmentV06Validator : AbstractValidator<INotif
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Header).NotNull().WithMessage("NotificationOfCaseAssignmentV06.Header is required (1..1).");
+        RuleFor(x => x.Case).NotNull().WithMessage("NotificationOfCaseAssignmentV06.Case is required (1..1).");
+        RuleFor(x => x.Assignment).NotNull().WithMessage("NotificationOfCaseAssignmentV06.Assignment is required (1..1).");
+        RuleFor(x => x.Notification).NotNull().WithMessage("NotificationOfCaseAssignmentV06.Notification is required (1..1).");
+
         RuleFor(x => x.Header).SetValidator(headerValidator);
         RuleFor(x => x.Case).SetValidator(caseValidator);
         RuleFor(x => x.Assignment).SetValidator(assignmentValidator);

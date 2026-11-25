@@ -72,6 +72,9 @@ public class MandateSuspensionRequestV04Validator : AbstractValidator<IMandateSu
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.GroupHeader).NotNull().WithMessage("MandateSuspensionRequestV04.GroupHeader is required (1..1).");
+
         RuleFor(x => x.GroupHeader).SetValidator(groupHeaderValidator);
         RuleForEach(x => x.UnderlyingSuspensionDetails).SetValidator(underlyingSuspensionDetailsValidator);
         RuleForEach(x => x.SupplementaryData).SetValidator(supplementaryDataValidator);

@@ -77,50 +77,60 @@ public class FIToFIPaymentStatusRequestV07Validator : AbstractValidator<IFIToFIP
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
-        RuleFor(x => x.GroupHeader).SetValidator(groupHeaderValidator!);
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.GroupHeader).NotNull().WithMessage("FIToFIPaymentStatusRequestV07.GroupHeader is required (1..1).");
 
-        RuleForEach(x => x.OriginalGroupInformation).SetValidator(originalGroupInformationValidator!);
-        RuleForEach(x => x.TransactionInformation).SetValidator(transactionInformationValidator!);
-        RuleForEach(x => x.SupplementaryData).SetValidator(supplementaryDataValidator!);
+        // The rules below read these members, so they run only when they are present.
+        When(
+            x => x.GroupHeader is not null,
+            () =>
+            {
+                RuleFor(x => x.GroupHeader).SetValidator(groupHeaderValidator!);
 
-        // ── OriginalGroupInformationAbsenceRule ──────────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.OriginalGroupInformation.Count() != 0
-                || x.TransactionInformation.All(t => t.OriginalGroupInformation is not null)
-            )
-            .WithName("OriginalGroupInformationAbsenceRule")
-            .WithMessage(
-                "FIToFIPaymentStatusRequestV07: if OriginalGroupInformation is absent, every "
-                    + "TransactionInformation[*].OriginalGroupInformation must be present "
-                    + "(OriginalGroupInformationAbsenceRule)."
-            );
+                RuleForEach(x => x.OriginalGroupInformation).SetValidator(originalGroupInformationValidator!);
+                RuleForEach(x => x.TransactionInformation).SetValidator(transactionInformationValidator!);
+                RuleForEach(x => x.SupplementaryData).SetValidator(supplementaryDataValidator!);
 
-        // ── OriginalGroupInformationSinglePresenceRule ───────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.OriginalGroupInformation.Count() != 1
-                || x.TransactionInformation.All(t => t.OriginalGroupInformation is null)
-            )
-            .WithName("OriginalGroupInformationSinglePresenceRule")
-            .WithMessage(
-                "FIToFIPaymentStatusRequestV07: if OriginalGroupInformation is present exactly "
-                    + "once, every TransactionInformation[*].OriginalGroupInformation must be "
-                    + "absent (OriginalGroupInformationSinglePresenceRule)."
-            );
+                // ── OriginalGroupInformationAbsenceRule ──────────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.OriginalGroupInformation.Count() != 0
+                        || x.TransactionInformation.All(t => t.OriginalGroupInformation is not null)
+                    )
+                    .WithName("OriginalGroupInformationAbsenceRule")
+                    .WithMessage(
+                        "FIToFIPaymentStatusRequestV07: if OriginalGroupInformation is absent, every "
+                            + "TransactionInformation[*].OriginalGroupInformation must be present "
+                            + "(OriginalGroupInformationAbsenceRule)."
+                    );
 
-        // ── OriginalGroupInformationMultiplePresenceRule ─────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.OriginalGroupInformation.Count() <= 1
-                || x.TransactionInformation.All(t => t.OriginalGroupInformation is not null)
-            )
-            .WithName("OriginalGroupInformationMultiplePresenceRule")
-            .WithMessage(
-                "FIToFIPaymentStatusRequestV07: if OriginalGroupInformation is present more than "
-                    + "once, every TransactionInformation[*].OriginalGroupInformation must be "
-                    + "present (OriginalGroupInformationMultiplePresenceRule)."
-            );
+                // ── OriginalGroupInformationSinglePresenceRule ───────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.OriginalGroupInformation.Count() != 1
+                        || x.TransactionInformation.All(t => t.OriginalGroupInformation is null)
+                    )
+                    .WithName("OriginalGroupInformationSinglePresenceRule")
+                    .WithMessage(
+                        "FIToFIPaymentStatusRequestV07: if OriginalGroupInformation is present exactly "
+                            + "once, every TransactionInformation[*].OriginalGroupInformation must be "
+                            + "absent (OriginalGroupInformationSinglePresenceRule)."
+                    );
+
+                // ── OriginalGroupInformationMultiplePresenceRule ─────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.OriginalGroupInformation.Count() <= 1
+                        || x.TransactionInformation.All(t => t.OriginalGroupInformation is not null)
+                    )
+                    .WithName("OriginalGroupInformationMultiplePresenceRule")
+                    .WithMessage(
+                        "FIToFIPaymentStatusRequestV07: if OriginalGroupInformation is present more than "
+                            + "once, every TransactionInformation[*].OriginalGroupInformation must be "
+                            + "present (OriginalGroupInformationMultiplePresenceRule)."
+                    );
+            }
+        );
     }
 
     /// <summary>

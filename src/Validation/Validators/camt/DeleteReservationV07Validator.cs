@@ -58,6 +58,9 @@ public class DeleteReservationV07Validator : AbstractValidator<IDeleteReservatio
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.MessageHeader).NotNull().WithMessage("DeleteReservationV07.MessageHeader is required (1..1).");
+
         RuleFor(x => x.MessageHeader).SetValidator(messageHeaderValidator);
 
         When(

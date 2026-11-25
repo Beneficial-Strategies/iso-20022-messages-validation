@@ -96,132 +96,142 @@ public class FIToFICustomerCreditTransferV14Validator : AbstractValidator<IFIToF
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
-        RuleFor(x => x.GroupHeader).SetValidator(groupHeaderValidator!);
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.GroupHeader).NotNull().WithMessage("FIToFICustomerCreditTransferV14.GroupHeader is required (1..1).");
 
-        RuleForEach(x => x.CreditTransferTransactionInformation)
-            .SetValidator(creditTransferTransactionInformationValidator!);
-        RuleForEach(x => x.SupplementaryData).SetValidator(supplementaryDataValidator!);
+        // The rules below read these members, so they run only when they are present.
+        When(
+            x => x.GroupHeader is not null,
+            () =>
+            {
+                RuleFor(x => x.GroupHeader).SetValidator(groupHeaderValidator!);
 
-        // ── InstructedAgentRule ───────────────────────────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.InstructedAgent is null
-                || x.CreditTransferTransactionInformation.All(t => t.InstructedAgent is null)
-            )
-            .WithName("InstructedAgentRule")
-            .WithMessage(
-                "FIToFICustomerCreditTransferV14: if GroupHeader.InstructedAgent is present, every "
-                    + "CreditTransferTransactionInformation[*].InstructedAgent must be absent (InstructedAgentRule)."
-            );
+                RuleForEach(x => x.CreditTransferTransactionInformation)
+                    .SetValidator(creditTransferTransactionInformationValidator!);
+                RuleForEach(x => x.SupplementaryData).SetValidator(supplementaryDataValidator!);
 
-        // ── InstructingAgentRule ──────────────────────────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.InstructingAgent is null
-                || x.CreditTransferTransactionInformation.All(t => t.InstructingAgent is null)
-            )
-            .WithName("InstructingAgentRule")
-            .WithMessage(
-                "FIToFICustomerCreditTransferV14: if GroupHeader.InstructingAgent is present, every "
-                    + "CreditTransferTransactionInformation[*].InstructingAgent must be absent (InstructingAgentRule)."
-            );
+                // ── InstructedAgentRule ───────────────────────────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.InstructedAgent is null
+                        || x.CreditTransferTransactionInformation.All(t => t.InstructedAgent is null)
+                    )
+                    .WithName("InstructedAgentRule")
+                    .WithMessage(
+                        "FIToFICustomerCreditTransferV14: if GroupHeader.InstructedAgent is present, every "
+                            + "CreditTransferTransactionInformation[*].InstructedAgent must be absent (InstructedAgentRule)."
+                    );
 
-        // ── TotalInterbankSettlementAmountRule ───────────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.TotalInterbankSettlementAmount is null
-                || x.CreditTransferTransactionInformation.All(t =>
-                    t.InterbankSettlementAmount.Currency == x.GroupHeader.TotalInterbankSettlementAmount.Currency
-                )
-            )
-            .WithName("TotalInterbankSettlementAmountRule")
-            .WithMessage(
-                "FIToFICustomerCreditTransferV14: if GroupHeader.TotalInterbankSettlementAmount is "
-                    + "present, every CreditTransferTransactionInformation[*].InterbankSettlementAmount "
-                    + "must share its currency (TotalInterbankSettlementAmountRule)."
-            );
+                // ── InstructingAgentRule ──────────────────────────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.InstructingAgent is null
+                        || x.CreditTransferTransactionInformation.All(t => t.InstructingAgent is null)
+                    )
+                    .WithName("InstructingAgentRule")
+                    .WithMessage(
+                        "FIToFICustomerCreditTransferV14: if GroupHeader.InstructingAgent is present, every "
+                            + "CreditTransferTransactionInformation[*].InstructingAgent must be absent (InstructingAgentRule)."
+                    );
 
-        // ── TotalInterbankSettlementAmountAndSumRule ─────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.TotalInterbankSettlementAmount is null
-                || x.GroupHeader.TotalInterbankSettlementAmount.Amount
-                    == x.CreditTransferTransactionInformation.Sum(t => t.InterbankSettlementAmount.Amount)
-            )
-            .WithName("TotalInterbankSettlementAmountAndSumRule")
-            .WithMessage(
-                "FIToFICustomerCreditTransferV14: GroupHeader.TotalInterbankSettlementAmount, when "
-                    + "present, must equal the sum of all "
-                    + "CreditTransferTransactionInformation[*].InterbankSettlementAmount "
-                    + "(TotalInterbankSettlementAmountAndSumRule)."
-            );
+                // ── TotalInterbankSettlementAmountRule ───────────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.TotalInterbankSettlementAmount is null
+                        || x.CreditTransferTransactionInformation.All(t =>
+                            t.InterbankSettlementAmount.Currency == x.GroupHeader.TotalInterbankSettlementAmount.Currency
+                        )
+                    )
+                    .WithName("TotalInterbankSettlementAmountRule")
+                    .WithMessage(
+                        "FIToFICustomerCreditTransferV14: if GroupHeader.TotalInterbankSettlementAmount is "
+                            + "present, every CreditTransferTransactionInformation[*].InterbankSettlementAmount "
+                            + "must share its currency (TotalInterbankSettlementAmountRule)."
+                    );
 
-        // ── GroupHeaderInterbankSettlementDateRule ───────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.InterbankSettlementDate is null
-                || x.CreditTransferTransactionInformation.All(t => t.InterbankSettlementDate is null)
-            )
-            .WithName("GroupHeaderInterbankSettlementDateRule")
-            .WithMessage(
-                "FIToFICustomerCreditTransferV14: if GroupHeader.InterbankSettlementDate is "
-                    + "present, every CreditTransferTransactionInformation[*].InterbankSettlementDate "
-                    + "must be absent (GroupHeaderInterbankSettlementDateRule)."
-            );
+                // ── TotalInterbankSettlementAmountAndSumRule ─────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.TotalInterbankSettlementAmount is null
+                        || x.GroupHeader.TotalInterbankSettlementAmount.Amount
+                            == x.CreditTransferTransactionInformation.Sum(t => t.InterbankSettlementAmount.Amount)
+                    )
+                    .WithName("TotalInterbankSettlementAmountAndSumRule")
+                    .WithMessage(
+                        "FIToFICustomerCreditTransferV14: GroupHeader.TotalInterbankSettlementAmount, when "
+                            + "present, must equal the sum of all "
+                            + "CreditTransferTransactionInformation[*].InterbankSettlementAmount "
+                            + "(TotalInterbankSettlementAmountAndSumRule)."
+                    );
 
-        // ── TransactionInterbankSettlementDateRule ───────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.InterbankSettlementDate is not null
-                || x.CreditTransferTransactionInformation.All(t => t.InterbankSettlementDate is not null)
-            )
-            .WithName("TransactionInterbankSettlementDateRule")
-            .WithMessage(
-                "FIToFICustomerCreditTransferV14: if GroupHeader.InterbankSettlementDate is "
-                    + "absent, every CreditTransferTransactionInformation[*].InterbankSettlementDate "
-                    + "must be present (TransactionInterbankSettlementDateRule)."
-            );
+                // ── GroupHeaderInterbankSettlementDateRule ───────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.InterbankSettlementDate is null
+                        || x.CreditTransferTransactionInformation.All(t => t.InterbankSettlementDate is null)
+                    )
+                    .WithName("GroupHeaderInterbankSettlementDateRule")
+                    .WithMessage(
+                        "FIToFICustomerCreditTransferV14: if GroupHeader.InterbankSettlementDate is "
+                            + "present, every CreditTransferTransactionInformation[*].InterbankSettlementDate "
+                            + "must be absent (GroupHeaderInterbankSettlementDateRule)."
+                    );
 
-        // ── PaymentTypeInformationRule ────────────────────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.PaymentTypeInformation is null
-                || x.CreditTransferTransactionInformation.All(t => t.PaymentTypeInformation is null)
-            )
-            .WithName("PaymentTypeInformationRule")
-            .WithMessage(
-                "FIToFICustomerCreditTransferV14: if GroupHeader.PaymentTypeInformation is "
-                    + "present, every CreditTransferTransactionInformation[*].PaymentTypeInformation "
-                    + "must be absent (PaymentTypeInformationRule)."
-            );
+                // ── TransactionInterbankSettlementDateRule ───────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.InterbankSettlementDate is not null
+                        || x.CreditTransferTransactionInformation.All(t => t.InterbankSettlementDate is not null)
+                    )
+                    .WithName("TransactionInterbankSettlementDateRule")
+                    .WithMessage(
+                        "FIToFICustomerCreditTransferV14: if GroupHeader.InterbankSettlementDate is "
+                            + "absent, every CreditTransferTransactionInformation[*].InterbankSettlementDate "
+                            + "must be present (TransactionInterbankSettlementDateRule)."
+                    );
 
-        // ── NumberOfTransactionsAndCreditTransfersRule ───────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                int.TryParse((string)x.GroupHeader.NumberOfTransactions, out var n)
-                && n == x.CreditTransferTransactionInformation.Count()
-            )
-            .WithName("NumberOfTransactionsAndCreditTransfersRule")
-            .WithMessage(
-                "FIToFICustomerCreditTransferV14: GroupHeader.NumberOfTransactions must equal the "
-                    + "count of CreditTransferTransactionInformation "
-                    + "(NumberOfTransactionsAndCreditTransfersRule)."
-            );
+                // ── PaymentTypeInformationRule ────────────────────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.PaymentTypeInformation is null
+                        || x.CreditTransferTransactionInformation.All(t => t.PaymentTypeInformation is null)
+                    )
+                    .WithName("PaymentTypeInformationRule")
+                    .WithMessage(
+                        "FIToFICustomerCreditTransferV14: if GroupHeader.PaymentTypeInformation is "
+                            + "present, every CreditTransferTransactionInformation[*].PaymentTypeInformation "
+                            + "must be absent (PaymentTypeInformationRule)."
+                    );
 
-        // ── GroupHeaderExpiryDateTimeRule ─────────────────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.ExpiryDateTime is null
-                || x.CreditTransferTransactionInformation.All(t =>
-                    t.AdditionalDateTime is null || t.AdditionalDateTime.ExpiryDateTime is null
-                )
-            )
-            .WithName("GroupHeaderExpiryDateTimeRule")
-            .WithMessage(
-                "FIToFICustomerCreditTransferV14: if GroupHeader.ExpiryDateTime is present, every "
-                    + "CreditTransferTransactionInformation[*].AdditionalDateTime.ExpiryDateTime "
-                    + "must be absent (GroupHeaderExpiryDateTimeRule)."
-            );
+                // ── NumberOfTransactionsAndCreditTransfersRule ───────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        int.TryParse((string)x.GroupHeader.NumberOfTransactions, out var n)
+                        && n == x.CreditTransferTransactionInformation.Count()
+                    )
+                    .WithName("NumberOfTransactionsAndCreditTransfersRule")
+                    .WithMessage(
+                        "FIToFICustomerCreditTransferV14: GroupHeader.NumberOfTransactions must equal the "
+                            + "count of CreditTransferTransactionInformation "
+                            + "(NumberOfTransactionsAndCreditTransfersRule)."
+                    );
+
+                // ── GroupHeaderExpiryDateTimeRule ─────────────────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.ExpiryDateTime is null
+                        || x.CreditTransferTransactionInformation.All(t =>
+                            t.AdditionalDateTime is null || t.AdditionalDateTime.ExpiryDateTime is null
+                        )
+                    )
+                    .WithName("GroupHeaderExpiryDateTimeRule")
+                    .WithMessage(
+                        "FIToFICustomerCreditTransferV14: if GroupHeader.ExpiryDateTime is present, every "
+                            + "CreditTransferTransactionInformation[*].AdditionalDateTime.ExpiryDateTime "
+                            + "must be absent (GroupHeaderExpiryDateTimeRule)."
+                    );
+            }
+        );
     }
 
     /// <summary>

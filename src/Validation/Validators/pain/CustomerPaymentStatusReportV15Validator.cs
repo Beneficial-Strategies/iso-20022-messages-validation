@@ -98,59 +98,70 @@ public class CustomerPaymentStatusReportV15Validator : AbstractValidator<ICustom
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
-        RuleFor(x => x.GroupHeader).SetValidator(groupHeaderValidator!);
-        RuleFor(x => x.OriginalGroupInformationAndStatus).SetValidator(originalGroupInformationAndStatusValidator!);
-        RuleForEach(x => x.OriginalPaymentInformationAndStatus)
-            .SetValidator(originalPaymentInformationAndStatusValidator!);
-        RuleForEach(x => x.SupplementaryData).SetValidator(supplementaryDataValidator!);
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.GroupHeader).NotNull().WithMessage("CustomerPaymentStatusReportV15.GroupHeader is required (1..1).");
+        RuleFor(x => x.OriginalGroupInformationAndStatus).NotNull().WithMessage("CustomerPaymentStatusReportV15.OriginalGroupInformationAndStatus is required (1..1).");
 
-        RuleFor(x => x)
-            .Must(x =>
-                x.OriginalGroupInformationAndStatus.GroupStatus is not { } status
-                || !AcceptedStatuses.Contains(status)
-                || x.OriginalPaymentInformationAndStatus.All(p =>
-                    p.PaymentInformationStatus != ExternalPaymentGroupStatus1Code.Rejected
-                )
-            )
-            .WithName("GroupStatusAcceptedRule")
-            .WithMessage(
-                "CustomerPaymentStatusReportV15: when OriginalGroupInformationAndStatus.GroupStatus is ACTC/ACCP/ACSP/ACSC/ACWC, no OriginalPaymentInformationAndStatus entry's PaymentInformationStatus may be RJCT (GroupStatusAcceptedRule)."
-            );
+        // The rules below read these members, so they run only when they are present.
+        When(
+            x => x.GroupHeader is not null && x.OriginalGroupInformationAndStatus is not null,
+            () =>
+            {
+                RuleFor(x => x.GroupHeader).SetValidator(groupHeaderValidator!);
+                RuleFor(x => x.OriginalGroupInformationAndStatus).SetValidator(originalGroupInformationAndStatusValidator!);
+                RuleForEach(x => x.OriginalPaymentInformationAndStatus)
+                    .SetValidator(originalPaymentInformationAndStatusValidator!);
+                RuleForEach(x => x.SupplementaryData).SetValidator(supplementaryDataValidator!);
 
-        RuleFor(x => x)
-            .Must(x =>
-                x.OriginalGroupInformationAndStatus.GroupStatus != ExternalPaymentGroupStatus1Code.Pending
-                || x.OriginalPaymentInformationAndStatus.All(p =>
-                    p.PaymentInformationStatus != ExternalPaymentGroupStatus1Code.Rejected
-                )
-            )
-            .WithName("GroupStatusPendingRule")
-            .WithMessage(
-                "CustomerPaymentStatusReportV15: when OriginalGroupInformationAndStatus.GroupStatus is PDNG, no OriginalPaymentInformationAndStatus entry's PaymentInformationStatus may be RJCT (GroupStatusPendingRule)."
-            );
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.OriginalGroupInformationAndStatus.GroupStatus is not { } status
+                        || !AcceptedStatuses.Contains(status)
+                        || x.OriginalPaymentInformationAndStatus.All(p =>
+                            p.PaymentInformationStatus != ExternalPaymentGroupStatus1Code.Rejected
+                        )
+                    )
+                    .WithName("GroupStatusAcceptedRule")
+                    .WithMessage(
+                        "CustomerPaymentStatusReportV15: when OriginalGroupInformationAndStatus.GroupStatus is ACTC/ACCP/ACSP/ACSC/ACWC, no OriginalPaymentInformationAndStatus entry's PaymentInformationStatus may be RJCT (GroupStatusAcceptedRule)."
+                    );
 
-        RuleFor(x => x)
-            .Must(x =>
-                x.OriginalGroupInformationAndStatus.GroupStatus != ExternalPaymentGroupStatus1Code.Rejected
-                || x.OriginalPaymentInformationAndStatus.All(p =>
-                    p.PaymentInformationStatus is null
-                    || p.PaymentInformationStatus == ExternalPaymentGroupStatus1Code.Rejected
-                )
-            )
-            .WithName("GroupStatusRejectedRule")
-            .WithMessage(
-                "CustomerPaymentStatusReportV15: when OriginalGroupInformationAndStatus.GroupStatus is RJCT, every present OriginalPaymentInformationAndStatus entry's PaymentInformationStatus must also be RJCT (GroupStatusRejectedRule)."
-            );
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.OriginalGroupInformationAndStatus.GroupStatus != ExternalPaymentGroupStatus1Code.Pending
+                        || x.OriginalPaymentInformationAndStatus.All(p =>
+                            p.PaymentInformationStatus != ExternalPaymentGroupStatus1Code.Rejected
+                        )
+                    )
+                    .WithName("GroupStatusPendingRule")
+                    .WithMessage(
+                        "CustomerPaymentStatusReportV15: when OriginalGroupInformationAndStatus.GroupStatus is PDNG, no OriginalPaymentInformationAndStatus entry's PaymentInformationStatus may be RJCT (GroupStatusPendingRule)."
+                    );
 
-        RuleFor(x => x)
-            .Must(x =>
-                x.OriginalGroupInformationAndStatus.GroupStatus != ExternalPaymentGroupStatus1Code.Received
-                || x.OriginalPaymentInformationAndStatus.All(p => p.PaymentInformationStatus is null)
-            )
-            .WithName("GroupStatusReceivedRule")
-            .WithMessage(
-                "CustomerPaymentStatusReportV15: when OriginalGroupInformationAndStatus.GroupStatus is RCVD, no OriginalPaymentInformationAndStatus entry may have a PaymentInformationStatus (GroupStatusReceivedRule)."
-            );
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.OriginalGroupInformationAndStatus.GroupStatus != ExternalPaymentGroupStatus1Code.Rejected
+                        || x.OriginalPaymentInformationAndStatus.All(p =>
+                            p.PaymentInformationStatus is null
+                            || p.PaymentInformationStatus == ExternalPaymentGroupStatus1Code.Rejected
+                        )
+                    )
+                    .WithName("GroupStatusRejectedRule")
+                    .WithMessage(
+                        "CustomerPaymentStatusReportV15: when OriginalGroupInformationAndStatus.GroupStatus is RJCT, every present OriginalPaymentInformationAndStatus entry's PaymentInformationStatus must also be RJCT (GroupStatusRejectedRule)."
+                    );
+
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.OriginalGroupInformationAndStatus.GroupStatus != ExternalPaymentGroupStatus1Code.Received
+                        || x.OriginalPaymentInformationAndStatus.All(p => p.PaymentInformationStatus is null)
+                    )
+                    .WithName("GroupStatusReceivedRule")
+                    .WithMessage(
+                        "CustomerPaymentStatusReportV15: when OriginalGroupInformationAndStatus.GroupStatus is RCVD, no OriginalPaymentInformationAndStatus entry may have a PaymentInformationStatus (GroupStatusReceivedRule)."
+                    );
+            }
+        );
     }
 
     /// <summary>

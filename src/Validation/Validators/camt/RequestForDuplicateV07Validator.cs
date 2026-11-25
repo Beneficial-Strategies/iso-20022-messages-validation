@@ -62,6 +62,9 @@ public class RequestForDuplicateV07Validator : AbstractValidator<IRequestForDupl
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Assignment).NotNull().WithMessage("RequestForDuplicateV07.Assignment is required (1..1).");
+
         RuleFor(x => x.Assignment).SetValidator(assignmentValidator);
 
         When(x => x.Case is not null, () => RuleFor(x => x.Case).SetValidator(caseValidator!));
