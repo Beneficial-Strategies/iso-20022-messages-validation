@@ -24,6 +24,10 @@ public class TradeRecurrentQuery7Validator : AbstractValidator<ITradeRecurrentQu
     /// </summary>
     public TradeRecurrentQuery7Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.QueryType).NotDefault().WithMessage("TradeRecurrentQuery7.QueryType is required (1..1).");
+        RuleFor(x => x.ValidUntil).NotDefault().WithMessage("TradeRecurrentQuery7.ValidUntil is required (1..1).");
+
         RuleFor(x => x.Frequency)
             .NotEmpty()
             .WithMessage("TradeRecurrentQuery7.Frequency must contain at least one element (1..∞).");

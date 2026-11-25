@@ -24,6 +24,9 @@ public class RedemptionBulkExecution06Validator : AbstractValidator<IRedemptionB
     /// </summary>
     public RedemptionBulkExecution06Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.FinancialInstrumentDetails).NotNull().WithMessage("RedemptionBulkExecution06.FinancialInstrumentDetails is required (1..1).");
+
         RuleFor(x => x.IndividualExecutionDetails)
             .NotEmpty()
             .WithMessage("RedemptionBulkExecution06.IndividualExecutionDetails must contain at least one element (1..∞).");

@@ -24,6 +24,9 @@ public class RegulatoryStipulations1Validator : AbstractValidator<IRegulatorySti
     /// </summary>
     public RegulatoryStipulations1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Country).NotDefault().WithMessage("RegulatoryStipulations1.Country is required (1..1).");
+
         RuleFor(x => x.Stipulations)
             .NotEmpty()
             .WithMessage("RegulatoryStipulations1.Stipulations must contain at least one element (1..∞).");

@@ -24,6 +24,10 @@ public class SecuritiesReferenceDataReport5Validator : AbstractValidator<ISecuri
     /// </summary>
     public SecuritiesReferenceDataReport5Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.FinancialInstrumentGeneralAttributes).NotNull().WithMessage("SecuritiesReferenceDataReport5.FinancialInstrumentGeneralAttributes is required (1..1).");
+        RuleFor(x => x.Issuer).NotDefault().WithMessage("SecuritiesReferenceDataReport5.Issuer is required (1..1).");
+
         RuleFor(x => x.TradingVenueRelatedAttributes)
             .NotEmpty()
             .WithMessage("SecuritiesReferenceDataReport5.TradingVenueRelatedAttributes must contain at least one element (1..∞).");

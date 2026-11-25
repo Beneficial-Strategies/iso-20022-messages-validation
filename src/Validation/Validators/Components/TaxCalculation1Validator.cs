@@ -26,6 +26,11 @@ public class TaxCalculation1Validator : AbstractValidator<ITaxCalculation1>
     /// </summary>
     public TaxCalculation1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.HostCurrency).NotDefault().WithMessage("TaxCalculation1.HostCurrency is required (1..1).");
+        RuleFor(x => x.TotalTaxableServiceChargeHostAmount).NotNull().WithMessage("TaxCalculation1.TotalTaxableServiceChargeHostAmount is required (1..1).");
+        RuleFor(x => x.TotalTax).NotNull().WithMessage("TaxCalculation1.TotalTax is required (1..1).");
+
         // HostCurrency (ActiveOrHistoricCurrencyCode), TotalTaxableServiceChargeHostAmount,
         // TotalTax (AmountAndDirection34): required (1..1) and already `required` C#
         // properties — no rule needed. No validator exists yet for AmountAndDirection34;

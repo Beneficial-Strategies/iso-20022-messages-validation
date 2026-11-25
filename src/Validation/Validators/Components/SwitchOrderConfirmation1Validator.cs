@@ -25,6 +25,9 @@ public class SwitchOrderConfirmation1Validator : AbstractValidator<ISwitchOrderC
     /// </summary>
     public SwitchOrderConfirmation1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.AmendmentIndicator).NotDefault().WithMessage("SwitchOrderConfirmation1.AmendmentIndicator is required (1..1).");
+
         RuleFor(x => x.SwitchExecutionDetails)
             .NotEmpty()
             .WithMessage("SwitchOrderConfirmation1.SwitchExecutionDetails must contain at least one element (1..∞).");

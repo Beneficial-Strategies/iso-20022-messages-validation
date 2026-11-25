@@ -33,6 +33,10 @@ public class ProprietaryData7Validator : AbstractValidator<IProprietaryData7>
     /// </param>
     public ProprietaryData7Validator(IValidator<IProprietaryData6> dataValidator)
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Type).NotDefault().WithMessage("ProprietaryData7.Type is required (1..1).");
+        RuleFor(x => x.Data).NotNull().WithMessage("ProprietaryData7.Data is required (1..1).");
+
         // Type: required (1..1) and already a `required` C# property — format enforced by the
         // struct constructor.
 

@@ -24,6 +24,10 @@ public class VariationMargin2Validator : AbstractValidator<IVariationMargin2>
     /// </summary>
     public VariationMargin2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.TotalMarkToMarket).NotNull().WithMessage("VariationMargin2.TotalMarkToMarket is required (1..1).");
+        RuleFor(x => x.FailsHaircut).NotNull().WithMessage("VariationMargin2.FailsHaircut is required (1..1).");
+
         RuleFor(x => x.TotalVariationMargin)
             .NotEmpty()
             .WithMessage("VariationMargin2.TotalVariationMargin must contain at least one element (1..∞).");

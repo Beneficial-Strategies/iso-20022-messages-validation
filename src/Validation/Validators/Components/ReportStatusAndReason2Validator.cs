@@ -25,6 +25,9 @@ public class ReportStatusAndReason2Validator : AbstractValidator<IReportStatusAn
     /// </summary>
     public ReportStatusAndReason2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.RelatedReference).NotDefault().WithMessage("ReportStatusAndReason2.RelatedReference is required (1..1).");
+
         RuleFor(x => x.Rejected)
             .NotEmpty()
             .WithMessage("ReportStatusAndReason2.Rejected must contain at least one element (1..100).");

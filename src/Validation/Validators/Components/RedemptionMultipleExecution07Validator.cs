@@ -24,6 +24,9 @@ public class RedemptionMultipleExecution07Validator : AbstractValidator<IRedempt
     /// </summary>
     public RedemptionMultipleExecution07Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.InvestmentAccountDetails).NotNull().WithMessage("RedemptionMultipleExecution07.InvestmentAccountDetails is required (1..1).");
+
         RuleFor(x => x.IndividualExecutionDetails)
             .NotEmpty()
             .WithMessage("RedemptionMultipleExecution07.IndividualExecutionDetails must contain at least one element (1..∞).");

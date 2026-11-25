@@ -33,6 +33,12 @@ public class ReportHeader7Validator : AbstractValidator<IReportHeader7>
     /// <param name="partyValidator">Validator for the <c>From</c> and <c>To</c> building blocks (both Party50Choice_).</param>
     public ReportHeader7Validator(IValidator<IParty50Choice> partyValidator)
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotDefault().WithMessage("ReportHeader7.Identification is required (1..1).");
+        RuleFor(x => x.From).NotNull().WithMessage("ReportHeader7.From is required (1..1).");
+        RuleFor(x => x.To).NotNull().WithMessage("ReportHeader7.To is required (1..1).");
+        RuleFor(x => x.CreationDateTime).NotDefault().WithMessage("ReportHeader7.CreationDateTime is required (1..1).");
+
         // Identification, CreationDateTime: required (1..1) and already `required` C# properties
         // — format enforced by struct constructors.
 

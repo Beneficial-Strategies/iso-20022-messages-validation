@@ -24,6 +24,10 @@ public class TrackerData1Validator : AbstractValidator<ITrackerData1>
     /// </summary>
     public TrackerData1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.ConfirmedDate).NotNull().WithMessage("TrackerData1.ConfirmedDate is required (1..1).");
+        RuleFor(x => x.ConfirmedAmount).NotNull().WithMessage("TrackerData1.ConfirmedAmount is required (1..1).");
+
         RuleFor(x => x.TrackerRecord)
             .NotEmpty()
             .WithMessage("TrackerData1.TrackerRecord must contain at least one element (1..∞).");

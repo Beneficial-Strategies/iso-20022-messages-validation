@@ -96,18 +96,11 @@ public class RequiredMemberCoverageTests
         }
     }
 
-    /// <summary>
-    /// The namespaces not yet done (issue #17): their gaps are listed by <see cref="ListGaps"/>
-    /// and are not yet an error. Remove a name here when its batch is merged.
-    /// </summary>
-    private static readonly string[] Pending = ["Components"];
-
-    /// <summary>Every required member of a validator outside the pending namespaces is refused when null or <c>default</c>.</summary>
+    /// <summary>Every required member of every validator is refused when null or <c>default</c>.</summary>
     [Fact]
     public void RequiredMembers_AreRefused_WhenNullOrDefault()
     {
         var gaps = Gaps()
-            .Where(g => !Pending.Contains(g.Validator.Namespace!.Split('.')[^1]))
             .Select(g => $"{g.Validator.Name}.{g.Member} ({g.Kind})")
             .ToList();
         Assert.True(gaps.Count == 0, "Required members with no rule:\n" + string.Join("\n", gaps));

@@ -25,6 +25,9 @@ public class TransferIn13Validator : AbstractValidator<ITransferIn13>
     /// </summary>
     public TransferIn13Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.AccountDetails).NotNull().WithMessage("TransferIn13.AccountDetails is required (1..1).");
+
         RuleFor(x => x.TransferAndReferences)
             .NotEmpty()
             .WithMessage("TransferIn13.TransferAndReferences must contain at least one element (1..∞).");

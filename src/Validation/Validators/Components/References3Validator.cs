@@ -24,6 +24,11 @@ public class References3Validator : AbstractValidator<IReferences3>
     /// </summary>
     public References3Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.MessageIdentification).NotNull().WithMessage("References3.MessageIdentification is required (1..1).");
+        RuleFor(x => x.RequestToBeCompletedIdentification).NotNull().WithMessage("References3.RequestToBeCompletedIdentification is required (1..1).");
+        RuleFor(x => x.ProcessIdentification).NotNull().WithMessage("References3.ProcessIdentification is required (1..1).");
+
         RuleFor(x => x.RequestReason)
             .NotEmpty()
             .WithMessage("References3.RequestReason must contain at least one element (1..∞).");

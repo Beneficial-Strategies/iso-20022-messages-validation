@@ -24,6 +24,10 @@ public class RequestDetails5Validator : AbstractValidator<IRequestDetails5>
     /// </summary>
     public RequestDetails5Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Type).NotDefault().WithMessage("RequestDetails5.Type is required (1..1).");
+        RuleFor(x => x.RequestReference).NotDefault().WithMessage("RequestDetails5.RequestReference is required (1..1).");
+
         RuleFor(x => x.ReportKey)
             .NotEmpty()
             .WithMessage("RequestDetails5.ReportKey must contain at least one element (1..∞).");

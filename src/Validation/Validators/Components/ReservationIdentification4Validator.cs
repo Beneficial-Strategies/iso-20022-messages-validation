@@ -53,6 +53,9 @@ public class ReservationIdentification4Validator : AbstractValidator<IReservatio
         IValidator<IReservationType2Choice> typeValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Type).NotNull().WithMessage("ReservationIdentification4.Type is required (1..1).");
+
         RuleFor(x => x.Type).SetValidator(typeValidator);
 
         When(

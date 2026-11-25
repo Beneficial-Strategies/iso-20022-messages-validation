@@ -24,6 +24,10 @@ public class ReconciliationCounterpartyPairStatistics6Validator : AbstractValida
     /// </summary>
     public ReconciliationCounterpartyPairStatistics6Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.CounterpartyIdentification).NotNull().WithMessage("ReconciliationCounterpartyPairStatistics6.CounterpartyIdentification is required (1..1).");
+        RuleFor(x => x.TotalNumberOfTransactions).NotDefault().WithMessage("ReconciliationCounterpartyPairStatistics6.TotalNumberOfTransactions is required (1..1).");
+
         RuleFor(x => x.ReconciliationReport)
             .NotEmpty()
             .WithMessage("ReconciliationCounterpartyPairStatistics6.ReconciliationReport must contain at least one element (1..∞).");

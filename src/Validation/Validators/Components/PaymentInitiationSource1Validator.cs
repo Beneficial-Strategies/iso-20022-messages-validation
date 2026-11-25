@@ -22,4 +22,13 @@ namespace BeneficialStrategies.Iso20022.Messages.Validation.Components;
 /// FluentValidation project's own <c>CLAUDE.md</c>) can record this type as reviewed rather than
 /// silently skipped.
 /// </remarks>
-public class PaymentInitiationSource1Validator : AbstractValidator<IPaymentInitiationSource1> { }
+public class PaymentInitiationSource1Validator : AbstractValidator<IPaymentInitiationSource1>
+{
+    /// <summary>Initializes a new instance.</summary>
+    public PaymentInitiationSource1Validator()
+    {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Name).NotDefault().WithMessage("PaymentInitiationSource1.Name is required (1..1).");
+
+    }
+}

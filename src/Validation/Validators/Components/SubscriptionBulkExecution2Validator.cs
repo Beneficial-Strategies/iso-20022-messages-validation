@@ -25,6 +25,9 @@ public class SubscriptionBulkExecution2Validator : AbstractValidator<ISubscripti
     /// </summary>
     public SubscriptionBulkExecution2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.FinancialInstrumentDetails).NotNull().WithMessage("SubscriptionBulkExecution2.FinancialInstrumentDetails is required (1..1).");
+
         RuleFor(x => x.IndividualExecutionDetails)
             .NotEmpty()
             .WithMessage("SubscriptionBulkExecution2.IndividualExecutionDetails must contain at least one element (1..∞).");

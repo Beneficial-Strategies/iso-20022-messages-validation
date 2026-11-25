@@ -25,6 +25,11 @@ public class PaymentInstrument9Validator : AbstractValidator<IPaymentInstrument9
     /// </summary>
     public PaymentInstrument9Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.SettlementCurrency).NotDefault().WithMessage("PaymentInstrument9.SettlementCurrency is required (1..1).");
+        RuleFor(x => x.ChequeDetails).NotNull().WithMessage("PaymentInstrument9.ChequeDetails is required (1..1).");
+        RuleFor(x => x.BankersDraftDetails).NotNull().WithMessage("PaymentInstrument9.BankersDraftDetails is required (1..1).");
+
         RuleFor(x => x.CashAccountDetails)
             .NotEmpty()
             .WithMessage("PaymentInstrument9.CashAccountDetails must contain at least one element (1..3).");

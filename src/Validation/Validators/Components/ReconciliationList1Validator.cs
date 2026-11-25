@@ -25,6 +25,18 @@ public class ReconciliationList1Validator : AbstractValidator<IReconciliationLis
     /// </summary>
     public ReconciliationList1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Date).NotDefault().WithMessage("ReconciliationList1.Date is required (1..1).");
+        RuleFor(x => x.Recipient).NotNull().WithMessage("ReconciliationList1.Recipient is required (1..1).");
+        RuleFor(x => x.Advisor).NotNull().WithMessage("ReconciliationList1.Advisor is required (1..1).");
+        RuleFor(x => x.Parameters).NotNull().WithMessage("ReconciliationList1.Parameters is required (1..1).");
+        RuleFor(x => x.PaymentReference).NotNull().WithMessage("ReconciliationList1.PaymentReference is required (1..1).");
+        RuleFor(x => x.PaymentMeans).NotNull().WithMessage("ReconciliationList1.PaymentMeans is required (1..1).");
+        RuleFor(x => x.PaymentDate).NotDefault().WithMessage("ReconciliationList1.PaymentDate is required (1..1).");
+        RuleFor(x => x.PaymentTerms).NotNull().WithMessage("ReconciliationList1.PaymentTerms is required (1..1).");
+        RuleFor(x => x.PaymentAmount).NotNull().WithMessage("ReconciliationList1.PaymentAmount is required (1..1).");
+        RuleFor(x => x.ItemCount).NotDefault().WithMessage("ReconciliationList1.ItemCount is required (1..1).");
+
         RuleFor(x => x.Item)
             .NotEmpty()
             .WithMessage("ReconciliationList1.Item must contain at least one element (1..∞).");
