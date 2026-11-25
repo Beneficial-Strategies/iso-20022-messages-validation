@@ -90,53 +90,64 @@ public class CustomerPaymentReversalV13Validator : AbstractValidator<ICustomerPa
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
-        RuleFor(x => x.GroupHeader).SetValidator(groupHeaderValidator!);
-        RuleFor(x => x.OriginalGroupInformation).SetValidator(originalGroupInformationValidator!);
-        RuleForEach(x => x.OriginalPaymentInformationAndReversal)
-            .SetValidator(originalPaymentInformationAndReversalValidator!);
-        RuleForEach(x => x.SupplementaryData).SetValidator(supplementaryDataValidator!);
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.GroupHeader).NotNull().WithMessage("CustomerPaymentReversalV13.GroupHeader is required (1..1).");
+        RuleFor(x => x.OriginalGroupInformation).NotNull().WithMessage("CustomerPaymentReversalV13.OriginalGroupInformation is required (1..1).");
 
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.GroupReversal is not { BoolValue: true }
-                || x.OriginalPaymentInformationAndReversal.Count() == 0
-            )
-            .WithName("GroupReversalAndPaymentInformationNotPresentRule")
-            .WithMessage(
-                "CustomerPaymentReversalV13: when GroupHeader.GroupReversal is true, OriginalPaymentInformationAndReversal is not allowed (GroupReversalAndPaymentInformationNotPresentRule)."
-            );
+        // The rules below read these members, so they run only when they are present.
+        When(
+            x => x.GroupHeader is not null && x.OriginalGroupInformation is not null,
+            () =>
+            {
+                RuleFor(x => x.GroupHeader).SetValidator(groupHeaderValidator!);
+                RuleFor(x => x.OriginalGroupInformation).SetValidator(originalGroupInformationValidator!);
+                RuleForEach(x => x.OriginalPaymentInformationAndReversal)
+                    .SetValidator(originalPaymentInformationAndReversalValidator!);
+                RuleForEach(x => x.SupplementaryData).SetValidator(supplementaryDataValidator!);
 
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.GroupReversal is not { BoolValue: true }
-                || x.OriginalGroupInformation.ReversalReasonInformation.Any(r => r.Reason is not null)
-            )
-            .WithName("GroupReversalAndReasonRule")
-            .WithMessage(
-                "CustomerPaymentReversalV13: when GroupHeader.GroupReversal is true, OriginalGroupInformation.ReversalReasonInformation must contain at least one entry with Reason present (GroupReversalAndReasonRule)."
-            );
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.GroupReversal is not { BoolValue: true }
+                        || x.OriginalPaymentInformationAndReversal.Count() == 0
+                    )
+                    .WithName("GroupReversalAndPaymentInformationNotPresentRule")
+                    .WithMessage(
+                        "CustomerPaymentReversalV13: when GroupHeader.GroupReversal is true, OriginalPaymentInformationAndReversal is not allowed (GroupReversalAndPaymentInformationNotPresentRule)."
+                    );
 
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.GroupReversal is { BoolValue: true }
-                || x.OriginalPaymentInformationAndReversal.Count() > 0
-            )
-            .WithName("GroupReversalAndPaymentInformationPresentRule")
-            .WithMessage(
-                "CustomerPaymentReversalV13: when GroupHeader.GroupReversal is false, at least one OriginalPaymentInformationAndReversal entry must be present (GroupReversalAndPaymentInformationPresentRule)."
-            );
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.GroupReversal is not { BoolValue: true }
+                        || x.OriginalGroupInformation.ReversalReasonInformation.Any(r => r.Reason is not null)
+                    )
+                    .WithName("GroupReversalAndReasonRule")
+                    .WithMessage(
+                        "CustomerPaymentReversalV13: when GroupHeader.GroupReversal is true, OriginalGroupInformation.ReversalReasonInformation must contain at least one entry with Reason present (GroupReversalAndReasonRule)."
+                    );
 
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.GroupReversal is { BoolValue: true }
-                || x.OriginalPaymentInformationAndReversal.Any(p => p.PaymentInformationReversal is { BoolValue: true })
-                || int.Parse(x.GroupHeader.NumberOfTransactions.ToString())
-                    == x.OriginalPaymentInformationAndReversal.Sum(p => p.TransactionInformation.Count())
-            )
-            .WithName("GroupReversalAndNumberOfTransactionsGuideline")
-            .WithMessage(
-                "CustomerPaymentReversalV13: when GroupHeader.GroupReversal is false and every OriginalPaymentInformationAndReversal entry's PaymentInformationReversal is false, GroupHeader.NumberOfTransactions must equal the total count of TransactionInformation entries across the message (GroupReversalAndNumberOfTransactionsGuideline)."
-            );
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.GroupReversal is { BoolValue: true }
+                        || x.OriginalPaymentInformationAndReversal.Count() > 0
+                    )
+                    .WithName("GroupReversalAndPaymentInformationPresentRule")
+                    .WithMessage(
+                        "CustomerPaymentReversalV13: when GroupHeader.GroupReversal is false, at least one OriginalPaymentInformationAndReversal entry must be present (GroupReversalAndPaymentInformationPresentRule)."
+                    );
+
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.GroupReversal is { BoolValue: true }
+                        || x.OriginalPaymentInformationAndReversal.Any(p => p.PaymentInformationReversal is { BoolValue: true })
+                        || int.Parse(x.GroupHeader.NumberOfTransactions.ToString())
+                            == x.OriginalPaymentInformationAndReversal.Sum(p => p.TransactionInformation.Count())
+                    )
+                    .WithName("GroupReversalAndNumberOfTransactionsGuideline")
+                    .WithMessage(
+                        "CustomerPaymentReversalV13: when GroupHeader.GroupReversal is false and every OriginalPaymentInformationAndReversal entry's PaymentInformationReversal is false, GroupHeader.NumberOfTransactions must equal the total count of TransactionInformation entries across the message (GroupReversalAndNumberOfTransactionsGuideline)."
+                    );
+            }
+        );
     }
 
     /// <summary>

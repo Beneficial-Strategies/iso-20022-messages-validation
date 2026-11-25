@@ -56,6 +56,9 @@ public class CreateLimitV02Validator : AbstractValidator<ICreateLimitV02>
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.MessageHeader).NotNull().WithMessage("CreateLimitV02.MessageHeader is required (1..1).");
+
         RuleFor(x => x.MessageHeader).SetValidator(messageHeaderValidator);
         RuleForEach(x => x.LimitData).SetValidator(limitDataValidator);
         RuleForEach(x => x.SupplementaryData).SetValidator(supplementaryDataValidator);

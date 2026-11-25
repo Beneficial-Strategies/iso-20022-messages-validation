@@ -81,6 +81,9 @@ public class MandateAmendmentRequestV08Validator : AbstractValidator<IMandateAme
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.GroupHeader).NotNull().WithMessage("MandateAmendmentRequestV08.GroupHeader is required (1..1).");
+
         RuleFor(x => x.GroupHeader).SetValidator(groupHeaderValidator);
         RuleForEach(x => x.UnderlyingAmendmentDetails).SetValidator(underlyingAmendmentDetailsValidator);
         RuleForEach(x => x.SupplementaryData).SetValidator(supplementaryDataValidator);

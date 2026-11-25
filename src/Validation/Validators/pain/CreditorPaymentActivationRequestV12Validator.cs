@@ -46,6 +46,9 @@ public class CreditorPaymentActivationRequestV12Validator : AbstractValidator<IC
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.GroupHeader).NotNull().WithMessage("CreditorPaymentActivationRequestV12.GroupHeader is required (1..1).");
+
         RuleFor(x => x.GroupHeader).SetValidator(groupHeaderValidator!);
 
         RuleFor(x => x.PaymentInformation)

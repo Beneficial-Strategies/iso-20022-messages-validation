@@ -74,6 +74,10 @@ public class RejectInvestigationV07Validator : AbstractValidator<IRejectInvestig
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Assignment).NotNull().WithMessage("RejectInvestigationV07.Assignment is required (1..1).");
+        RuleFor(x => x.Justification).NotNull().WithMessage("RejectInvestigationV07.Justification is required (1..1).");
+
         RuleFor(x => x.Assignment).SetValidator(assignmentValidator);
 
         When(x => x.Case is not null, () => RuleFor(x => x.Case).SetValidator(caseValidator!));

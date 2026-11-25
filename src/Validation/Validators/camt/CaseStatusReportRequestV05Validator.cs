@@ -67,6 +67,10 @@ public class CaseStatusReportRequestV05Validator : AbstractValidator<ICaseStatus
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.RequestHeader).NotNull().WithMessage("CaseStatusReportRequestV05.RequestHeader is required (1..1).");
+        RuleFor(x => x.Case).NotNull().WithMessage("CaseStatusReportRequestV05.Case is required (1..1).");
+
         RuleFor(x => x.RequestHeader).SetValidator(requestHeaderValidator);
         RuleFor(x => x.Case).SetValidator(caseValidator);
         RuleForEach(x => x.SupplementaryData).SetValidator(supplementaryDataValidator);

@@ -82,104 +82,114 @@ public class FIToFICustomerDirectDebitV12Validator : AbstractValidator<IFIToFICu
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
-        RuleFor(x => x.GroupHeader).SetValidator(groupHeaderValidator!);
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.GroupHeader).NotNull().WithMessage("FIToFICustomerDirectDebitV12.GroupHeader is required (1..1).");
 
-        RuleForEach(x => x.DirectDebitTransactionInformation)
-            .SetValidator(directDebitTransactionInformationValidator!);
-        RuleForEach(x => x.SupplementaryData).SetValidator(supplementaryDataValidator!);
+        // The rules below read these members, so they run only when they are present.
+        When(
+            x => x.GroupHeader is not null,
+            () =>
+            {
+                RuleFor(x => x.GroupHeader).SetValidator(groupHeaderValidator!);
 
-        // ── InstructedAgentRule ───────────────────────────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.InstructedAgent is null
-                || x.DirectDebitTransactionInformation.All(t => t.InstructedAgent is null)
-            )
-            .WithName("InstructedAgentRule")
-            .WithMessage(
-                "FIToFICustomerDirectDebitV12: if GroupHeader.InstructedAgent is present, every "
-                    + "DirectDebitTransactionInformation[*].InstructedAgent must be absent (InstructedAgentRule)."
-            );
+                RuleForEach(x => x.DirectDebitTransactionInformation)
+                    .SetValidator(directDebitTransactionInformationValidator!);
+                RuleForEach(x => x.SupplementaryData).SetValidator(supplementaryDataValidator!);
 
-        // ── InstructingAgentRule ──────────────────────────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.InstructingAgent is null
-                || x.DirectDebitTransactionInformation.All(t => t.InstructingAgent is null)
-            )
-            .WithName("InstructingAgentRule")
-            .WithMessage(
-                "FIToFICustomerDirectDebitV12: if GroupHeader.InstructingAgent is present, every "
-                    + "DirectDebitTransactionInformation[*].InstructingAgent must be absent (InstructingAgentRule)."
-            );
+                // ── InstructedAgentRule ───────────────────────────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.InstructedAgent is null
+                        || x.DirectDebitTransactionInformation.All(t => t.InstructedAgent is null)
+                    )
+                    .WithName("InstructedAgentRule")
+                    .WithMessage(
+                        "FIToFICustomerDirectDebitV12: if GroupHeader.InstructedAgent is present, every "
+                            + "DirectDebitTransactionInformation[*].InstructedAgent must be absent (InstructedAgentRule)."
+                    );
 
-        // ── TotalInterbankSettlementAmountRule ───────────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.TotalInterbankSettlementAmount is null
-                || x.DirectDebitTransactionInformation.All(t =>
-                    t.InterbankSettlementAmount.Currency == x.GroupHeader.TotalInterbankSettlementAmount.Currency
-                )
-            )
-            .WithName("TotalInterbankSettlementAmountRule")
-            .WithMessage(
-                "FIToFICustomerDirectDebitV12: if GroupHeader.TotalInterbankSettlementAmount is "
-                    + "present, every DirectDebitTransactionInformation[*].InterbankSettlementAmount "
-                    + "must share its currency (TotalInterbankSettlementAmountRule)."
-            );
+                // ── InstructingAgentRule ──────────────────────────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.InstructingAgent is null
+                        || x.DirectDebitTransactionInformation.All(t => t.InstructingAgent is null)
+                    )
+                    .WithName("InstructingAgentRule")
+                    .WithMessage(
+                        "FIToFICustomerDirectDebitV12: if GroupHeader.InstructingAgent is present, every "
+                            + "DirectDebitTransactionInformation[*].InstructingAgent must be absent (InstructingAgentRule)."
+                    );
 
-        // ── TotalInterbankSettlementAmountAndSumRule ─────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.TotalInterbankSettlementAmount is null
-                || x.GroupHeader.TotalInterbankSettlementAmount.Amount
-                    == x.DirectDebitTransactionInformation.Sum(t => t.InterbankSettlementAmount.Amount)
-            )
-            .WithName("TotalInterbankSettlementAmountAndSumRule")
-            .WithMessage(
-                "FIToFICustomerDirectDebitV12: GroupHeader.TotalInterbankSettlementAmount, when "
-                    + "present, must equal the sum of all "
-                    + "DirectDebitTransactionInformation[*].InterbankSettlementAmount "
-                    + "(TotalInterbankSettlementAmountAndSumRule)."
-            );
+                // ── TotalInterbankSettlementAmountRule ───────────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.TotalInterbankSettlementAmount is null
+                        || x.DirectDebitTransactionInformation.All(t =>
+                            t.InterbankSettlementAmount.Currency == x.GroupHeader.TotalInterbankSettlementAmount.Currency
+                        )
+                    )
+                    .WithName("TotalInterbankSettlementAmountRule")
+                    .WithMessage(
+                        "FIToFICustomerDirectDebitV12: if GroupHeader.TotalInterbankSettlementAmount is "
+                            + "present, every DirectDebitTransactionInformation[*].InterbankSettlementAmount "
+                            + "must share its currency (TotalInterbankSettlementAmountRule)."
+                    );
 
-        // ── GroupHeaderInterbankSettlementDateRule ───────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.InterbankSettlementDate is null
-                || x.DirectDebitTransactionInformation.All(t => t.InterbankSettlementDate is null)
-            )
-            .WithName("GroupHeaderInterbankSettlementDateRule")
-            .WithMessage(
-                "FIToFICustomerDirectDebitV12: if GroupHeader.InterbankSettlementDate is "
-                    + "present, every DirectDebitTransactionInformation[*].InterbankSettlementDate "
-                    + "must be absent (GroupHeaderInterbankSettlementDateRule)."
-            );
+                // ── TotalInterbankSettlementAmountAndSumRule ─────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.TotalInterbankSettlementAmount is null
+                        || x.GroupHeader.TotalInterbankSettlementAmount.Amount
+                            == x.DirectDebitTransactionInformation.Sum(t => t.InterbankSettlementAmount.Amount)
+                    )
+                    .WithName("TotalInterbankSettlementAmountAndSumRule")
+                    .WithMessage(
+                        "FIToFICustomerDirectDebitV12: GroupHeader.TotalInterbankSettlementAmount, when "
+                            + "present, must equal the sum of all "
+                            + "DirectDebitTransactionInformation[*].InterbankSettlementAmount "
+                            + "(TotalInterbankSettlementAmountAndSumRule)."
+                    );
 
-        // ── TransactionInterbankSettlementDateRule ───────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.InterbankSettlementDate is not null
-                || x.DirectDebitTransactionInformation.All(t => t.InterbankSettlementDate is not null)
-            )
-            .WithName("TransactionInterbankSettlementDateRule")
-            .WithMessage(
-                "FIToFICustomerDirectDebitV12: if GroupHeader.InterbankSettlementDate is absent, "
-                    + "every DirectDebitTransactionInformation[*].InterbankSettlementDate must be "
-                    + "present (TransactionInterbankSettlementDateRule)."
-            );
+                // ── GroupHeaderInterbankSettlementDateRule ───────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.InterbankSettlementDate is null
+                        || x.DirectDebitTransactionInformation.All(t => t.InterbankSettlementDate is null)
+                    )
+                    .WithName("GroupHeaderInterbankSettlementDateRule")
+                    .WithMessage(
+                        "FIToFICustomerDirectDebitV12: if GroupHeader.InterbankSettlementDate is "
+                            + "present, every DirectDebitTransactionInformation[*].InterbankSettlementDate "
+                            + "must be absent (GroupHeaderInterbankSettlementDateRule)."
+                    );
 
-        // ── PaymentTypeInformationRule ────────────────────────────────────────────────
-        RuleFor(x => x)
-            .Must(x =>
-                x.GroupHeader.PaymentTypeInformation is null
-                || x.DirectDebitTransactionInformation.All(t => t.PaymentTypeInformation is null)
-            )
-            .WithName("PaymentTypeInformationRule")
-            .WithMessage(
-                "FIToFICustomerDirectDebitV12: if GroupHeader.PaymentTypeInformation is present, "
-                    + "every DirectDebitTransactionInformation[*].PaymentTypeInformation must be "
-                    + "absent (PaymentTypeInformationRule)."
-            );
+                // ── TransactionInterbankSettlementDateRule ───────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.InterbankSettlementDate is not null
+                        || x.DirectDebitTransactionInformation.All(t => t.InterbankSettlementDate is not null)
+                    )
+                    .WithName("TransactionInterbankSettlementDateRule")
+                    .WithMessage(
+                        "FIToFICustomerDirectDebitV12: if GroupHeader.InterbankSettlementDate is absent, "
+                            + "every DirectDebitTransactionInformation[*].InterbankSettlementDate must be "
+                            + "present (TransactionInterbankSettlementDateRule)."
+                    );
+
+                // ── PaymentTypeInformationRule ────────────────────────────────────────────────
+                RuleFor(x => x)
+                    .Must(x =>
+                        x.GroupHeader.PaymentTypeInformation is null
+                        || x.DirectDebitTransactionInformation.All(t => t.PaymentTypeInformation is null)
+                    )
+                    .WithName("PaymentTypeInformationRule")
+                    .WithMessage(
+                        "FIToFICustomerDirectDebitV12: if GroupHeader.PaymentTypeInformation is present, "
+                            + "every DirectDebitTransactionInformation[*].PaymentTypeInformation must be "
+                            + "absent (PaymentTypeInformationRule)."
+                    );
+            }
+        );
     }
 
     /// <summary>

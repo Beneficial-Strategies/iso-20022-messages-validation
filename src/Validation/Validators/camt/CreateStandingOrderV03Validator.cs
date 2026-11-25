@@ -63,6 +63,11 @@ public class CreateStandingOrderV03Validator : AbstractValidator<ICreateStanding
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.MessageHeader).NotNull().WithMessage("CreateStandingOrderV03.MessageHeader is required (1..1).");
+        RuleFor(x => x.StandingOrderIdentification).NotNull().WithMessage("CreateStandingOrderV03.StandingOrderIdentification is required (1..1).");
+        RuleFor(x => x.ValueSet).NotNull().WithMessage("CreateStandingOrderV03.ValueSet is required (1..1).");
+
         RuleFor(x => x.MessageHeader).SetValidator(messageHeaderValidator);
         RuleFor(x => x.StandingOrderIdentification).SetValidator(standingOrderIdentificationValidator);
         RuleFor(x => x.ValueSet).SetValidator(valueSetValidator);

@@ -49,8 +49,12 @@ public class PayInEventAcknowledgementV02Validator : AbstractValidator<IPayInEve
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
-        // MessageIdentification: required (1..1) and already a `required` C# property — format
-        // enforced by the struct constructor.
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.MessageIdentification).NotDefault().WithMessage("PayInEventAcknowledgementV02.MessageIdentification is required (1..1).");
+        RuleFor(x => x.AcknowledgementDetails).NotNull().WithMessage("PayInEventAcknowledgementV02.AcknowledgementDetails is required (1..1).");
+
+        // MessageIdentification: required (1..1), refused when default above; format enforced by
+        // the struct constructor.
         // SettlementSessionIdentifier: optional scalar, format enforced by the struct constructor
         // — no rule needed.
 

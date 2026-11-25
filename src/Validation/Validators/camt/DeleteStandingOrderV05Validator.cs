@@ -52,6 +52,10 @@ public class DeleteStandingOrderV05Validator : AbstractValidator<IDeleteStanding
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.MessageHeader).NotNull().WithMessage("DeleteStandingOrderV05.MessageHeader is required (1..1).");
+        RuleFor(x => x.StandingOrderDetails).NotNull().WithMessage("DeleteStandingOrderV05.StandingOrderDetails is required (1..1).");
+
         RuleFor(x => x.MessageHeader).SetValidator(messageHeaderValidator);
         RuleFor(x => x.StandingOrderDetails).SetValidator(standingOrderDetailsValidator);
         RuleForEach(x => x.SupplementaryData).SetValidator(supplementaryDataValidator);

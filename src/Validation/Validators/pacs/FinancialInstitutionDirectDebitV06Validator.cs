@@ -56,6 +56,9 @@ public class FinancialInstitutionDirectDebitV06Validator : AbstractValidator<IFi
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.GroupHeader).NotNull().WithMessage("FinancialInstitutionDirectDebitV06.GroupHeader is required (1..1).");
+
         RuleFor(x => x.GroupHeader).SetValidator(groupHeaderValidator!);
 
         RuleFor(x => x.CreditInstruction)
