@@ -24,6 +24,9 @@ public class PaymentInstrumentType1Validator : AbstractValidator<IPaymentInstrum
     /// </summary>
     public PaymentInstrumentType1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.CardNumber).NotDefault().WithMessage("PaymentInstrumentType1.CardNumber is required (1..1).");
+
         RuleFor(x => x.AuthorityRequestType)
             .NotEmpty()
             .WithMessage("PaymentInstrumentType1.AuthorityRequestType must contain at least one element (1..∞).");

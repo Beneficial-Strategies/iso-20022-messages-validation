@@ -25,6 +25,9 @@ public class SignedData4Validator : AbstractValidator<ISignedData4>
     /// </summary>
     public SignedData4Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.EncapsulatedContent).NotNull().WithMessage("SignedData4.EncapsulatedContent is required (1..1).");
+
         RuleFor(x => x.DigestAlgorithm)
             .NotEmpty()
             .WithMessage("SignedData4.DigestAlgorithm must contain at least one element (1..∞).");

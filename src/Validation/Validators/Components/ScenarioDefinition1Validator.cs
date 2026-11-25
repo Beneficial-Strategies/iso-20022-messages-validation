@@ -24,6 +24,9 @@ public class ScenarioDefinition1Validator : AbstractValidator<IScenarioDefinitio
     /// </summary>
     public ScenarioDefinition1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotNull().WithMessage("ScenarioDefinition1.Identification is required (1..1).");
+
         RuleFor(x => x.StressItem)
             .NotEmpty()
             .WithMessage("ScenarioDefinition1.StressItem must contain at least one element (1..2).");

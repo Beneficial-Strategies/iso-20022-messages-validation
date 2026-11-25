@@ -24,6 +24,9 @@ public class PositionAccount2Validator : AbstractValidator<IPositionAccount2>
     /// </summary>
     public PositionAccount2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotNull().WithMessage("PositionAccount2.Identification is required (1..1).");
+
         RuleFor(x => x.Position)
             .NotEmpty()
             .WithMessage("PositionAccount2.Position must contain at least one element (1..∞).");

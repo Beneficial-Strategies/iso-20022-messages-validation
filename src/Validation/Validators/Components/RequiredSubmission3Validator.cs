@@ -25,6 +25,11 @@ public class RequiredSubmission3Validator : AbstractValidator<IRequiredSubmissio
     /// </summary>
     public RequiredSubmission3Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.MatchIssueDate).NotDefault().WithMessage("RequiredSubmission3.MatchIssueDate is required (1..1).");
+        RuleFor(x => x.MatchTransport).NotDefault().WithMessage("RequiredSubmission3.MatchTransport is required (1..1).");
+        RuleFor(x => x.MatchAmount).NotDefault().WithMessage("RequiredSubmission3.MatchAmount is required (1..1).");
+
         RuleFor(x => x.Submitter)
             .NotEmpty()
             .WithMessage("RequiredSubmission3.Submitter must contain at least one element (1..∞).");

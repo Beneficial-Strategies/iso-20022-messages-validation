@@ -25,6 +25,10 @@ public class TradeTransactionStatusAndReason1Validator : AbstractValidator<ITrad
     /// </summary>
     public TradeTransactionStatusAndReason1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.RelatedReference).NotDefault().WithMessage("TradeTransactionStatusAndReason1.RelatedReference is required (1..1).");
+        RuleFor(x => x.TradeReference).NotDefault().WithMessage("TradeTransactionStatusAndReason1.TradeReference is required (1..1).");
+
         RuleFor(x => x.Rejected)
             .NotEmpty()
             .WithMessage("TradeTransactionStatusAndReason1.Rejected must contain at least one element (1..100).");

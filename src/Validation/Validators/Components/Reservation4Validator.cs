@@ -41,6 +41,9 @@ public class Reservation4Validator : AbstractValidator<IReservation4>
         IValidator<IAmount2Choice> amountValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Amount).NotNull().WithMessage("Reservation4.Amount is required (1..1).");
+
         RuleFor(x => x.Amount).SetValidator(amountValidator);
 
         When(

@@ -24,6 +24,10 @@ public class TradeCounterpartyReport14Validator : AbstractValidator<ITradeCounte
     /// </summary>
     public TradeCounterpartyReport14Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.ReportingCounterparty).NotNull().WithMessage("TradeCounterpartyReport14.ReportingCounterparty is required (1..1).");
+        RuleFor(x => x.OtherCounterparty).NotNull().WithMessage("TradeCounterpartyReport14.OtherCounterparty is required (1..1).");
+
         RuleFor(x => x.Beneficiary)
             .NotEmpty()
             .WithMessage("TradeCounterpartyReport14.Beneficiary must contain at least one element (1..2).");

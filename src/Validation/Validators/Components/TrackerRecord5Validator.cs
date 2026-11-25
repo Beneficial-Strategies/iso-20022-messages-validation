@@ -35,6 +35,9 @@ public class TrackerRecord5Validator : AbstractValidator<ITrackerRecord5>
         IValidator<ICurrencyExchange13> exchangeRateDataValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Agent).NotNull().WithMessage("TrackerRecord5.Agent is required (1..1).");
+
         RuleFor(x => x.Agent).SetValidator(agentValidator!);
         When(
             x => x.ExchangeRateData is not null,

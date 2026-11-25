@@ -26,6 +26,10 @@ public class SwitchExecution7Validator : AbstractValidator<ISwitchExecution7>
     /// </summary>
     public SwitchExecution7Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.DealReference).NotDefault().WithMessage("SwitchExecution7.DealReference is required (1..1).");
+        RuleFor(x => x.OrderReference).NotDefault().WithMessage("SwitchExecution7.OrderReference is required (1..1).");
+
         RuleFor(x => x.RedemptionLegDetails)
             .NotEmpty()
             .WithMessage("SwitchExecution7.RedemptionLegDetails must contain at least one element (1..∞).");

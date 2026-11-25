@@ -24,6 +24,10 @@ public class ReportLine6Validator : AbstractValidator<IReportLine6>
     /// </summary>
     public ReportLine6Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.CommercialDocumentReference).NotNull().WithMessage("ReportLine6.CommercialDocumentReference is required (1..1).");
+        RuleFor(x => x.NetAmount).NotNull().WithMessage("ReportLine6.NetAmount is required (1..1).");
+
         RuleFor(x => x.BreakdownByPurchaseOrder)
             .NotEmpty()
             .WithMessage("ReportLine6.BreakdownByPurchaseOrder must contain at least one element (1..∞).");

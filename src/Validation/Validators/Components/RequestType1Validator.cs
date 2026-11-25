@@ -24,6 +24,9 @@ public class RequestType1Validator : AbstractValidator<IRequestType1>
     /// </summary>
     public RequestType1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Number).NotDefault().WithMessage("RequestType1.Number is required (1..1).");
+
         RuleFor(x => x.Type)
             .NotEmpty()
             .WithMessage("RequestType1.Type must contain at least one element (1..∞).");

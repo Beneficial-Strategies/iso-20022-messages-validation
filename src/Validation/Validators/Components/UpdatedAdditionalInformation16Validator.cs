@@ -24,6 +24,9 @@ public class UpdatedAdditionalInformation16Validator : AbstractValidator<IUpdate
     /// </summary>
     public UpdatedAdditionalInformation16Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Language).NotDefault().WithMessage("UpdatedAdditionalInformation16.Language is required (1..1).");
+
         RuleFor(x => x.AdditionalInformation)
             .NotEmpty()
             .WithMessage("UpdatedAdditionalInformation16.AdditionalInformation must contain at least one element (1..∞).");

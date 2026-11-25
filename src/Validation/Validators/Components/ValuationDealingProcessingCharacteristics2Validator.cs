@@ -24,6 +24,12 @@ public class ValuationDealingProcessingCharacteristics2Validator : AbstractValid
     /// </summary>
     public ValuationDealingProcessingCharacteristics2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.ValuationFrequencyDescription).NotDefault().WithMessage("ValuationDealingProcessingCharacteristics2.ValuationFrequencyDescription is required (1..1).");
+        RuleFor(x => x.DecimalisationUnits).NotDefault().WithMessage("ValuationDealingProcessingCharacteristics2.DecimalisationUnits is required (1..1).");
+        RuleFor(x => x.DecimalisationPrice).NotDefault().WithMessage("ValuationDealingProcessingCharacteristics2.DecimalisationPrice is required (1..1).");
+        RuleFor(x => x.DualFundIndicator).NotDefault().WithMessage("ValuationDealingProcessingCharacteristics2.DualFundIndicator is required (1..1).");
+
         RuleFor(x => x.PriceCurrency)
             .NotEmpty()
             .WithMessage("ValuationDealingProcessingCharacteristics2.PriceCurrency must contain at least one element (1..∞).");

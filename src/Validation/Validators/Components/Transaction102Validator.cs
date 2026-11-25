@@ -24,6 +24,9 @@ public class Transaction102Validator : AbstractValidator<ITransaction102>
     /// </summary>
     public Transaction102Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.TransactionIdentification).NotNull().WithMessage("Transaction102.TransactionIdentification is required (1..1).");
+
         RuleFor(x => x.AmendedData)
             .NotEmpty()
             .WithMessage("Transaction102.AmendedData must contain at least one element (1..∞).");

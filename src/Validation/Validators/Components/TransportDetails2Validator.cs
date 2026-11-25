@@ -26,6 +26,11 @@ public class TransportDetails2Validator : AbstractValidator<ITransportDetails2>
     /// </summary>
     public TransportDetails2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.RoutingSummary).NotNull().WithMessage("TransportDetails2.RoutingSummary is required (1..1).");
+        RuleFor(x => x.ProposedShipmentDate).NotDefault().WithMessage("TransportDetails2.ProposedShipmentDate is required (1..1).");
+        RuleFor(x => x.ActualShipmentDate).NotDefault().WithMessage("TransportDetails2.ActualShipmentDate is required (1..1).");
+
         RuleFor(x => x.TransportDocumentReference)
             .NotEmpty()
             .WithMessage("TransportDetails2.TransportDocumentReference must contain at least one element (1..∞).");

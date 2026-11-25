@@ -47,6 +47,10 @@ public class TransactionParties11Validator : AbstractValidator<ITransactionParti
         IValidator<ICashAccount40> cashAccountValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Debtor).NotNull().WithMessage("TransactionParties11.Debtor is required (1..1).");
+        RuleFor(x => x.Creditor).NotNull().WithMessage("TransactionParties11.Creditor is required (1..1).");
+
         RuleFor(x => x.Creditor).SetValidator(partyValidator!);
         RuleFor(x => x.Debtor).SetValidator(partyValidator!);
 

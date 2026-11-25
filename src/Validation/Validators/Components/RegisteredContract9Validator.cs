@@ -24,6 +24,11 @@ public class RegisteredContract9Validator : AbstractValidator<IRegisteredContrac
     /// </summary>
     public RegisteredContract9Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.ContractRegistrationAmendmentIdentification).NotDefault().WithMessage("RegisteredContract9.ContractRegistrationAmendmentIdentification is required (1..1).");
+        RuleFor(x => x.ReportingParty).NotNull().WithMessage("RegisteredContract9.ReportingParty is required (1..1).");
+        RuleFor(x => x.RegistrationAgent).NotNull().WithMessage("RegisteredContract9.RegistrationAgent is required (1..1).");
+
         RuleFor(x => x.RegisteredContractAmendment)
             .NotEmpty()
             .WithMessage("RegisteredContract9.RegisteredContractAmendment must contain at least one element (1..∞).");

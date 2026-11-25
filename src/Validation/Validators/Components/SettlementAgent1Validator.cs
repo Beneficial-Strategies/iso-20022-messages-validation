@@ -24,6 +24,9 @@ public class SettlementAgent1Validator : AbstractValidator<ISettlementAgent1>
     /// </summary>
     public SettlementAgent1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotDefault().WithMessage("SettlementAgent1.Identification is required (1..1).");
+
         RuleFor(x => x.Account)
             .NotEmpty()
             .WithMessage("SettlementAgent1.Account must contain at least one element (1..∞).");

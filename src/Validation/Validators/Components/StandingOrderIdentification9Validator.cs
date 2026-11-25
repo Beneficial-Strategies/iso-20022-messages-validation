@@ -41,6 +41,9 @@ public class StandingOrderIdentification9Validator : AbstractValidator<IStanding
         IValidator<IBranchAndFinancialInstitutionIdentification8> agentValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Account).NotNull().WithMessage("StandingOrderIdentification9.Account is required (1..1).");
+
         RuleFor(x => x.Account).SetValidator(accountValidator);
 
         When(

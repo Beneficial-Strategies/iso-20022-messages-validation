@@ -75,101 +75,111 @@ public class PaymentTransaction182Validator : AbstractValidator<IPaymentTransact
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
-        // ── ReversedInterbankSettlementAmount (ActiveCurrencyAndAmount, required 1..1) ───
-        RuleFor(x => (string)x.ReversedInterbankSettlementAmount.Currency)
-            .NotEmpty()
-            .Matches(CurrencyRegex)
-            .WithMessage(
-                "PaymentTransaction182.ReversedInterbankSettlementAmount.Currency must be a valid ISO 4217 three-letter currency code (e.g. EUR, USD)."
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.ReversedInterbankSettlementAmount).NotNull().WithMessage("PaymentTransaction182.ReversedInterbankSettlementAmount is required (1..1).");
+
+        // The rules below read these members, so they run only when they are present.
+        When(
+            x => x.ReversedInterbankSettlementAmount is not null,
+            () =>
+            {
+            // ── ReversedInterbankSettlementAmount (ActiveCurrencyAndAmount, required 1..1) ───
+            RuleFor(x => (string)x.ReversedInterbankSettlementAmount.Currency)
+                .NotEmpty()
+                .Matches(CurrencyRegex)
+                .WithMessage(
+                    "PaymentTransaction182.ReversedInterbankSettlementAmount.Currency must be a valid ISO 4217 three-letter currency code (e.g. EUR, USD)."
+                );
+
+            RuleFor(x => x.ReversedInterbankSettlementAmount.Amount)
+                .GreaterThan(0)
+                .WithMessage("PaymentTransaction182.ReversedInterbankSettlementAmount.Amount must be greater than zero.");
+
+            When(
+                x => x.OriginalGroupInformation is not null,
+                () => RuleFor(x => x.OriginalGroupInformation).SetValidator(originalGroupInformationValidator!)
             );
 
-        RuleFor(x => x.ReversedInterbankSettlementAmount.Amount)
-            .GreaterThan(0)
-            .WithMessage("PaymentTransaction182.ReversedInterbankSettlementAmount.Amount must be greater than zero.");
+            When(
+                x => x.OriginalInterbankSettlementAmount is not null,
+                () =>
+                {
+                    RuleFor(x => (string)x.OriginalInterbankSettlementAmount!.Currency)
+                        .NotEmpty()
+                        .Matches(CurrencyRegex)
+                        .WithMessage(
+                            "PaymentTransaction182.OriginalInterbankSettlementAmount.Currency must be a valid ISO 4217 three-letter currency code (e.g. EUR, USD)."
+                        );
 
-        When(
-            x => x.OriginalGroupInformation is not null,
-            () => RuleFor(x => x.OriginalGroupInformation).SetValidator(originalGroupInformationValidator!)
-        );
+                    RuleFor(x => x.OriginalInterbankSettlementAmount!.Amount)
+                        .GreaterThan(0)
+                        .WithMessage(
+                            "PaymentTransaction182.OriginalInterbankSettlementAmount.Amount must be greater than zero."
+                        );
+                }
+            );
 
-        When(
-            x => x.OriginalInterbankSettlementAmount is not null,
-            () =>
-            {
-                RuleFor(x => (string)x.OriginalInterbankSettlementAmount!.Currency)
-                    .NotEmpty()
-                    .Matches(CurrencyRegex)
-                    .WithMessage(
-                        "PaymentTransaction182.OriginalInterbankSettlementAmount.Currency must be a valid ISO 4217 three-letter currency code (e.g. EUR, USD)."
-                    );
+            When(
+                x => x.ReversedInstructedAmount is not null,
+                () =>
+                {
+                    RuleFor(x => (string)x.ReversedInstructedAmount!.Currency)
+                        .NotEmpty()
+                        .Matches(CurrencyRegex)
+                        .WithMessage(
+                            "PaymentTransaction182.ReversedInstructedAmount.Currency must be a valid ISO 4217 three-letter currency code (e.g. EUR, USD)."
+                        );
 
-                RuleFor(x => x.OriginalInterbankSettlementAmount!.Amount)
-                    .GreaterThan(0)
-                    .WithMessage(
-                        "PaymentTransaction182.OriginalInterbankSettlementAmount.Amount must be greater than zero."
-                    );
+                    RuleFor(x => x.ReversedInstructedAmount!.Amount)
+                        .GreaterThan(0)
+                        .WithMessage("PaymentTransaction182.ReversedInstructedAmount.Amount must be greater than zero.");
+                }
+            );
+
+            When(
+                x => x.CompensationAmount is not null,
+                () =>
+                {
+                    RuleFor(x => (string)x.CompensationAmount!.Currency)
+                        .NotEmpty()
+                        .Matches(CurrencyRegex)
+                        .WithMessage(
+                            "PaymentTransaction182.CompensationAmount.Currency must be a valid ISO 4217 three-letter currency code (e.g. EUR, USD)."
+                        );
+
+                    RuleFor(x => x.CompensationAmount!.Amount)
+                        .GreaterThan(0)
+                        .WithMessage("PaymentTransaction182.CompensationAmount.Amount must be greater than zero.");
+                }
+            );
+
+            When(
+                x => x.SettlementTimeIndication is not null,
+                () => RuleFor(x => x.SettlementTimeIndication).SetValidator(settlementTimeIndicationValidator!)
+            );
+
+            RuleForEach(x => x.ChargesInformation).SetValidator(chargesInformationValidator!);
+
+            When(
+                x => x.InstructingAgent is not null,
+                () => RuleFor(x => x.InstructingAgent).SetValidator(instructingAgentValidator!)
+            );
+
+            When(
+                x => x.InstructedAgent is not null,
+                () => RuleFor(x => x.InstructedAgent).SetValidator(instructedAgentValidator!)
+            );
+
+            RuleForEach(x => x.ReversalReasonInformation).SetValidator(reversalReasonInformationValidator!);
+
+            When(
+                x => x.OriginalTransactionReference is not null,
+                () => RuleFor(x => x.OriginalTransactionReference).SetValidator(originalTransactionReferenceValidator!)
+            );
+
+            RuleForEach(x => x.SupplementaryData).SetValidator(supplementaryDataValidator!);
             }
         );
-
-        When(
-            x => x.ReversedInstructedAmount is not null,
-            () =>
-            {
-                RuleFor(x => (string)x.ReversedInstructedAmount!.Currency)
-                    .NotEmpty()
-                    .Matches(CurrencyRegex)
-                    .WithMessage(
-                        "PaymentTransaction182.ReversedInstructedAmount.Currency must be a valid ISO 4217 three-letter currency code (e.g. EUR, USD)."
-                    );
-
-                RuleFor(x => x.ReversedInstructedAmount!.Amount)
-                    .GreaterThan(0)
-                    .WithMessage("PaymentTransaction182.ReversedInstructedAmount.Amount must be greater than zero.");
-            }
-        );
-
-        When(
-            x => x.CompensationAmount is not null,
-            () =>
-            {
-                RuleFor(x => (string)x.CompensationAmount!.Currency)
-                    .NotEmpty()
-                    .Matches(CurrencyRegex)
-                    .WithMessage(
-                        "PaymentTransaction182.CompensationAmount.Currency must be a valid ISO 4217 three-letter currency code (e.g. EUR, USD)."
-                    );
-
-                RuleFor(x => x.CompensationAmount!.Amount)
-                    .GreaterThan(0)
-                    .WithMessage("PaymentTransaction182.CompensationAmount.Amount must be greater than zero.");
-            }
-        );
-
-        When(
-            x => x.SettlementTimeIndication is not null,
-            () => RuleFor(x => x.SettlementTimeIndication).SetValidator(settlementTimeIndicationValidator!)
-        );
-
-        RuleForEach(x => x.ChargesInformation).SetValidator(chargesInformationValidator!);
-
-        When(
-            x => x.InstructingAgent is not null,
-            () => RuleFor(x => x.InstructingAgent).SetValidator(instructingAgentValidator!)
-        );
-
-        When(
-            x => x.InstructedAgent is not null,
-            () => RuleFor(x => x.InstructedAgent).SetValidator(instructedAgentValidator!)
-        );
-
-        RuleForEach(x => x.ReversalReasonInformation).SetValidator(reversalReasonInformationValidator!);
-
-        When(
-            x => x.OriginalTransactionReference is not null,
-            () => RuleFor(x => x.OriginalTransactionReference).SetValidator(originalTransactionReferenceValidator!)
-        );
-
-        RuleForEach(x => x.SupplementaryData).SetValidator(supplementaryDataValidator!);
     }
 
     /// <summary>
