@@ -25,6 +25,18 @@ public class LoanContract2Validator : AbstractValidator<ILoanContract2>
     /// </summary>
     public LoanContract2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.ContractDocumentIdentification).NotNull().WithMessage("LoanContract2.ContractDocumentIdentification is required (1..1).");
+        RuleFor(x => x.Amount).NotNull().WithMessage("LoanContract2.Amount is required (1..1).");
+        RuleFor(x => x.MaturityDate).NotDefault().WithMessage("LoanContract2.MaturityDate is required (1..1).");
+        RuleFor(x => x.ProlongationFlag).NotDefault().WithMessage("LoanContract2.ProlongationFlag is required (1..1).");
+        RuleFor(x => x.StartDate).NotDefault().WithMessage("LoanContract2.StartDate is required (1..1).");
+        RuleFor(x => x.SettlementCurrency).NotDefault().WithMessage("LoanContract2.SettlementCurrency is required (1..1).");
+        RuleFor(x => x.DurationCode).NotDefault().WithMessage("LoanContract2.DurationCode is required (1..1).");
+        RuleFor(x => x.InterestRate).NotNull().WithMessage("LoanContract2.InterestRate is required (1..1).");
+        RuleFor(x => x.InterestSchedule).NotNull().WithMessage("LoanContract2.InterestSchedule is required (1..1).");
+        RuleFor(x => x.IntraCompanyLoan).NotDefault().WithMessage("LoanContract2.IntraCompanyLoan is required (1..1).");
+
         RuleFor(x => x.Buyer)
             .NotEmpty()
             .WithMessage("LoanContract2.Buyer must contain at least one element (1..∞).");

@@ -38,6 +38,10 @@ public class GroupHeader128Validator : AbstractValidator<IGroupHeader128>
         IValidator<IPartyIdentification272> initiatingPartyValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.MessageIdentification).NotDefault().WithMessage("GroupHeader128.MessageIdentification is required (1..1).");
+        RuleFor(x => x.CreationDateTime).NotDefault().WithMessage("GroupHeader128.CreationDateTime is required (1..1).");
+
         When(x => x.CreditorAgent is not null, () => RuleFor(x => x.CreditorAgent).SetValidator(agentValidator!));
         When(x => x.DebtorAgent is not null, () => RuleFor(x => x.DebtorAgent).SetValidator(agentValidator!));
         When(

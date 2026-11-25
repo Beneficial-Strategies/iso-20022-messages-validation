@@ -25,6 +25,9 @@ public class IntraPositionDetails44Validator : AbstractValidator<IIntraPositionD
     /// </summary>
     public IntraPositionDetails44Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.BalanceFrom).NotNull().WithMessage("IntraPositionDetails44.BalanceFrom is required (1..1).");
+
         RuleFor(x => x.IntraPositionMovement)
             .NotEmpty()
             .WithMessage("IntraPositionDetails44.IntraPositionMovement must contain at least one element (1..∞).");

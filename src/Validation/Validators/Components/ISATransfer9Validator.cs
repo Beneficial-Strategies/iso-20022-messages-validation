@@ -25,6 +25,10 @@ public class ISATransfer9Validator : AbstractValidator<IISATransfer9>
     /// </summary>
     public ISATransfer9Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.TransferorAccount).NotNull().WithMessage("ISATransfer9.TransferorAccount is required (1..1).");
+        RuleFor(x => x.Transferee).NotNull().WithMessage("ISATransfer9.Transferee is required (1..1).");
+
         RuleFor(x => x.ProductTransfer)
             .NotEmpty()
             .WithMessage("ISATransfer9.ProductTransfer must contain at least one element (1..∞).");

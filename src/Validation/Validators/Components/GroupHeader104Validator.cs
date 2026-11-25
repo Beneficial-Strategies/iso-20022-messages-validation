@@ -38,6 +38,11 @@ public class GroupHeader104Validator : AbstractValidator<IGroupHeader104>
     /// </param>
     public GroupHeader104Validator(IValidator<ISettlementInstruction14> settlementInformationValidator)
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.MessageIdentification).NotDefault().WithMessage("GroupHeader104.MessageIdentification is required (1..1).");
+        RuleFor(x => x.CreationDateTime).NotDefault().WithMessage("GroupHeader104.CreationDateTime is required (1..1).");
+        RuleFor(x => x.NumberOfSettlementRequests).NotDefault().WithMessage("GroupHeader104.NumberOfSettlementRequests is required (1..1).");
+
         // MessageIdentification, NumberOfSettlementRequests: required scalars, format/length
         // enforced by struct constructors — no rule needed.
         // CreationDateTime: required, lexical form enforced by struct constructor — no rule needed.

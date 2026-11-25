@@ -39,6 +39,10 @@ public class GroupHeader120Validator : AbstractValidator<IGroupHeader120>
         IValidator<IOriginalBusinessQuery1> originalBusinessQueryValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.MessageIdentification).NotDefault().WithMessage("GroupHeader120.MessageIdentification is required (1..1).");
+        RuleFor(x => x.CreationDateTime).NotDefault().WithMessage("GroupHeader120.CreationDateTime is required (1..1).");
+
         // MessageIdentification: required scalar, length enforced by struct constructor — no rule needed.
         // CreationDateTime: required, lexical form enforced by struct constructor — no rule needed.
 

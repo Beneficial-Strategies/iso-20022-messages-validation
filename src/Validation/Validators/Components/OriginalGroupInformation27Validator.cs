@@ -24,4 +24,14 @@ namespace BeneficialStrategies.Iso20022.Messages.Validation.Components;
 /// coverage-scoping policy ("reviewed and confirmed to need nothing"), same convention as
 /// <c>AddressType3Choice_Validator</c>.
 /// </remarks>
-public class OriginalGroupInformation27Validator : AbstractValidator<IOriginalGroupInformation27> { }
+public class OriginalGroupInformation27Validator : AbstractValidator<IOriginalGroupInformation27>
+{
+    /// <summary>Initializes a new instance.</summary>
+    public OriginalGroupInformation27Validator()
+    {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.OriginalMessageIdentification).NotDefault().WithMessage("OriginalGroupInformation27.OriginalMessageIdentification is required (1..1).");
+        RuleFor(x => x.OriginalMessageNameIdentification).NotDefault().WithMessage("OriginalGroupInformation27.OriginalMessageNameIdentification is required (1..1).");
+
+    }
+}

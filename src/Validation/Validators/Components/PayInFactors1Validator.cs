@@ -26,6 +26,9 @@ public class PayInFactors1Validator : AbstractValidator<IPayInFactors1>
     /// </summary>
     public PayInFactors1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.AggregateShortPositionLimit).NotNull().WithMessage("PayInFactors1.AggregateShortPositionLimit is required (1..1).");
+
         // AggregateShortPositionLimit (ActiveCurrencyAndAmount): required (1..1) and already
         // `required` C# property — no rule needed. No validator exists yet for it; nested
         // fields unvalidated.

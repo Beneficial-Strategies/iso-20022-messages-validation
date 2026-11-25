@@ -23,4 +23,13 @@ namespace BeneficialStrategies.Iso20022.Messages.Validation.Components;
 /// type so the coverage-scoping policy (see the FluentValidation project's own <c>CLAUDE.md</c>)
 /// can record this type as reviewed rather than silently skipped.
 /// </remarks>
-public class OriginalBusinessQuery1Validator : AbstractValidator<IOriginalBusinessQuery1> { }
+public class OriginalBusinessQuery1Validator : AbstractValidator<IOriginalBusinessQuery1>
+{
+    /// <summary>Initializes a new instance.</summary>
+    public OriginalBusinessQuery1Validator()
+    {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.MessageIdentification).NotDefault().WithMessage("OriginalBusinessQuery1.MessageIdentification is required (1..1).");
+
+    }
+}

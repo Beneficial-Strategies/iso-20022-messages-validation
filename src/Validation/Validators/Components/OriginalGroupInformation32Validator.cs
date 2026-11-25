@@ -44,6 +44,10 @@ public class OriginalGroupInformation32Validator : AbstractValidator<IOriginalGr
         IValidator<IStatusReasonInformation14> statusReasonInformationValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.OriginalMessageIdentification).NotDefault().WithMessage("OriginalGroupInformation32.OriginalMessageIdentification is required (1..1).");
+        RuleFor(x => x.OriginalMessageNameIdentification).NotDefault().WithMessage("OriginalGroupInformation32.OriginalMessageNameIdentification is required (1..1).");
+
         RuleForEach(x => x.NumberOfTransactionsPerStatus).SetValidator(numberOfTransactionsPerStatusValidator!);
         RuleForEach(x => x.StatusReasonInformation).SetValidator(statusReasonInformationValidator!);
     }

@@ -25,6 +25,9 @@ public class Organisation16Validator : AbstractValidator<IOrganisation16>
     /// </summary>
     public Organisation16Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Name).NotDefault().WithMessage("Organisation16.Name is required (1..1).");
+
         RuleFor(x => x.PostalAddress)
             .NotEmpty()
             .WithMessage("Organisation16.PostalAddress must contain at least one element (1..5).");

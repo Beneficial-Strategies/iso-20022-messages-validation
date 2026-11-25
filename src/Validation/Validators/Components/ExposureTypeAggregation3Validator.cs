@@ -24,6 +24,9 @@ public class ExposureTypeAggregation3Validator : AbstractValidator<IExposureType
     /// </summary>
     public ExposureTypeAggregation3Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.ExposureType).NotNull().WithMessage("ExposureTypeAggregation3.ExposureType is required (1..1).");
+
         RuleFor(x => x.ValuationAmounts)
             .NotEmpty()
             .WithMessage("ExposureTypeAggregation3.ValuationAmounts must contain at least one element (1..∞).");

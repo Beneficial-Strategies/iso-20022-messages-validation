@@ -41,6 +41,9 @@ public class OriginalPaymentInstruction56Validator : AbstractValidator<IOriginal
         IValidator<IPaymentTransaction178> transactionInformationAndStatusValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.OriginalPaymentInformationIdentification).NotDefault().WithMessage("OriginalPaymentInstruction56.OriginalPaymentInformationIdentification is required (1..1).");
+
         RuleForEach(x => x.StatusReasonInformation).SetValidator(statusReasonInformationValidator!);
         RuleForEach(x => x.NumberOfTransactionsPerStatus).SetValidator(numberOfTransactionsPerStatusValidator!);
         RuleForEach(x => x.TransactionInformationAndStatus).SetValidator(transactionInformationAndStatusValidator!);

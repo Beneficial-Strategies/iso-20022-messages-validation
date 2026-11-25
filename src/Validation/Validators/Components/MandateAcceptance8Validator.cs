@@ -52,6 +52,9 @@ public class MandateAcceptance8Validator : AbstractValidator<IMandateAcceptance8
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.AcceptanceResult).NotNull().WithMessage("MandateAcceptance8.AcceptanceResult is required (1..1).");
+
         RuleFor(x => x.AcceptanceResult).SetValidator(acceptanceResultValidator);
 
         When(

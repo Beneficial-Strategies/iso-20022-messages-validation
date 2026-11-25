@@ -55,6 +55,9 @@ public class LimitIdentification8Validator : AbstractValidator<ILimitIdentificat
         IValidator<ILimitType1Choice> typeValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Type).NotNull().WithMessage("LimitIdentification8.Type is required (1..1).");
+
         RuleFor(x => x.Type).SetValidator(typeValidator);
 
         When(

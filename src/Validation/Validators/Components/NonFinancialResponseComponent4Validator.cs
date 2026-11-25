@@ -24,6 +24,10 @@ public class NonFinancialResponseComponent4Validator : AbstractValidator<INonFin
     /// </summary>
     public NonFinancialResponseComponent4Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Environment).NotNull().WithMessage("NonFinancialResponseComponent4.Environment is required (1..1).");
+        RuleFor(x => x.Response).NotNull().WithMessage("NonFinancialResponseComponent4.Response is required (1..1).");
+
         RuleFor(x => x.ResponseContent)
             .NotEmpty()
             .WithMessage("NonFinancialResponseComponent4.ResponseContent must contain at least one element (1..∞).");

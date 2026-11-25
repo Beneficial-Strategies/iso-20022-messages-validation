@@ -68,6 +68,12 @@ public class GroupHeader123Validator : AbstractValidator<IGroupHeader123>
         IValidator<IPaymentTypeInformation28> paymentTypeInformationValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.MessageIdentification).NotDefault().WithMessage("GroupHeader123.MessageIdentification is required (1..1).");
+        RuleFor(x => x.CreationDateTime).NotDefault().WithMessage("GroupHeader123.CreationDateTime is required (1..1).");
+        RuleFor(x => x.NumberOfTransactions).NotDefault().WithMessage("GroupHeader123.NumberOfTransactions is required (1..1).");
+        RuleFor(x => x.SettlementInformation).NotNull().WithMessage("GroupHeader123.SettlementInformation is required (1..1).");
+
         RuleFor(x => x.SettlementInformation).SetValidator(settlementInformationValidator!);
 
         RuleFor(x => x.Authorisation)

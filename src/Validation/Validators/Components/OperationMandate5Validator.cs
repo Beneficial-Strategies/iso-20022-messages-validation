@@ -25,6 +25,11 @@ public class OperationMandate5Validator : AbstractValidator<IOperationMandate5>
     /// </summary>
     public OperationMandate5Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotDefault().WithMessage("OperationMandate5.Identification is required (1..1).");
+        RuleFor(x => x.RequiredSignatureNumber).NotDefault().WithMessage("OperationMandate5.RequiredSignatureNumber is required (1..1).");
+        RuleFor(x => x.SignatureOrderIndicator).NotDefault().WithMessage("OperationMandate5.SignatureOrderIndicator is required (1..1).");
+
         RuleFor(x => x.ApplicableChannel)
             .NotEmpty()
             .WithMessage("OperationMandate5.ApplicableChannel must contain at least one element (1..∞).");

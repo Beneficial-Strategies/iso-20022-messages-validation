@@ -53,6 +53,10 @@ public class GroupHeader110Validator : AbstractValidator<IGroupHeader110>
         IValidator<IBranchAndFinancialInstitutionIdentification8> agentValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.MessageIdentification).NotDefault().WithMessage("GroupHeader110.MessageIdentification is required (1..1).");
+        RuleFor(x => x.CreationDateTime).NotDefault().WithMessage("GroupHeader110.CreationDateTime is required (1..1).");
+
         // MessageIdentification, CreationDateTime: required (1..1) and already `required` C#
         // properties — length/format enforced by struct constructors.
 

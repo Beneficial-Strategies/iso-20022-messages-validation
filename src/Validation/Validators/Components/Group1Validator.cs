@@ -25,6 +25,9 @@ public class Group1Validator : AbstractValidator<IGroup1>
     /// </summary>
     public Group1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.GroupIdentification).NotDefault().WithMessage("Group1.GroupIdentification is required (1..1).");
+
         RuleFor(x => x.Party)
             .NotEmpty()
             .WithMessage("Group1.Party must contain at least one element (1..∞).");

@@ -49,6 +49,10 @@ public class LimitStructure6Validator : AbstractValidator<ILimitStructure6>
         IValidator<IAmount2Choice> amountValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.LimitIdentification).NotNull().WithMessage("LimitStructure6.LimitIdentification is required (1..1).");
+        RuleFor(x => x.Amount).NotNull().WithMessage("LimitStructure6.Amount is required (1..1).");
+
         RuleFor(x => x.LimitIdentification).SetValidator(limitIdentificationValidator);
         RuleFor(x => x.Amount).SetValidator(amountValidator);
 

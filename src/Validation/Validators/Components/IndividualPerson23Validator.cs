@@ -26,6 +26,11 @@ public class IndividualPerson23Validator : AbstractValidator<IIndividualPerson23
     /// </summary>
     public IndividualPerson23Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.GivenName).NotDefault().WithMessage("IndividualPerson23.GivenName is required (1..1).");
+        RuleFor(x => x.Name).NotDefault().WithMessage("IndividualPerson23.Name is required (1..1).");
+        RuleFor(x => x.BirthDate).NotDefault().WithMessage("IndividualPerson23.BirthDate is required (1..1).");
+
         RuleFor(x => x.Citizenship)
             .NotEmpty()
             .WithMessage("IndividualPerson23.Citizenship must contain at least one element (1..3).");

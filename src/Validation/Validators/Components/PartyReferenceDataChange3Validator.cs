@@ -24,6 +24,10 @@ public class PartyReferenceDataChange3Validator : AbstractValidator<IPartyRefere
     /// </summary>
     public PartyReferenceDataChange3Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.PartyIdentification).NotNull().WithMessage("PartyReferenceDataChange3.PartyIdentification is required (1..1).");
+        RuleFor(x => x.OperationTimeStamp).NotDefault().WithMessage("PartyReferenceDataChange3.OperationTimeStamp is required (1..1).");
+
         RuleFor(x => x.Record)
             .NotEmpty()
             .WithMessage("PartyReferenceDataChange3.Record must contain at least one element (1..∞).");

@@ -24,6 +24,9 @@ public class OriginalReportStatistics3Validator : AbstractValidator<IOriginalRep
     /// </summary>
     public OriginalReportStatistics3Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.TotalNumberOfRecords).NotDefault().WithMessage("OriginalReportStatistics3.TotalNumberOfRecords is required (1..1).");
+
         RuleFor(x => x.NumberOfRecordsPerStatus)
             .NotEmpty()
             .WithMessage("OriginalReportStatistics3.NumberOfRecordsPerStatus must contain at least one element (1..∞).");

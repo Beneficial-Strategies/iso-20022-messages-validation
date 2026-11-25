@@ -39,6 +39,10 @@ public class PartyAndSignature4Validator : AbstractValidator<IPartyAndSignature4
     /// </summary>
     public PartyAndSignature4Validator(IValidator<IPartyIdentification272> partyValidator)
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Party).NotNull().WithMessage("PartyAndSignature4.Party is required (1..1).");
+        RuleFor(x => x.Signature).NotNull().WithMessage("PartyAndSignature4.Signature is required (1..1).");
+
         RuleFor(x => x.Party).SetValidator(partyValidator!);
         // Signature: SkipPayload — nothing further to validate structurally.
     }

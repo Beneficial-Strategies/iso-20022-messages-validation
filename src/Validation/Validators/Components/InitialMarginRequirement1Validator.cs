@@ -24,6 +24,9 @@ public class InitialMarginRequirement1Validator : AbstractValidator<IInitialMarg
     /// </summary>
     public InitialMarginRequirement1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Credit).NotNull().WithMessage("InitialMarginRequirement1.Credit is required (1..1).");
+
         RuleFor(x => x.InitialMarginExposure)
             .NotEmpty()
             .WithMessage("InitialMarginRequirement1.InitialMarginExposure must contain at least one element (1..∞).");

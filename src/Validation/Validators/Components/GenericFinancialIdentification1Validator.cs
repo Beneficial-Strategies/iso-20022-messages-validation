@@ -38,6 +38,9 @@ public class GenericFinancialIdentification1Validator
         IValidator<IFinancialIdentificationSchemeName1Choice> schemeNameValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotDefault().WithMessage("GenericFinancialIdentification1.Identification is required (1..1).");
+
         // Identification: Max35Text, required (1..1) and already `required` C# property — length
         // [1..35] enforced by struct constructor.
         // Issuer: Max35Text, optional — length [1..35] enforced by struct constructor.

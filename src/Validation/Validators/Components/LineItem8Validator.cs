@@ -25,6 +25,16 @@ public class LineItem8Validator : AbstractValidator<ILineItem8>
     /// </summary>
     public LineItem8Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.OrderedLineItemsTotalAmount).NotNull().WithMessage("LineItem8.OrderedLineItemsTotalAmount is required (1..1).");
+        RuleFor(x => x.AcceptedLineItemsTotalAmount).NotNull().WithMessage("LineItem8.AcceptedLineItemsTotalAmount is required (1..1).");
+        RuleFor(x => x.OutstandingLineItemsTotalAmount).NotNull().WithMessage("LineItem8.OutstandingLineItemsTotalAmount is required (1..1).");
+        RuleFor(x => x.PendingLineItemsTotalAmount).NotNull().WithMessage("LineItem8.PendingLineItemsTotalAmount is required (1..1).");
+        RuleFor(x => x.OrderedTotalNetAmount).NotNull().WithMessage("LineItem8.OrderedTotalNetAmount is required (1..1).");
+        RuleFor(x => x.AcceptedTotalNetAmount).NotNull().WithMessage("LineItem8.AcceptedTotalNetAmount is required (1..1).");
+        RuleFor(x => x.OutstandingTotalNetAmount).NotNull().WithMessage("LineItem8.OutstandingTotalNetAmount is required (1..1).");
+        RuleFor(x => x.PendingTotalNetAmount).NotNull().WithMessage("LineItem8.PendingTotalNetAmount is required (1..1).");
+
         RuleFor(x => x.LineItemDetails)
             .NotEmpty()
             .WithMessage("LineItem8.LineItemDetails must contain at least one element (1..∞).");

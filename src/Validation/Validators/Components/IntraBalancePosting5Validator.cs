@@ -25,6 +25,9 @@ public class IntraBalancePosting5Validator : AbstractValidator<IIntraBalancePost
     /// </summary>
     public IntraBalancePosting5Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.BalanceFrom).NotNull().WithMessage("IntraBalancePosting5.BalanceFrom is required (1..1).");
+
         // BalanceFrom (CashSubBalanceTypeAndQuantityBreakdown3): required (1..1) and already
         // `required` C# property — no rule needed. No validator exists yet for it; nested fields
         // unvalidated.

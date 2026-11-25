@@ -25,6 +25,17 @@ public class FundProcessingPassport1Validator : AbstractValidator<IFundProcessin
     /// </summary>
     public FundProcessingPassport1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.UpdatedDate).NotNull().WithMessage("FundProcessingPassport1.UpdatedDate is required (1..1).");
+        RuleFor(x => x.SecurityIdentification).NotNull().WithMessage("FundProcessingPassport1.SecurityIdentification is required (1..1).");
+        RuleFor(x => x.MainFundOrderDesk).NotNull().WithMessage("FundProcessingPassport1.MainFundOrderDesk is required (1..1).");
+        RuleFor(x => x.FundManagementCompany).NotNull().WithMessage("FundProcessingPassport1.FundManagementCompany is required (1..1).");
+        RuleFor(x => x.FundDetails).NotNull().WithMessage("FundProcessingPassport1.FundDetails is required (1..1).");
+        RuleFor(x => x.ValuationDealingCharacteristics).NotNull().WithMessage("FundProcessingPassport1.ValuationDealingCharacteristics is required (1..1).");
+        RuleFor(x => x.InvestmentRestrictions).NotNull().WithMessage("FundProcessingPassport1.InvestmentRestrictions is required (1..1).");
+        RuleFor(x => x.SubscriptionProcessingCharacteristics).NotNull().WithMessage("FundProcessingPassport1.SubscriptionProcessingCharacteristics is required (1..1).");
+        RuleFor(x => x.RedemptionProcessingCharacteristics).NotNull().WithMessage("FundProcessingPassport1.RedemptionProcessingCharacteristics is required (1..1).");
+
         RuleFor(x => x.SettlementDetails)
             .NotEmpty()
             .WithMessage("FundProcessingPassport1.SettlementDetails must contain at least one element (1..∞).");

@@ -25,6 +25,9 @@ public class FinancialInstrument8Validator : AbstractValidator<IFinancialInstrum
     /// </summary>
     public FinancialInstrument8Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.DualFundIndicator).NotDefault().WithMessage("FinancialInstrument8.DualFundIndicator is required (1..1).");
+
         RuleFor(x => x.Identification)
             .NotEmpty()
             .WithMessage("FinancialInstrument8.Identification must contain at least one element (1..10).");

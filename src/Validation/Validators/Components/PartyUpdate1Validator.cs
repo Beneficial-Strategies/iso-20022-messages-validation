@@ -24,6 +24,10 @@ public class PartyUpdate1Validator : AbstractValidator<IPartyUpdate1>
     /// </summary>
     public PartyUpdate1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotNull().WithMessage("PartyUpdate1.Identification is required (1..1).");
+        RuleFor(x => x.Other).NotNull().WithMessage("PartyUpdate1.Other is required (1..1).");
+
         RuleFor(x => x.Status)
             .NotEmpty()
             .WithMessage("PartyUpdate1.Status must contain at least one element (1..∞).");

@@ -25,6 +25,9 @@ public class FinancialInstrumentDetails21Validator : AbstractValidator<IFinancia
     /// </summary>
     public FinancialInstrumentDetails21Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.FinancialInstrumentIdentification).NotNull().WithMessage("FinancialInstrumentDetails21.FinancialInstrumentIdentification is required (1..1).");
+
         RuleFor(x => x.SubBalance)
             .NotEmpty()
             .WithMessage("FinancialInstrumentDetails21.SubBalance must contain at least one element (1..∞).");

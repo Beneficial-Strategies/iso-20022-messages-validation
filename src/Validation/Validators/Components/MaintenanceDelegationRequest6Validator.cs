@@ -24,6 +24,9 @@ public class MaintenanceDelegationRequest6Validator : AbstractValidator<IMainten
     /// </summary>
     public MaintenanceDelegationRequest6Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.TMIdentification).NotNull().WithMessage("MaintenanceDelegationRequest6.TMIdentification is required (1..1).");
+
         RuleFor(x => x.RequestedDelegation)
             .NotEmpty()
             .WithMessage("MaintenanceDelegationRequest6.RequestedDelegation must contain at least one element (1..∞).");

@@ -25,6 +25,10 @@ public class PEPISATransfer7Validator : AbstractValidator<IPEPISATransfer7>
     /// </summary>
     public PEPISATransfer7Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.ClientAccount).NotNull().WithMessage("PEPISATransfer7.ClientAccount is required (1..1).");
+        RuleFor(x => x.NewPlanManager).NotNull().WithMessage("PEPISATransfer7.NewPlanManager is required (1..1).");
+
         RuleFor(x => x.ProductTransfer)
             .NotEmpty()
             .WithMessage("PEPISATransfer7.ProductTransfer must contain at least one element (1..∞).");

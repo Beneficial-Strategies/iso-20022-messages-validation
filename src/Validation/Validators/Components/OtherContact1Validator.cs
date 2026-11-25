@@ -25,6 +25,9 @@ public class OtherContact1Validator : AbstractValidator<IOtherContact1>
     /// </summary>
     public OtherContact1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.ChannelType).NotDefault().WithMessage("OtherContact1.ChannelType is required (1..1).");
+
         // ChannelType: Max4Text, required (1..1) and already `required` C# property — length
         // [1..4] enforced by struct constructor.
         // Identification: Max128Text, optional — length [1..128] enforced by struct constructor.

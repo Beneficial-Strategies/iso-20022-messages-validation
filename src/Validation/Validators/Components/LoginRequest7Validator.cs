@@ -24,6 +24,10 @@ public class LoginRequest7Validator : AbstractValidator<ILoginRequest7>
     /// </summary>
     public LoginRequest7Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.LoginDateTime).NotDefault().WithMessage("LoginRequest7.LoginDateTime is required (1..1).");
+        RuleFor(x => x.CashierLanguage).NotDefault().WithMessage("LoginRequest7.CashierLanguage is required (1..1).");
+
         RuleFor(x => x.SaleSoftware)
             .NotEmpty()
             .WithMessage("LoginRequest7.SaleSoftware must contain at least one element (1..∞).");

@@ -24,6 +24,9 @@ public class MarginAccount1Validator : AbstractValidator<IMarginAccount1>
     /// </summary>
     public MarginAccount1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotNull().WithMessage("MarginAccount1.Identification is required (1..1).");
+
         RuleFor(x => x.PositionAccount)
             .NotEmpty()
             .WithMessage("MarginAccount1.PositionAccount must contain at least one element (1..∞).");

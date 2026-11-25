@@ -35,6 +35,10 @@ public class OriginalGroupHeader20Validator : AbstractValidator<IOriginalGroupHe
     /// </summary>
     public OriginalGroupHeader20Validator(IValidator<IPaymentReversalReason10> reversalReasonInformationValidator)
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.OriginalMessageIdentification).NotDefault().WithMessage("OriginalGroupHeader20.OriginalMessageIdentification is required (1..1).");
+        RuleFor(x => x.OriginalMessageNameIdentification).NotDefault().WithMessage("OriginalGroupHeader20.OriginalMessageNameIdentification is required (1..1).");
+
         RuleForEach(x => x.ReversalReasonInformation).SetValidator(reversalReasonInformationValidator!);
     }
 

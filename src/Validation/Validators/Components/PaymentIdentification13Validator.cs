@@ -24,4 +24,13 @@ namespace BeneficialStrategies.Iso20022.Messages.Validation.Components;
 /// coverage-scoping policy ("reviewed and confirmed to need nothing"), same convention as
 /// <c>AddressType3Choice_Validator</c>.
 /// </remarks>
-public class PaymentIdentification13Validator : AbstractValidator<IPaymentIdentification13> { }
+public class PaymentIdentification13Validator : AbstractValidator<IPaymentIdentification13>
+{
+    /// <summary>Initializes a new instance.</summary>
+    public PaymentIdentification13Validator()
+    {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.EndToEndIdentification).NotDefault().WithMessage("PaymentIdentification13.EndToEndIdentification is required (1..1).");
+
+    }
+}

@@ -24,6 +24,9 @@ public class LoginResponse4Validator : AbstractValidator<ILoginResponse4>
     /// </summary>
     public LoginResponse4Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.POIDateTime).NotDefault().WithMessage("LoginResponse4.POIDateTime is required (1..1).");
+
         RuleFor(x => x.POISoftware)
             .NotEmpty()
             .WithMessage("LoginResponse4.POISoftware must contain at least one element (1..∞).");

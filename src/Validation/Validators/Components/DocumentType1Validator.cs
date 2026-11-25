@@ -34,6 +34,9 @@ public class DocumentType1Validator : AbstractValidator<IDocumentType1>
     /// </param>
     public DocumentType1Validator(IValidator<IDocumentType2Choice> codeOrProprietaryValidator)
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.CodeOrProprietary).NotNull().WithMessage("DocumentType1.CodeOrProprietary is required (1..1).");
+
         // Issuer: Max35Text, optional — length [1..35] enforced by struct constructor.
 
         RuleFor(x => x.CodeOrProprietary).SetValidator(codeOrProprietaryValidator);

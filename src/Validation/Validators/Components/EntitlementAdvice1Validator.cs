@@ -25,6 +25,10 @@ public class EntitlementAdvice1Validator : AbstractValidator<IEntitlementAdvice1
     /// </summary>
     public EntitlementAdvice1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.OptionType).NotNull().WithMessage("EntitlementAdvice1.OptionType is required (1..1).");
+        RuleFor(x => x.OptionNumber).NotDefault().WithMessage("EntitlementAdvice1.OptionNumber is required (1..1).");
+
         RuleFor(x => x.AccountAndDistributionDetails)
             .NotEmpty()
             .WithMessage("EntitlementAdvice1.AccountAndDistributionDetails must contain at least one element (1..∞).");

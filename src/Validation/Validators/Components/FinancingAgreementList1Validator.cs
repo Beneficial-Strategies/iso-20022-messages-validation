@@ -25,6 +25,16 @@ public class FinancingAgreementList1Validator : AbstractValidator<IFinancingAgre
     /// </summary>
     public FinancingAgreementList1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identifier).NotDefault().WithMessage("FinancingAgreementList1.Identifier is required (1..1).");
+        RuleFor(x => x.Date).NotDefault().WithMessage("FinancingAgreementList1.Date is required (1..1).");
+        RuleFor(x => x.AgreementRequestor).NotNull().WithMessage("FinancingAgreementList1.AgreementRequestor is required (1..1).");
+        RuleFor(x => x.AgreementResponder).NotNull().WithMessage("FinancingAgreementList1.AgreementResponder is required (1..1).");
+        RuleFor(x => x.GuaranteeApplicant).NotNull().WithMessage("FinancingAgreementList1.GuaranteeApplicant is required (1..1).");
+        RuleFor(x => x.GuaranteeBeneficiary).NotNull().WithMessage("FinancingAgreementList1.GuaranteeBeneficiary is required (1..1).");
+        RuleFor(x => x.GuaranteeIssuer).NotNull().WithMessage("FinancingAgreementList1.GuaranteeIssuer is required (1..1).");
+        RuleFor(x => x.ItemCount).NotDefault().WithMessage("FinancingAgreementList1.ItemCount is required (1..1).");
+
         RuleFor(x => x.Item)
             .NotEmpty()
             .WithMessage("FinancingAgreementList1.Item must contain at least one element (1..∞).");

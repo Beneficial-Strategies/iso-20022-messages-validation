@@ -24,6 +24,9 @@ public class LineItemAndPOIdentification1Validator : AbstractValidator<ILineItem
     /// </summary>
     public LineItemAndPOIdentification1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.PurchaseOrderReference).NotNull().WithMessage("LineItemAndPOIdentification1.PurchaseOrderReference is required (1..1).");
+
         RuleFor(x => x.LineItemIdentification)
             .NotEmpty()
             .WithMessage("LineItemAndPOIdentification1.LineItemIdentification must contain at least one element (1..∞).");

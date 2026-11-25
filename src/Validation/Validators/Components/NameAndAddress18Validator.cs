@@ -40,6 +40,10 @@ public class NameAndAddress18Validator : AbstractValidator<INameAndAddress18>
     /// </summary>
     public NameAndAddress18Validator(IValidator<IPostalAddress27> addressValidator)
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Name).NotDefault().WithMessage("NameAndAddress18.Name is required (1..1).");
+        RuleFor(x => x.Address).NotNull().WithMessage("NameAndAddress18.Address is required (1..1).");
+
         RuleFor(x => x.Address).SetValidator(addressValidator!);
     }
 

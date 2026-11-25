@@ -25,6 +25,10 @@ public class InvoiceTotals8Validator : AbstractValidator<IInvoiceTotals8>
     /// </summary>
     public InvoiceTotals8Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.AccountIdentification).NotNull().WithMessage("InvoiceTotals8.AccountIdentification is required (1..1).");
+        RuleFor(x => x.InvoiceTotals).NotNull().WithMessage("InvoiceTotals8.InvoiceTotals is required (1..1).");
+
         // AccountIdentification (AccountIdentification38Choice_) and InvoiceTotals
         // (InvoiceTotals7): required (1..1) and already `required` C# properties — no rule
         // needed. No validator exists yet for either; nested fields unvalidated.

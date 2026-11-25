@@ -24,6 +24,10 @@ public class LiquidityStressTestResult1Validator : AbstractValidator<ILiquidityS
     /// </summary>
     public LiquidityStressTestResult1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotDefault().WithMessage("LiquidityStressTestResult1.Identification is required (1..1).");
+        RuleFor(x => x.ScenarioDefaulters).NotNull().WithMessage("LiquidityStressTestResult1.ScenarioDefaulters is required (1..1).");
+
         RuleFor(x => x.LiquidityRequiredAndAvailable)
             .NotEmpty()
             .WithMessage("LiquidityStressTestResult1.LiquidityRequiredAndAvailable must contain at least one element (6..6).");

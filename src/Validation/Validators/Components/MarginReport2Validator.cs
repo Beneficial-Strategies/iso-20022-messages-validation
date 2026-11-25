@@ -25,6 +25,9 @@ public class MarginReport2Validator : AbstractValidator<IMarginReport2>
     /// </summary>
     public MarginReport2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.MarginAccount).NotNull().WithMessage("MarginReport2.MarginAccount is required (1..1).");
+
         RuleFor(x => x.MarginCalculation)
             .NotEmpty()
             .WithMessage("MarginReport2.MarginCalculation must contain at least one element (1..∞).");

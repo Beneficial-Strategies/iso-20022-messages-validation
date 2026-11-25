@@ -24,6 +24,9 @@ public class LoginResponse7Validator : AbstractValidator<ILoginResponse7>
     /// </summary>
     public LoginResponse7Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.POIDateTime).NotDefault().WithMessage("LoginResponse7.POIDateTime is required (1..1).");
+
         RuleFor(x => x.POISoftware)
             .NotEmpty()
             .WithMessage("LoginResponse7.POISoftware must contain at least one element (1..∞).");

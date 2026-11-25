@@ -43,6 +43,9 @@ public class MandateSuspensionReason3Validator : AbstractValidator<IMandateSuspe
         IValidator<IMandateSuspensionReason1Choice> reasonValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Reason).NotNull().WithMessage("MandateSuspensionReason3.Reason is required (1..1).");
+
         RuleFor(x => x.Reason).SetValidator(reasonValidator);
 
         When(x => x.Originator is not null, () => RuleFor(x => x.Originator).SetValidator(originatorValidator!));

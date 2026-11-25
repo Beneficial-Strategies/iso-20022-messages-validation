@@ -116,6 +116,10 @@ public class Mandate21Validator : AbstractValidator<IMandate21>
         IValidator<IReferredMandateDocument2> referredDocumentValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.MandateIdentification).NotDefault().WithMessage("Mandate21.MandateIdentification is required (1..1).");
+        RuleFor(x => x.TrackingIndicator).NotDefault().WithMessage("Mandate21.TrackingIndicator is required (1..1).");
+
         // ── UltimateDebtorGuideline ───────────────────────────────────────────────
         RuleFor(x => x)
             .Must(x => x.UltimateDebtor is null || !x.UltimateDebtor.Equals(x.Debtor))

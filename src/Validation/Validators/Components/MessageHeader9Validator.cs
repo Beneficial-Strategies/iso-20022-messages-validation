@@ -36,6 +36,9 @@ public class MessageHeader9Validator : AbstractValidator<IMessageHeader9>
     /// </param>
     public MessageHeader9Validator(IValidator<IRequestType4Choice> requestTypeValidator)
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.MessageIdentification).NotDefault().WithMessage("MessageHeader9.MessageIdentification is required (1..1).");
+
         When(
             x => x.RequestType is not null,
             () => RuleFor(x => x.RequestType).SetValidator(requestTypeValidator!)
