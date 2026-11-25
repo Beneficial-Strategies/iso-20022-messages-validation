@@ -26,6 +26,9 @@ public class SwitchOrder3Validator : AbstractValidator<ISwitchOrder3>
     /// </summary>
     public SwitchOrder3Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.OrderReference).NotDefault().WithMessage("SwitchOrder3.OrderReference is required (1..1).");
+
         RuleFor(x => x.RedemptionLegDetails)
             .NotEmpty()
             .WithMessage("SwitchOrder3.RedemptionLegDetails must contain at least one element (1..∞).");

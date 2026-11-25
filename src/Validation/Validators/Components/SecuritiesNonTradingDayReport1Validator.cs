@@ -24,6 +24,9 @@ public class SecuritiesNonTradingDayReport1Validator : AbstractValidator<ISecuri
     /// </summary>
     public SecuritiesNonTradingDayReport1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotNull().WithMessage("SecuritiesNonTradingDayReport1.Identification is required (1..1).");
+
         RuleFor(x => x.NonWorkingDay)
             .NotEmpty()
             .WithMessage("SecuritiesNonTradingDayReport1.NonWorkingDay must contain at least one element (1..∞).");

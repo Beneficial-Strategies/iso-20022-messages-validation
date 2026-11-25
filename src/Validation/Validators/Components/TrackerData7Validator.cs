@@ -41,6 +41,10 @@ public class TrackerData7Validator : AbstractValidator<ITrackerData7>
         IValidator<ITrackerRecord5> trackerRecordValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.ConfirmedDate).NotNull().WithMessage("TrackerData7.ConfirmedDate is required (1..1).");
+        RuleFor(x => x.ConfirmedAmount).NotNull().WithMessage("TrackerData7.ConfirmedAmount is required (1..1).");
+
         RuleFor(x => x.ConfirmedDate).SetValidator(confirmedDateValidator!);
 
         RuleFor(x => x.TrackerRecord)

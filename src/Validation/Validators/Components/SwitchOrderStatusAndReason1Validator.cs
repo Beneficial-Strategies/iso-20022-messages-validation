@@ -25,6 +25,14 @@ public class SwitchOrderStatusAndReason1Validator : AbstractValidator<ISwitchOrd
     /// </summary>
     public SwitchOrderStatusAndReason1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.OrderReference).NotDefault().WithMessage("SwitchOrderStatusAndReason1.OrderReference is required (1..1).");
+        RuleFor(x => x.Cancelled).NotNull().WithMessage("SwitchOrderStatusAndReason1.Cancelled is required (1..1).");
+        RuleFor(x => x.ConditionallyAccepted).NotNull().WithMessage("SwitchOrderStatusAndReason1.ConditionallyAccepted is required (1..1).");
+        RuleFor(x => x.Suspended).NotNull().WithMessage("SwitchOrderStatusAndReason1.Suspended is required (1..1).");
+        RuleFor(x => x.InRepair).NotNull().WithMessage("SwitchOrderStatusAndReason1.InRepair is required (1..1).");
+        RuleFor(x => x.PartiallySettled).NotNull().WithMessage("SwitchOrderStatusAndReason1.PartiallySettled is required (1..1).");
+
         RuleFor(x => x.Rejected)
             .NotEmpty()
             .WithMessage("SwitchOrderStatusAndReason1.Rejected must contain at least one element (1..10).");

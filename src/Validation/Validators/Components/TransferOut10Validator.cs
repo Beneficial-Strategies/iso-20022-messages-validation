@@ -25,6 +25,9 @@ public class TransferOut10Validator : AbstractValidator<ITransferOut10>
     /// </summary>
     public TransferOut10Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.AccountDetails).NotNull().WithMessage("TransferOut10.AccountDetails is required (1..1).");
+
         RuleFor(x => x.TransferDetails)
             .NotEmpty()
             .WithMessage("TransferOut10.TransferDetails must contain at least one element (1..∞).");

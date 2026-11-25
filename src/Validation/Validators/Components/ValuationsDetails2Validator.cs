@@ -24,6 +24,9 @@ public class ValuationsDetails2Validator : AbstractValidator<IValuationsDetails2
     /// </summary>
     public ValuationsDetails2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Haircut).NotDefault().WithMessage("ValuationsDetails2.Haircut is required (1..1).");
+
         RuleFor(x => x.ValuationDetailsAmount)
             .NotEmpty()
             .WithMessage("ValuationsDetails2.ValuationDetailsAmount must contain at least one element (1..∞).");

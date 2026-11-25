@@ -24,6 +24,10 @@ public class TransactionCertificate3Validator : AbstractValidator<ITransactionCe
     /// </summary>
     public TransactionCertificate3Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.TransactionIdentification).NotDefault().WithMessage("TransactionCertificate3.TransactionIdentification is required (1..1).");
+        RuleFor(x => x.Certificate).NotNull().WithMessage("TransactionCertificate3.Certificate is required (1..1).");
+
         RuleFor(x => x.CertificateRecord)
             .NotEmpty()
             .WithMessage("TransactionCertificate3.CertificateRecord must contain at least one element (1..∞).");

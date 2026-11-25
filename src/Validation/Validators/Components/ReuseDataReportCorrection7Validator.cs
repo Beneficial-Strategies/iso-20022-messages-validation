@@ -24,6 +24,11 @@ public class ReuseDataReportCorrection7Validator : AbstractValidator<IReuseDataR
     /// </summary>
     public ReuseDataReportCorrection7Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.ReportingDateTime).NotDefault().WithMessage("ReuseDataReportCorrection7.ReportingDateTime is required (1..1).");
+        RuleFor(x => x.CounterpartyData).NotNull().WithMessage("ReuseDataReportCorrection7.CounterpartyData is required (1..1).");
+        RuleFor(x => x.EventDay).NotDefault().WithMessage("ReuseDataReportCorrection7.EventDay is required (1..1).");
+
         RuleFor(x => x.CollateralComponent)
             .NotEmpty()
             .WithMessage("ReuseDataReportCorrection7.CollateralComponent must contain at least one element (1..∞).");

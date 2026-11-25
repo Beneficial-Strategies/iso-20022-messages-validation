@@ -25,6 +25,10 @@ public class UnderlyingSecurityMovement1Validator : AbstractValidator<IUnderlyin
     /// </summary>
     public UnderlyingSecurityMovement1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.SecurityIdentification).NotNull().WithMessage("UnderlyingSecurityMovement1.SecurityIdentification is required (1..1).");
+        RuleFor(x => x.SecuritiesQuantity).NotNull().WithMessage("UnderlyingSecurityMovement1.SecuritiesQuantity is required (1..1).");
+
         RuleFor(x => x.AccountDetails)
             .NotEmpty()
             .WithMessage("UnderlyingSecurityMovement1.AccountDetails must contain at least one element (1..2).");

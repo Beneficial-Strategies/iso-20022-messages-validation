@@ -51,24 +51,37 @@ public class TransactionAllocation2Validator : AbstractValidator<ITransactionAll
         IValidator<IReferences80Choice> relatedReferencesValidator
     )
     {
-        // ── Amount (ActiveOrHistoricCurrencyAndAmount, required 1..1) ────────────────
-        RuleFor(x => (string)x.Amount.Currency)
-            .NotEmpty()
-            .Matches(CurrencyRegex)
-            .WithMessage(
-                "TransactionAllocation2.Amount.Currency must be a valid ISO 4217 three-letter currency code (e.g. EUR, USD)."
-            );
-        RuleFor(x => x.Amount.Amount)
-            .GreaterThan(0)
-            .WithMessage("TransactionAllocation2.Amount.Amount must be greater than zero.");
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Amount).NotNull().WithMessage("TransactionAllocation2.Amount is required (1..1).");
+        RuleFor(x => x.Account).NotNull().WithMessage("TransactionAllocation2.Account is required (1..1).");
+        RuleFor(x => x.Purpose).NotNull().WithMessage("TransactionAllocation2.Purpose is required (1..1).");
+        RuleFor(x => x.Reference).NotDefault().WithMessage("TransactionAllocation2.Reference is required (1..1).");
 
-        // CreditDebitIndicator: closed CreditDebitCode enum, required — no rule needed.
-        // Reference: Max35Text, required — length enforced by struct constructor, no rule needed.
+        // The rules below read these members, so they run only when they are present.
+        When(
+            x => x.Amount is not null && x.Account is not null && x.Purpose is not null,
+            () =>
+            {
+            // ── Amount (ActiveOrHistoricCurrencyAndAmount, required 1..1) ────────────────
+            RuleFor(x => (string)x.Amount.Currency)
+                .NotEmpty()
+                .Matches(CurrencyRegex)
+                .WithMessage(
+                    "TransactionAllocation2.Amount.Currency must be a valid ISO 4217 three-letter currency code (e.g. EUR, USD)."
+                );
+            RuleFor(x => x.Amount.Amount)
+                .GreaterThan(0)
+                .WithMessage("TransactionAllocation2.Amount.Amount must be greater than zero.");
 
-        RuleFor(x => x.Account).SetValidator(accountValidator!);
-        RuleFor(x => x.Purpose).SetValidator(purposeValidator!);
+            // CreditDebitIndicator: closed CreditDebitCode enum, required — no rule needed.
+            // Reference: Max35Text, required — length enforced by struct constructor, no rule needed.
 
-        RuleForEach(x => x.RelatedReferences).SetValidator(relatedReferencesValidator!);
+            RuleFor(x => x.Account).SetValidator(accountValidator!);
+            RuleFor(x => x.Purpose).SetValidator(purposeValidator!);
+
+            RuleForEach(x => x.RelatedReferences).SetValidator(relatedReferencesValidator!);
+            }
+        );
     }
 
     /// <summary>

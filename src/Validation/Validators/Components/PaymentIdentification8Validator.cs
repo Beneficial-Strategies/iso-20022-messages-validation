@@ -23,4 +23,13 @@ namespace BeneficialStrategies.Iso20022.Messages.Validation.Components;
 /// type so the coverage-scoping policy (see the FluentValidation project's own <c>CLAUDE.md</c>)
 /// can record this type as reviewed rather than silently skipped.
 /// </remarks>
-public class PaymentIdentification8Validator : AbstractValidator<IPaymentIdentification8> { }
+public class PaymentIdentification8Validator : AbstractValidator<IPaymentIdentification8>
+{
+    /// <summary>Initializes a new instance.</summary>
+    public PaymentIdentification8Validator()
+    {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.EndToEndIdentification).NotDefault().WithMessage("PaymentIdentification8.EndToEndIdentification is required (1..1).");
+
+    }
+}

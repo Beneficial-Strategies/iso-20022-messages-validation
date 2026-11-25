@@ -24,6 +24,13 @@ public class PaymentInstruction43Validator : AbstractValidator<IPaymentInstructi
     /// </summary>
     public PaymentInstruction43Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.PaymentInformationIdentification).NotDefault().WithMessage("PaymentInstruction43.PaymentInformationIdentification is required (1..1).");
+        RuleFor(x => x.RequestedExecutionDate).NotDefault().WithMessage("PaymentInstruction43.RequestedExecutionDate is required (1..1).");
+        RuleFor(x => x.Debtor).NotNull().WithMessage("PaymentInstruction43.Debtor is required (1..1).");
+        RuleFor(x => x.DebtorAccount).NotNull().WithMessage("PaymentInstruction43.DebtorAccount is required (1..1).");
+        RuleFor(x => x.DebtorAgent).NotNull().WithMessage("PaymentInstruction43.DebtorAgent is required (1..1).");
+
         RuleFor(x => x.CreditTransferTransactionInformation)
             .NotEmpty()
             .WithMessage("PaymentInstruction43.CreditTransferTransactionInformation must contain at least one element (1..∞).");

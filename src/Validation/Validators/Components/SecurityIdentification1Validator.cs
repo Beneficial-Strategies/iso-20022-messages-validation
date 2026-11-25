@@ -25,6 +25,12 @@ public class SecurityIdentification1Validator : AbstractValidator<ISecurityIdent
     /// </summary>
     public SecurityIdentification1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotNull().WithMessage("SecurityIdentification1.Identification is required (1..1).");
+        RuleFor(x => x.Name).NotDefault().WithMessage("SecurityIdentification1.Name is required (1..1).");
+        RuleFor(x => x.BaseCurrency).NotDefault().WithMessage("SecurityIdentification1.BaseCurrency is required (1..1).");
+        RuleFor(x => x.CountryOfDomicile).NotDefault().WithMessage("SecurityIdentification1.CountryOfDomicile is required (1..1).");
+
         RuleFor(x => x.RegisteredDistributionCountry)
             .NotEmpty()
             .WithMessage("SecurityIdentification1.RegisteredDistributionCountry must contain at least one element (1..∞).");

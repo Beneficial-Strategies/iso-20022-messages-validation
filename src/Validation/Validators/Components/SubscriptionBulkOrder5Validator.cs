@@ -25,6 +25,9 @@ public class SubscriptionBulkOrder5Validator : AbstractValidator<ISubscriptionBu
     /// </summary>
     public SubscriptionBulkOrder5Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.FinancialInstrumentDetails).NotNull().WithMessage("SubscriptionBulkOrder5.FinancialInstrumentDetails is required (1..1).");
+
         RuleFor(x => x.IndividualOrderDetails)
             .NotEmpty()
             .WithMessage("SubscriptionBulkOrder5.IndividualOrderDetails must contain at least one element (1..∞).");

@@ -24,6 +24,9 @@ public class RemittanceLocation5Validator : AbstractValidator<IRemittanceLocatio
     /// </summary>
     public RemittanceLocation5Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.References).NotNull().WithMessage("RemittanceLocation5.References is required (1..1).");
+
         RuleFor(x => x.RemittanceLocationDetails)
             .NotEmpty()
             .WithMessage("RemittanceLocation5.RemittanceLocationDetails must contain at least one element (1..∞).");

@@ -24,6 +24,9 @@ public class SafekeepingAccount12Validator : AbstractValidator<ISafekeepingAccou
     /// </summary>
     public SafekeepingAccount12Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.AccountIdentification).NotDefault().WithMessage("SafekeepingAccount12.AccountIdentification is required (1..1).");
+
         RuleFor(x => x.InstructedBalance)
             .NotEmpty()
             .WithMessage("SafekeepingAccount12.InstructedBalance must contain at least one element (1..15).");

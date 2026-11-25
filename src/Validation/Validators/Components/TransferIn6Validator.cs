@@ -25,6 +25,10 @@ public class TransferIn6Validator : AbstractValidator<ITransferIn6>
     /// </summary>
     public TransferIn6Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.AccountDetails).NotNull().WithMessage("TransferIn6.AccountDetails is required (1..1).");
+        RuleFor(x => x.SettlementDetails).NotNull().WithMessage("TransferIn6.SettlementDetails is required (1..1).");
+
         RuleFor(x => x.TransferDetails)
             .NotEmpty()
             .WithMessage("TransferIn6.TransferDetails must contain at least one element (1..∞).");

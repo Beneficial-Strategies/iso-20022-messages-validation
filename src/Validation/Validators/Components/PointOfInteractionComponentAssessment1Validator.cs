@@ -24,6 +24,9 @@ public class PointOfInteractionComponentAssessment1Validator : AbstractValidator
     /// </summary>
     public PointOfInteractionComponentAssessment1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Number).NotDefault().WithMessage("PointOfInteractionComponentAssessment1.Number is required (1..1).");
+
         RuleFor(x => x.Assigner)
             .NotEmpty()
             .WithMessage("PointOfInteractionComponentAssessment1.Assigner must contain at least one element (1..∞).");

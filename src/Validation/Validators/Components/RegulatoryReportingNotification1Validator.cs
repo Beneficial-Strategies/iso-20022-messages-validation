@@ -25,6 +25,11 @@ public class RegulatoryReportingNotification1Validator : AbstractValidator<IRegu
     /// </summary>
     public RegulatoryReportingNotification1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.TransactionNotificationIdentification).NotDefault().WithMessage("RegulatoryReportingNotification1.TransactionNotificationIdentification is required (1..1).");
+        RuleFor(x => x.AccountOwner).NotNull().WithMessage("RegulatoryReportingNotification1.AccountOwner is required (1..1).");
+        RuleFor(x => x.AccountServicer).NotNull().WithMessage("RegulatoryReportingNotification1.AccountServicer is required (1..1).");
+
         RuleFor(x => x.TransactionCertificate)
             .NotEmpty()
             .WithMessage("RegulatoryReportingNotification1.TransactionCertificate must contain at least one element (1..∞).");

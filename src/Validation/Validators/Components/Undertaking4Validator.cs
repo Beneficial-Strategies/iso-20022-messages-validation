@@ -26,6 +26,12 @@ public class Undertaking4Validator : AbstractValidator<IUndertaking4>
     /// </summary>
     public Undertaking4Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.LocalUndertakingAmount).NotNull().WithMessage("Undertaking4.LocalUndertakingAmount is required (1..1).");
+        RuleFor(x => x.ExpiryDetails).NotNull().WithMessage("Undertaking4.ExpiryDetails is required (1..1).");
+        RuleFor(x => x.GovernanceRulesAndLaw).NotNull().WithMessage("Undertaking4.GovernanceRulesAndLaw is required (1..1).");
+        RuleFor(x => x.UndertakingWording).NotNull().WithMessage("Undertaking4.UndertakingWording is required (1..1).");
+
         RuleFor(x => x.Applicant)
             .NotEmpty()
             .WithMessage("Undertaking4.Applicant must contain at least one element (1..∞).");
