@@ -26,6 +26,9 @@ public class IndividualOrderConfirmationStatusAndReason1Validator : AbstractVali
     /// </summary>
     public IndividualOrderConfirmationStatusAndReason1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.OrderReference).NotDefault().WithMessage("IndividualOrderConfirmationStatusAndReason1.OrderReference is required (1..1).");
+
         RuleFor(x => x.AmendmentRejected)
             .NotEmpty()
             .WithMessage("IndividualOrderConfirmationStatusAndReason1.AmendmentRejected must contain at least one element (1..10).");

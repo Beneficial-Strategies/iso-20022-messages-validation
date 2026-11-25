@@ -25,6 +25,10 @@ public class LoanContract4Validator : AbstractValidator<ILoanContract4>
     /// </summary>
     public LoanContract4Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.ContractDocumentIdentification).NotNull().WithMessage("LoanContract4.ContractDocumentIdentification is required (1..1).");
+        RuleFor(x => x.IntraCompanyLoan).NotDefault().WithMessage("LoanContract4.IntraCompanyLoan is required (1..1).");
+
         RuleFor(x => x.Buyer)
             .NotEmpty()
             .WithMessage("LoanContract4.Buyer must contain at least one element (1..∞).");

@@ -55,6 +55,9 @@ public class MandateCopy4Validator : AbstractValidator<IMandateCopy4>
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.OriginalMandate).NotNull().WithMessage("MandateCopy4.OriginalMandate is required (1..1).");
+
         When(
             x => x.MandateStatus is not null,
             () => RuleFor(x => x.MandateStatus).SetValidator(mandateStatusValidator!)

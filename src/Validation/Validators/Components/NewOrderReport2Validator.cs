@@ -24,6 +24,9 @@ public class NewOrderReport2Validator : AbstractValidator<INewOrderReport2>
     /// </summary>
     public NewOrderReport2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.ReportIdentification).NotDefault().WithMessage("NewOrderReport2.ReportIdentification is required (1..1).");
+
         RuleFor(x => x.Order)
             .NotEmpty()
             .WithMessage("NewOrderReport2.Order must contain at least one element (1..∞).");

@@ -24,6 +24,10 @@ public class Meeting5Validator : AbstractValidator<IMeeting5>
     /// </summary>
     public Meeting5Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.DateAndTime).NotNull().WithMessage("Meeting5.DateAndTime is required (1..1).");
+        RuleFor(x => x.QuorumRequired).NotDefault().WithMessage("Meeting5.QuorumRequired is required (1..1).");
+
         RuleFor(x => x.Location)
             .NotEmpty()
             .WithMessage("Meeting5.Location must contain at least one element (1..5).");

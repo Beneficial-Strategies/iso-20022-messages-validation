@@ -43,6 +43,10 @@ public class OriginalGroupHeader22Validator : AbstractValidator<IOriginalGroupHe
         IValidator<IStatusReasonInformation14> statusReasonInformationValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.OriginalMessageIdentification).NotDefault().WithMessage("OriginalGroupHeader22.OriginalMessageIdentification is required (1..1).");
+        RuleFor(x => x.OriginalMessageNameIdentification).NotDefault().WithMessage("OriginalGroupHeader22.OriginalMessageNameIdentification is required (1..1).");
+
         RuleForEach(x => x.NumberOfTransactionsPerStatus).SetValidator(numberOfTransactionsPerStatusValidator!);
         RuleForEach(x => x.StatusReasonInformation).SetValidator(statusReasonInformationValidator!);
     }

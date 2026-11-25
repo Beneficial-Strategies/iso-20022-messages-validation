@@ -25,6 +25,9 @@ public class FinancialInstrumentDetails5Validator : AbstractValidator<IFinancial
     /// </summary>
     public FinancialInstrumentDetails5Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.FinancialInstrumentIdentification).NotNull().WithMessage("FinancialInstrumentDetails5.FinancialInstrumentIdentification is required (1..1).");
+
         RuleFor(x => x.Transaction)
             .NotEmpty()
             .WithMessage("FinancialInstrumentDetails5.Transaction must contain at least one element (1..∞).");

@@ -24,6 +24,9 @@ public class NewAccount3Validator : AbstractValidator<INewAccount3>
     /// </summary>
     public NewAccount3Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Account).NotNull().WithMessage("NewAccount3.Account is required (1..1).");
+
         RuleFor(x => x.AccountParty)
             .NotEmpty()
             .WithMessage("NewAccount3.AccountParty must contain at least one element (1..∞).");

@@ -26,6 +26,9 @@ public class InteroperabilityCCP1Validator : AbstractValidator<IInteroperability
     /// </summary>
     public InteroperabilityCCP1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotNull().WithMessage("InteroperabilityCCP1.Identification is required (1..1).");
+
         RuleFor(x => x.AssetHolding)
             .NotEmpty()
             .WithMessage("InteroperabilityCCP1.AssetHolding must contain at least one element (1..∞).");

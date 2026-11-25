@@ -26,6 +26,11 @@ public class LocalMarketAnnex2Validator : AbstractValidator<ILocalMarketAnnex2>
     /// </summary>
     public LocalMarketAnnex2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.LocalOrderDesk).NotNull().WithMessage("LocalMarketAnnex2.LocalOrderDesk is required (1..1).");
+        RuleFor(x => x.SubscriptionProcessingCharacteristics).NotNull().WithMessage("LocalMarketAnnex2.SubscriptionProcessingCharacteristics is required (1..1).");
+        RuleFor(x => x.RedemptionProcessingCharacteristics).NotNull().WithMessage("LocalMarketAnnex2.RedemptionProcessingCharacteristics is required (1..1).");
+
         RuleFor(x => x.Country)
             .NotEmpty()
             .WithMessage("LocalMarketAnnex2.Country must contain at least one element (1..∞).");

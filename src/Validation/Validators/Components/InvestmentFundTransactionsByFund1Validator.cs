@@ -25,6 +25,9 @@ public class InvestmentFundTransactionsByFund1Validator : AbstractValidator<IInv
     /// </summary>
     public InvestmentFundTransactionsByFund1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotNull().WithMessage("InvestmentFundTransactionsByFund1.Identification is required (1..1).");
+
         RuleFor(x => x.TransactionDetails)
             .NotEmpty()
             .WithMessage("InvestmentFundTransactionsByFund1.TransactionDetails must contain at least one element (1..∞).");

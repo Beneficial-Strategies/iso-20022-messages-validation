@@ -24,6 +24,16 @@ public class IncomeStatement2Validator : AbstractValidator<IIncomeStatement2>
     /// </summary>
     public IncomeStatement2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.OtherOperatingRevenue).NotNull().WithMessage("IncomeStatement2.OtherOperatingRevenue is required (1..1).");
+        RuleFor(x => x.OperatingExpenses).NotNull().WithMessage("IncomeStatement2.OperatingExpenses is required (1..1).");
+        RuleFor(x => x.OperatingProfitOrLoss).NotNull().WithMessage("IncomeStatement2.OperatingProfitOrLoss is required (1..1).");
+        RuleFor(x => x.NetInterestIncome).NotNull().WithMessage("IncomeStatement2.NetInterestIncome is required (1..1).");
+        RuleFor(x => x.OtherNonOperatingRevenue).NotNull().WithMessage("IncomeStatement2.OtherNonOperatingRevenue is required (1..1).");
+        RuleFor(x => x.NonOperatingExpenses).NotNull().WithMessage("IncomeStatement2.NonOperatingExpenses is required (1..1).");
+        RuleFor(x => x.PreTaxProfitOrLoss).NotNull().WithMessage("IncomeStatement2.PreTaxProfitOrLoss is required (1..1).");
+        RuleFor(x => x.PostTaxProfitOrLoss).NotNull().WithMessage("IncomeStatement2.PostTaxProfitOrLoss is required (1..1).");
+
         RuleFor(x => x.ClearingMemberFee)
             .NotEmpty()
             .WithMessage("IncomeStatement2.ClearingMemberFee must contain at least one element (1..∞).");

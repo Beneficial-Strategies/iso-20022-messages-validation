@@ -58,6 +58,9 @@ public class LiquidityDebitTransfer4Validator : AbstractValidator<ILiquidityDebi
         IValidator<IAmount2Choice> transferredAmountValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.TransferredAmount).NotNull().WithMessage("LiquidityDebitTransfer4.TransferredAmount is required (1..1).");
+
         // SettlementDate: optional scalar, format enforced by the struct constructor — no rule
         // needed.
 

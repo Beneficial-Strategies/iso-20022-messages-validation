@@ -56,6 +56,11 @@ public class MandateSuspension4Validator : AbstractValidator<IMandateSuspension4
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.SuspensionRequestIdentification).NotDefault().WithMessage("MandateSuspension4.SuspensionRequestIdentification is required (1..1).");
+        RuleFor(x => x.SuspensionReason).NotNull().WithMessage("MandateSuspension4.SuspensionReason is required (1..1).");
+        RuleFor(x => x.OriginalMandate).NotNull().WithMessage("MandateSuspension4.OriginalMandate is required (1..1).");
+
         RuleFor(x => x.OriginalMandate).SetValidator(originalMandateValidator);
         RuleFor(x => x.SuspensionReason).SetValidator(suspensionReasonValidator);
 

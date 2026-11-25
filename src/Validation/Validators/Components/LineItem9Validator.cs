@@ -25,6 +25,12 @@ public class LineItem9Validator : AbstractValidator<ILineItem9>
     /// </summary>
     public LineItem9Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.PurchaseOrderReference).NotNull().WithMessage("LineItem9.PurchaseOrderReference is required (1..1).");
+        RuleFor(x => x.FinalSubmission).NotDefault().WithMessage("LineItem9.FinalSubmission is required (1..1).");
+        RuleFor(x => x.LineItemsTotalAmount).NotNull().WithMessage("LineItem9.LineItemsTotalAmount is required (1..1).");
+        RuleFor(x => x.TotalNetAmount).NotNull().WithMessage("LineItem9.TotalNetAmount is required (1..1).");
+
         RuleFor(x => x.CommercialLineItems)
             .NotEmpty()
             .WithMessage("LineItem9.CommercialLineItems must contain at least one element (1..∞).");

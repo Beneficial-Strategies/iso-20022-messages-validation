@@ -23,4 +23,13 @@ namespace BeneficialStrategies.Iso20022.Messages.Validation.Components;
 /// FluentValidation project's own <c>CLAUDE.md</c>) can record this type as reviewed rather than
 /// silently skipped.
 /// </remarks>
-public class NumberOfTransactionsPerStatus5Validator : AbstractValidator<INumberOfTransactionsPerStatus5> { }
+public class NumberOfTransactionsPerStatus5Validator : AbstractValidator<INumberOfTransactionsPerStatus5>
+{
+    /// <summary>Initializes a new instance.</summary>
+    public NumberOfTransactionsPerStatus5Validator()
+    {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.DetailedNumberOfTransactions).NotDefault().WithMessage("NumberOfTransactionsPerStatus5.DetailedNumberOfTransactions is required (1..1).");
+
+    }
+}

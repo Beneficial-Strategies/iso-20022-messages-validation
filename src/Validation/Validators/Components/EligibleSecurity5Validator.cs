@@ -24,6 +24,9 @@ public class EligibleSecurity5Validator : AbstractValidator<IEligibleSecurity5>
     /// </summary>
     public EligibleSecurity5Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.PartyIdentification).NotNull().WithMessage("EligibleSecurity5.PartyIdentification is required (1..1).");
+
         RuleFor(x => x.SecurityIdentification)
             .NotEmpty()
             .WithMessage("EligibleSecurity5.SecurityIdentification must contain at least one element (1..∞).");

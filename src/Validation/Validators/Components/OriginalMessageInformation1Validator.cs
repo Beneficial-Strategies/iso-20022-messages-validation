@@ -27,6 +27,10 @@ public class OriginalMessageInformation1Validator : AbstractValidator<IOriginalM
     /// </summary>
     public OriginalMessageInformation1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.MessageIdentification).NotDefault().WithMessage("OriginalMessageInformation1.MessageIdentification is required (1..1).");
+        RuleFor(x => x.MessageNameIdentification).NotDefault().WithMessage("OriginalMessageInformation1.MessageNameIdentification is required (1..1).");
+
         // MessageIdentification, MessageNameIdentification: Max35Text, required (1..1) and
         // already `required` C# properties — length [1..35] enforced by struct constructor.
         // CreationDateTime: ISODateTime, optional — no additional constraint beyond the type itself.

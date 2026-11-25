@@ -25,6 +25,10 @@ public class InvestmentPlan13Validator : AbstractValidator<IInvestmentPlan13>
     /// </summary>
     public InvestmentPlan13Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Frequency).NotNull().WithMessage("InvestmentPlan13.Frequency is required (1..1).");
+        RuleFor(x => x.Quantity).NotNull().WithMessage("InvestmentPlan13.Quantity is required (1..1).");
+
         RuleFor(x => x.SecurityDetails)
             .NotEmpty()
             .WithMessage("InvestmentPlan13.SecurityDetails must contain at least one element (1..50).");

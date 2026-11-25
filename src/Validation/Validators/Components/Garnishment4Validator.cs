@@ -40,6 +40,9 @@ public class Garnishment4Validator : AbstractValidator<IGarnishment4>
         IValidator<IGarnishmentType1> typeValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Type).NotNull().WithMessage("Garnishment4.Type is required (1..1).");
+
         When(x => x.Garnishee is not null, () => RuleFor(x => x.Garnishee).SetValidator(partyValidator!));
         When(
             x => x.GarnishmentAdministrator is not null,

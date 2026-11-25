@@ -50,6 +50,11 @@ public class FundCashForecast2Validator : AbstractValidator<IFundCashForecast2>
     /// </param>
     public FundCashForecast2Validator(IValidator<ICashSortingCriterion2> sortingCriteriaDetailsValidator)
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.TradeDateTime).NotNull().WithMessage("FundCashForecast2.TradeDateTime is required (1..1).");
+        RuleFor(x => x.FinancialInstrumentDetails).NotNull().WithMessage("FundCashForecast2.FinancialInstrumentDetails is required (1..1).");
+        RuleFor(x => x.ExceptionalNetCashFlowIndicator).NotDefault().WithMessage("FundCashForecast2.ExceptionalNetCashFlowIndicator is required (1..1).");
+
         // ── Cross-field constraints ───────────────────────────────────────────────
 
         RuleFor(x => x)

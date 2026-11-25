@@ -24,6 +24,9 @@ public class LocalMarketAnnex6Validator : AbstractValidator<ILocalMarketAnnex6>
     /// </summary>
     public LocalMarketAnnex6Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.LocalOrderDesk).NotNull().WithMessage("LocalMarketAnnex6.LocalOrderDesk is required (1..1).");
+
         RuleFor(x => x.Country)
             .NotEmpty()
             .WithMessage("LocalMarketAnnex6.Country must contain at least one element (1..∞).");

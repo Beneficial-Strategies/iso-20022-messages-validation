@@ -44,6 +44,10 @@ public class MovementRecord2Validator : AbstractValidator<IMovementRecord2>
         IValidator<ICashAccount40> participantAccountValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotDefault().WithMessage("MovementRecord2.Identification is required (1..1).");
+        RuleFor(x => x.Amount).NotNull().WithMessage("MovementRecord2.Amount is required (1..1).");
+
         // Identification: Max35Text, required — length enforced by struct constructor, no rule needed.
         // Reference: Max35Text, optional — length enforced by struct constructor, no rule needed.
         // SequenceNumber: Number, optional scalar — no rule needed.

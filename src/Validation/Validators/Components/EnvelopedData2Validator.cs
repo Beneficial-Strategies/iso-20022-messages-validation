@@ -24,6 +24,9 @@ public class EnvelopedData2Validator : AbstractValidator<IEnvelopedData2>
     /// </summary>
     public EnvelopedData2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.EncryptedContent).NotNull().WithMessage("EnvelopedData2.EncryptedContent is required (1..1).");
+
         RuleFor(x => x.Recipient)
             .NotEmpty()
             .WithMessage("EnvelopedData2.Recipient must contain at least one element (1..∞).");

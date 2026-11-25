@@ -24,6 +24,9 @@ public class MultilateralSettlementRequest2Validator : AbstractValidator<IMultil
     /// </summary>
     public MultilateralSettlementRequest2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.InstructionIdentification).NotDefault().WithMessage("MultilateralSettlementRequest2.InstructionIdentification is required (1..1).");
+
         RuleFor(x => x.MovementRecord)
             .NotEmpty()
             .WithMessage("MultilateralSettlementRequest2.MovementRecord must contain at least one element (2..∞).");

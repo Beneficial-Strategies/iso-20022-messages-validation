@@ -25,6 +25,9 @@ public class FinancingInformationAndStatus1Validator : AbstractValidator<IFinanc
     /// </summary>
     public FinancingInformationAndStatus1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.FinancingAllowedSummary).NotNull().WithMessage("FinancingInformationAndStatus1.FinancingAllowedSummary is required (1..1).");
+
         RuleFor(x => x.InvoiceFinancingDetails)
             .NotEmpty()
             .WithMessage("FinancingInformationAndStatus1.InvoiceFinancingDetails must contain at least one element (1..∞).");

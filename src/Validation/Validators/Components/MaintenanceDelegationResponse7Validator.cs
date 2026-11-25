@@ -24,6 +24,11 @@ public class MaintenanceDelegationResponse7Validator : AbstractValidator<IMainte
     /// </summary>
     public MaintenanceDelegationResponse7Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.TMIdentification).NotNull().WithMessage("MaintenanceDelegationResponse7.TMIdentification is required (1..1).");
+        RuleFor(x => x.TMDateTime).NotDefault().WithMessage("MaintenanceDelegationResponse7.TMDateTime is required (1..1).");
+        RuleFor(x => x.TMChallengeValue).NotDefault().WithMessage("MaintenanceDelegationResponse7.TMChallengeValue is required (1..1).");
+
         RuleFor(x => x.DelegationResponse)
             .NotEmpty()
             .WithMessage("MaintenanceDelegationResponse7.DelegationResponse must contain at least one element (1..∞).");

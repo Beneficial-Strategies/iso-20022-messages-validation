@@ -54,6 +54,9 @@ public class MultilateralSettlementRequest3Validator : AbstractValidator<IMultil
         IValidator<ISettlementTimeRequest2> settlementTimeRequestValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.InstructionIdentification).NotDefault().WithMessage("MultilateralSettlementRequest3.InstructionIdentification is required (1..1).");
+
         // InstructionIdentification, SettlementCycle: length enforced by struct constructors — no rule needed.
         // InstructionPriority, SettlementPriority: closed Priority3Code enum, optional — no rule needed.
         // NumberOfMovementRecords: optional scalar — no rule needed.

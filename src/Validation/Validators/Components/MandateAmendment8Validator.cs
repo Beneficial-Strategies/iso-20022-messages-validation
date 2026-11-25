@@ -58,6 +58,11 @@ public class MandateAmendment8Validator : AbstractValidator<IMandateAmendment8>
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.AmendmentReason).NotNull().WithMessage("MandateAmendment8.AmendmentReason is required (1..1).");
+        RuleFor(x => x.Mandate).NotNull().WithMessage("MandateAmendment8.Mandate is required (1..1).");
+        RuleFor(x => x.OriginalMandate).NotNull().WithMessage("MandateAmendment8.OriginalMandate is required (1..1).");
+
         RuleFor(x => x.AmendmentReason).SetValidator(amendmentReasonValidator);
         RuleFor(x => x.Mandate).SetValidator(mandateValidator);
         RuleFor(x => x.OriginalMandate).SetValidator(originalMandateValidator);

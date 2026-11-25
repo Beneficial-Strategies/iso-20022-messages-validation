@@ -24,6 +24,10 @@ public class PartyAuditTrail2Validator : AbstractValidator<IPartyAuditTrail2>
     /// </summary>
     public PartyAuditTrail2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.OperationTimeStamp).NotDefault().WithMessage("PartyAuditTrail2.OperationTimeStamp is required (1..1).");
+        RuleFor(x => x.InstructingUser).NotDefault().WithMessage("PartyAuditTrail2.InstructingUser is required (1..1).");
+
         RuleFor(x => x.Record)
             .NotEmpty()
             .WithMessage("PartyAuditTrail2.Record must contain at least one element (1..∞).");

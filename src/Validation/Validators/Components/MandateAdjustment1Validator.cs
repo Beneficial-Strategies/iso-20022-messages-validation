@@ -36,6 +36,9 @@ public class MandateAdjustment1Validator : AbstractValidator<IMandateAdjustment1
     /// </param>
     public MandateAdjustment1Validator(IValidator<IFrequency37Choice> categoryValidator)
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.DateAdjustmentRuleIndicator).NotDefault().WithMessage("MandateAdjustment1.DateAdjustmentRuleIndicator is required (1..1).");
+
         // DateAdjustmentRuleIndicator: required (1..1) and already `required` C# property — no
         // rule needed.
         // Amount: ActiveCurrencyAndAmount, optional — currency/amount format enforced by the

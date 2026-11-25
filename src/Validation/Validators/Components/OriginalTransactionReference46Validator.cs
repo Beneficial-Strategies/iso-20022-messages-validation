@@ -61,6 +61,10 @@ public class OriginalTransactionReference46Validator : AbstractValidator<IOrigin
         IValidator<IBranchAndFinancialInstitutionIdentification8> agentValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.CreditorAgent).NotNull().WithMessage("OriginalTransactionReference46.CreditorAgent is required (1..1).");
+        RuleFor(x => x.Creditor).NotNull().WithMessage("OriginalTransactionReference46.Creditor is required (1..1).");
+
         When(x => x.Amount is not null, () => RuleFor(x => x.Amount).SetValidator(amountValidator!));
         When(
             x => x.RequestedExecutionDate is not null,

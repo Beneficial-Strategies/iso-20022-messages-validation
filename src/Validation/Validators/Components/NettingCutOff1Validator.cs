@@ -24,6 +24,9 @@ public class NettingCutOff1Validator : AbstractValidator<INettingCutOff1>
     /// </summary>
     public NettingCutOff1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.NettingIdentification).NotNull().WithMessage("NettingCutOff1.NettingIdentification is required (1..1).");
+
         RuleFor(x => x.NewCutOff)
             .NotEmpty()
             .WithMessage("NettingCutOff1.NewCutOff must contain at least one element (1..∞).");

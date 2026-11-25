@@ -48,6 +48,9 @@ public class MessageHeader7Validator : AbstractValidator<IMessageHeader7>
         IValidator<IOriginalBusinessQuery1> originalBusinessQueryValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.MessageIdentification).NotDefault().WithMessage("MessageHeader7.MessageIdentification is required (1..1).");
+
         // QueryName: optional scalar, length enforced by the struct constructor — no rule needed.
 
         When(

@@ -38,6 +38,9 @@ public class GenericOrganisationIdentification3Validator
         IValidator<IOrganisationIdentificationSchemeName1Choice> schemeNameValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotDefault().WithMessage("GenericOrganisationIdentification3.Identification is required (1..1).");
+
         // Identification: Max256Text, required (1..1) and already `required` C# property —
         // length enforced by struct constructor.
         // Issuer: Max35Text, optional — length [1..35] enforced by struct constructor.

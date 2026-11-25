@@ -25,6 +25,14 @@ public class IndividualOrderStatusAndReason2Validator : AbstractValidator<IIndiv
     /// </summary>
     public IndividualOrderStatusAndReason2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.OrderReference).NotDefault().WithMessage("IndividualOrderStatusAndReason2.OrderReference is required (1..1).");
+        RuleFor(x => x.Cancelled).NotNull().WithMessage("IndividualOrderStatusAndReason2.Cancelled is required (1..1).");
+        RuleFor(x => x.ConditionallyAccepted).NotNull().WithMessage("IndividualOrderStatusAndReason2.ConditionallyAccepted is required (1..1).");
+        RuleFor(x => x.Suspended).NotNull().WithMessage("IndividualOrderStatusAndReason2.Suspended is required (1..1).");
+        RuleFor(x => x.InRepair).NotNull().WithMessage("IndividualOrderStatusAndReason2.InRepair is required (1..1).");
+        RuleFor(x => x.PartiallySettled).NotNull().WithMessage("IndividualOrderStatusAndReason2.PartiallySettled is required (1..1).");
+
         RuleFor(x => x.Rejected)
             .NotEmpty()
             .WithMessage("IndividualOrderStatusAndReason2.Rejected must contain at least one element (1..10).");

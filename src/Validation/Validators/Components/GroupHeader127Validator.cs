@@ -69,6 +69,12 @@ public class GroupHeader127Validator : AbstractValidator<IGroupHeader127>
         IValidator<IBranchAndFinancialInstitutionIdentification8> instructingAgentValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.MessageIdentification).NotDefault().WithMessage("GroupHeader127.MessageIdentification is required (1..1).");
+        RuleFor(x => x.CreationDateTime).NotDefault().WithMessage("GroupHeader127.CreationDateTime is required (1..1).");
+        RuleFor(x => x.NumberOfTransactions).NotDefault().WithMessage("GroupHeader127.NumberOfTransactions is required (1..1).");
+        RuleFor(x => x.SettlementInformation).NotNull().WithMessage("GroupHeader127.SettlementInformation is required (1..1).");
+
         RuleFor(x => x.SettlementInformation).SetValidator(settlementInformationValidator!);
 
         // MessageIdentification, CreationDateTime, NumberOfTransactions: required scalars,

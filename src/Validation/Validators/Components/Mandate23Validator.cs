@@ -119,6 +119,13 @@ public class Mandate23Validator : AbstractValidator<IMandate23>
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.MandateRequestIdentification).NotDefault().WithMessage("Mandate23.MandateRequestIdentification is required (1..1).");
+        RuleFor(x => x.TrackingIndicator).NotDefault().WithMessage("Mandate23.TrackingIndicator is required (1..1).");
+        RuleFor(x => x.Creditor).NotNull().WithMessage("Mandate23.Creditor is required (1..1).");
+        RuleFor(x => x.Debtor).NotNull().WithMessage("Mandate23.Debtor is required (1..1).");
+        RuleFor(x => x.DebtorAgent).NotNull().WithMessage("Mandate23.DebtorAgent is required (1..1).");
+
         // ── UltimateDebtorGuideline ───────────────────────────────────────────────
         RuleFor(x => x)
             .Must(x => x.UltimateDebtor is null || !x.UltimateDebtor.Equals(x.Debtor))

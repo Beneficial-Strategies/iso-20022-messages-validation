@@ -25,6 +25,12 @@ public class OrderStatusAndReason7Validator : AbstractValidator<IOrderStatusAndR
     /// </summary>
     public OrderStatusAndReason7Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Cancelled).NotNull().WithMessage("OrderStatusAndReason7.Cancelled is required (1..1).");
+        RuleFor(x => x.ConditionallyAccepted).NotNull().WithMessage("OrderStatusAndReason7.ConditionallyAccepted is required (1..1).");
+        RuleFor(x => x.Suspended).NotNull().WithMessage("OrderStatusAndReason7.Suspended is required (1..1).");
+        RuleFor(x => x.PartiallySettled).NotNull().WithMessage("OrderStatusAndReason7.PartiallySettled is required (1..1).");
+
         RuleFor(x => x.Rejected)
             .NotEmpty()
             .WithMessage("OrderStatusAndReason7.Rejected must contain at least one element (1..10).");

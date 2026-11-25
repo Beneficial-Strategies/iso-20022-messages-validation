@@ -85,6 +85,10 @@ public class PEPISATransfer11Validator : AbstractValidator<IPEPISATransfer11>
     /// </summary>
     public PEPISATransfer11Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.TransferorAccount).NotNull().WithMessage("PEPISATransfer11.TransferorAccount is required (1..1).");
+        RuleFor(x => x.Transferee).NotNull().WithMessage("PEPISATransfer11.Transferee is required (1..1).");
+
         // ProductTransfer is 1..∞ but the C# model allows empty (model defect — see XML doc).
         RuleFor(x => x.ProductTransfer)
             .NotEmpty()

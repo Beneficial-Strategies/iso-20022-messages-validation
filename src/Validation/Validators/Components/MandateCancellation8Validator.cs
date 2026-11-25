@@ -54,6 +54,10 @@ public class MandateCancellation8Validator : AbstractValidator<IMandateCancellat
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.CancellationReason).NotNull().WithMessage("MandateCancellation8.CancellationReason is required (1..1).");
+        RuleFor(x => x.OriginalMandate).NotNull().WithMessage("MandateCancellation8.OriginalMandate is required (1..1).");
+
         RuleFor(x => x.OriginalMandate).SetValidator(originalMandateValidator);
         RuleFor(x => x.CancellationReason).SetValidator(cancellationReasonValidator);
 
