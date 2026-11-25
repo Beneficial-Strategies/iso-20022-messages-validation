@@ -94,147 +94,160 @@ public class CreditTransferTransaction80Validator : AbstractValidator<ICreditTra
         IValidator<ITransactionAllocation2> underlyingAllocationValidator
     )
     {
-        RuleFor(x => x.PaymentIdentification).SetValidator(paymentIdentificationValidator!);
-        RuleFor(x => x.Debtor).SetValidator(agentValidator!);
-        RuleFor(x => x.Creditor).SetValidator(agentValidator!);
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.PaymentIdentification).NotNull().WithMessage("CreditTransferTransaction80.PaymentIdentification is required (1..1).");
+        RuleFor(x => x.InterbankSettlementAmount).NotNull().WithMessage("CreditTransferTransaction80.InterbankSettlementAmount is required (1..1).");
+        RuleFor(x => x.Debtor).NotNull().WithMessage("CreditTransferTransaction80.Debtor is required (1..1).");
+        RuleFor(x => x.Creditor).NotNull().WithMessage("CreditTransferTransaction80.Creditor is required (1..1).");
 
-        // ── InterbankSettlementAmount (ActiveCurrencyAndAmount, required 1..1) ───────
-        RuleFor(x => (string)x.InterbankSettlementAmount.Currency)
-            .NotEmpty()
-            .Matches(CurrencyRegex)
-            .WithMessage(
-                "CreditTransferTransaction80.InterbankSettlementAmount.Currency must be a valid ISO 4217 three-letter currency code (e.g. EUR, USD)."
+        // The rules below read these members, so they run only when they are present.
+        When(
+            x => x.PaymentIdentification is not null && x.InterbankSettlementAmount is not null && x.Debtor is not null && x.Creditor is not null,
+            () =>
+            {
+            RuleFor(x => x.PaymentIdentification).SetValidator(paymentIdentificationValidator!);
+            RuleFor(x => x.Debtor).SetValidator(agentValidator!);
+            RuleFor(x => x.Creditor).SetValidator(agentValidator!);
+
+            // ── InterbankSettlementAmount (ActiveCurrencyAndAmount, required 1..1) ───────
+            RuleFor(x => (string)x.InterbankSettlementAmount.Currency)
+                .NotEmpty()
+                .Matches(CurrencyRegex)
+                .WithMessage(
+                    "CreditTransferTransaction80.InterbankSettlementAmount.Currency must be a valid ISO 4217 three-letter currency code (e.g. EUR, USD)."
+                );
+            RuleFor(x => x.InterbankSettlementAmount.Amount)
+                .GreaterThan(0)
+                .WithMessage("CreditTransferTransaction80.InterbankSettlementAmount.Amount must be greater than zero.");
+
+            When(
+                x => x.PaymentTypeInformation is not null,
+                () => RuleFor(x => x.PaymentTypeInformation).SetValidator(paymentTypeInformationValidator!)
             );
-        RuleFor(x => x.InterbankSettlementAmount.Amount)
-            .GreaterThan(0)
-            .WithMessage("CreditTransferTransaction80.InterbankSettlementAmount.Amount must be greater than zero.");
 
-        When(
-            x => x.PaymentTypeInformation is not null,
-            () => RuleFor(x => x.PaymentTypeInformation).SetValidator(paymentTypeInformationValidator!)
-        );
+            When(
+                x => x.SettlementTimeIndication is not null,
+                () => RuleFor(x => x.SettlementTimeIndication).SetValidator(settlementTimeIndicationValidator!)
+            );
 
-        When(
-            x => x.SettlementTimeIndication is not null,
-            () => RuleFor(x => x.SettlementTimeIndication).SetValidator(settlementTimeIndicationValidator!)
-        );
+            When(
+                x => x.SettlementTimeRequest is not null,
+                () => RuleFor(x => x.SettlementTimeRequest).SetValidator(settlementTimeRequestValidator!)
+            );
 
-        When(
-            x => x.SettlementTimeRequest is not null,
-            () => RuleFor(x => x.SettlementTimeRequest).SetValidator(settlementTimeRequestValidator!)
-        );
+            When(
+                x => x.PaymentSignature is not null,
+                () => RuleFor(x => x.PaymentSignature).SetValidator(paymentSignatureValidator!)
+            );
 
-        When(
-            x => x.PaymentSignature is not null,
-            () => RuleFor(x => x.PaymentSignature).SetValidator(paymentSignatureValidator!)
-        );
+            When(
+                x => x.PreviousInstructingAgent1 is not null,
+                () => RuleFor(x => x.PreviousInstructingAgent1).SetValidator(agentValidator!)
+            );
+            When(
+                x => x.PreviousInstructingAgent1Account is not null,
+                () => RuleFor(x => x.PreviousInstructingAgent1Account).SetValidator(cashAccountValidator!)
+            );
+            When(
+                x => x.PreviousInstructingAgent2 is not null,
+                () => RuleFor(x => x.PreviousInstructingAgent2).SetValidator(agentValidator!)
+            );
+            When(
+                x => x.PreviousInstructingAgent2Account is not null,
+                () => RuleFor(x => x.PreviousInstructingAgent2Account).SetValidator(cashAccountValidator!)
+            );
+            When(
+                x => x.PreviousInstructingAgent3 is not null,
+                () => RuleFor(x => x.PreviousInstructingAgent3).SetValidator(agentValidator!)
+            );
+            When(
+                x => x.PreviousInstructingAgent3Account is not null,
+                () => RuleFor(x => x.PreviousInstructingAgent3Account).SetValidator(cashAccountValidator!)
+            );
 
-        When(
-            x => x.PreviousInstructingAgent1 is not null,
-            () => RuleFor(x => x.PreviousInstructingAgent1).SetValidator(agentValidator!)
-        );
-        When(
-            x => x.PreviousInstructingAgent1Account is not null,
-            () => RuleFor(x => x.PreviousInstructingAgent1Account).SetValidator(cashAccountValidator!)
-        );
-        When(
-            x => x.PreviousInstructingAgent2 is not null,
-            () => RuleFor(x => x.PreviousInstructingAgent2).SetValidator(agentValidator!)
-        );
-        When(
-            x => x.PreviousInstructingAgent2Account is not null,
-            () => RuleFor(x => x.PreviousInstructingAgent2Account).SetValidator(cashAccountValidator!)
-        );
-        When(
-            x => x.PreviousInstructingAgent3 is not null,
-            () => RuleFor(x => x.PreviousInstructingAgent3).SetValidator(agentValidator!)
-        );
-        When(
-            x => x.PreviousInstructingAgent3Account is not null,
-            () => RuleFor(x => x.PreviousInstructingAgent3Account).SetValidator(cashAccountValidator!)
-        );
+            When(
+                x => x.InstructingAgent is not null,
+                () => RuleFor(x => x.InstructingAgent).SetValidator(agentValidator!)
+            );
+            When(
+                x => x.InstructedAgent is not null,
+                () => RuleFor(x => x.InstructedAgent).SetValidator(agentValidator!)
+            );
 
-        When(
-            x => x.InstructingAgent is not null,
-            () => RuleFor(x => x.InstructingAgent).SetValidator(agentValidator!)
-        );
-        When(
-            x => x.InstructedAgent is not null,
-            () => RuleFor(x => x.InstructedAgent).SetValidator(agentValidator!)
-        );
+            When(
+                x => x.IntermediaryAgent1 is not null,
+                () => RuleFor(x => x.IntermediaryAgent1).SetValidator(agentValidator!)
+            );
+            When(
+                x => x.IntermediaryAgent1Account is not null,
+                () => RuleFor(x => x.IntermediaryAgent1Account).SetValidator(cashAccountValidator!)
+            );
+            When(
+                x => x.IntermediaryAgent2 is not null,
+                () => RuleFor(x => x.IntermediaryAgent2).SetValidator(agentValidator!)
+            );
+            When(
+                x => x.IntermediaryAgent2Account is not null,
+                () => RuleFor(x => x.IntermediaryAgent2Account).SetValidator(cashAccountValidator!)
+            );
+            When(
+                x => x.IntermediaryAgent3 is not null,
+                () => RuleFor(x => x.IntermediaryAgent3).SetValidator(agentValidator!)
+            );
+            When(
+                x => x.IntermediaryAgent3Account is not null,
+                () => RuleFor(x => x.IntermediaryAgent3Account).SetValidator(cashAccountValidator!)
+            );
 
-        When(
-            x => x.IntermediaryAgent1 is not null,
-            () => RuleFor(x => x.IntermediaryAgent1).SetValidator(agentValidator!)
-        );
-        When(
-            x => x.IntermediaryAgent1Account is not null,
-            () => RuleFor(x => x.IntermediaryAgent1Account).SetValidator(cashAccountValidator!)
-        );
-        When(
-            x => x.IntermediaryAgent2 is not null,
-            () => RuleFor(x => x.IntermediaryAgent2).SetValidator(agentValidator!)
-        );
-        When(
-            x => x.IntermediaryAgent2Account is not null,
-            () => RuleFor(x => x.IntermediaryAgent2Account).SetValidator(cashAccountValidator!)
-        );
-        When(
-            x => x.IntermediaryAgent3 is not null,
-            () => RuleFor(x => x.IntermediaryAgent3).SetValidator(agentValidator!)
-        );
-        When(
-            x => x.IntermediaryAgent3Account is not null,
-            () => RuleFor(x => x.IntermediaryAgent3Account).SetValidator(cashAccountValidator!)
-        );
+            When(
+                x => x.UltimateDebtor is not null,
+                () => RuleFor(x => x.UltimateDebtor).SetValidator(agentValidator!)
+            );
+            When(
+                x => x.DebtorAccount is not null,
+                () => RuleFor(x => x.DebtorAccount).SetValidator(cashAccountValidator!)
+            );
+            When(
+                x => x.DebtorAgent is not null,
+                () => RuleFor(x => x.DebtorAgent).SetValidator(agentValidator!)
+            );
+            When(
+                x => x.DebtorAgentAccount is not null,
+                () => RuleFor(x => x.DebtorAgentAccount).SetValidator(cashAccountValidator!)
+            );
 
-        When(
-            x => x.UltimateDebtor is not null,
-            () => RuleFor(x => x.UltimateDebtor).SetValidator(agentValidator!)
-        );
-        When(
-            x => x.DebtorAccount is not null,
-            () => RuleFor(x => x.DebtorAccount).SetValidator(cashAccountValidator!)
-        );
-        When(
-            x => x.DebtorAgent is not null,
-            () => RuleFor(x => x.DebtorAgent).SetValidator(agentValidator!)
-        );
-        When(
-            x => x.DebtorAgentAccount is not null,
-            () => RuleFor(x => x.DebtorAgentAccount).SetValidator(cashAccountValidator!)
-        );
+            When(
+                x => x.CreditorAgent is not null,
+                () => RuleFor(x => x.CreditorAgent).SetValidator(agentValidator!)
+            );
+            When(
+                x => x.CreditorAgentAccount is not null,
+                () => RuleFor(x => x.CreditorAgentAccount).SetValidator(cashAccountValidator!)
+            );
+            When(
+                x => x.CreditorAccount is not null,
+                () => RuleFor(x => x.CreditorAccount).SetValidator(cashAccountValidator!)
+            );
+            When(
+                x => x.UltimateCreditor is not null,
+                () => RuleFor(x => x.UltimateCreditor).SetValidator(agentValidator!)
+            );
 
-        When(
-            x => x.CreditorAgent is not null,
-            () => RuleFor(x => x.CreditorAgent).SetValidator(agentValidator!)
-        );
-        When(
-            x => x.CreditorAgentAccount is not null,
-            () => RuleFor(x => x.CreditorAgentAccount).SetValidator(cashAccountValidator!)
-        );
-        When(
-            x => x.CreditorAccount is not null,
-            () => RuleFor(x => x.CreditorAccount).SetValidator(cashAccountValidator!)
-        );
-        When(
-            x => x.UltimateCreditor is not null,
-            () => RuleFor(x => x.UltimateCreditor).SetValidator(agentValidator!)
-        );
+            RuleForEach(x => x.InstructionForCreditorAgent).SetValidator(instructionForCreditorAgentValidator!);
+            RuleForEach(x => x.InstructionForNextAgent).SetValidator(instructionForNextAgentValidator!);
 
-        RuleForEach(x => x.InstructionForCreditorAgent).SetValidator(instructionForCreditorAgentValidator!);
-        RuleForEach(x => x.InstructionForNextAgent).SetValidator(instructionForNextAgentValidator!);
+            When(x => x.Purpose is not null, () => RuleFor(x => x.Purpose).SetValidator(purposeValidator!));
 
-        When(x => x.Purpose is not null, () => RuleFor(x => x.Purpose).SetValidator(purposeValidator!));
+            RuleForEach(x => x.RegulatoryReporting).SetValidator(regulatoryReportingValidator!);
 
-        RuleForEach(x => x.RegulatoryReporting).SetValidator(regulatoryReportingValidator!);
+            When(
+                x => x.RemittanceInformation is not null,
+                () => RuleFor(x => x.RemittanceInformation).SetValidator(remittanceInformationValidator!)
+            );
 
-        When(
-            x => x.RemittanceInformation is not null,
-            () => RuleFor(x => x.RemittanceInformation).SetValidator(remittanceInformationValidator!)
+            RuleForEach(x => x.UnderlyingAllocation).SetValidator(underlyingAllocationValidator!);
+            }
         );
-
-        RuleForEach(x => x.UnderlyingAllocation).SetValidator(underlyingAllocationValidator!);
     }
 
     /// <summary>

@@ -26,6 +26,11 @@ public class AccountStatement6Validator : AbstractValidator<IAccountStatement6>
     /// </summary>
     public AccountStatement6Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotDefault().WithMessage("AccountStatement6.Identification is required (1..1).");
+        RuleFor(x => x.CreationDateTime).NotDefault().WithMessage("AccountStatement6.CreationDateTime is required (1..1).");
+        RuleFor(x => x.Account).NotNull().WithMessage("AccountStatement6.Account is required (1..1).");
+
         // Identification (Max35Text) and CreationDateTime (ISODateTime): required (1..1) and
         // already `required` C# properties — no rule needed.
         // ElectronicSequenceNumber, LegalSequenceNumber, CopyDuplicateIndicator,

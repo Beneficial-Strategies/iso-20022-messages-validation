@@ -24,6 +24,9 @@ public class CardTransactionDetail5Validator : AbstractValidator<ICardTransactio
     /// </summary>
     public CardTransactionDetail5Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.TransactionAmounts).NotNull().WithMessage("CardTransactionDetail5.TransactionAmounts is required (1..1).");
+
         RuleFor(x => x.MessageReason)
             .NotEmpty()
             .WithMessage("CardTransactionDetail5.MessageReason must contain at least one element (1..∞).");

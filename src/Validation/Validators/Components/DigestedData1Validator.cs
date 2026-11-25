@@ -24,6 +24,10 @@ public class DigestedData1Validator : AbstractValidator<IDigestedData1>
     /// </summary>
     public DigestedData1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.EncapsulatedContent).NotNull().WithMessage("DigestedData1.EncapsulatedContent is required (1..1).");
+        RuleFor(x => x.Digest).NotDefault().WithMessage("DigestedData1.Digest is required (1..1).");
+
         RuleFor(x => x.DigestAlgorithm)
             .NotEmpty()
             .WithMessage("DigestedData1.DigestAlgorithm must contain at least one element (1..∞).");

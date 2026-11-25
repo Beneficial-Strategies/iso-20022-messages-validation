@@ -34,6 +34,10 @@ public class CurrencyExchangeSearchCriteria1Validator : AbstractValidator<ICurre
     /// </param>
     public CurrencyExchangeSearchCriteria1Validator(IValidator<ActiveOrHistoricCurrencyCode> currencyValidator)
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.SourceCurrency).NotDefault().WithMessage("CurrencyExchangeSearchCriteria1.SourceCurrency is required (1..1).");
+        RuleFor(x => x.TargetCurrency).NotDefault().WithMessage("CurrencyExchangeSearchCriteria1.TargetCurrency is required (1..1).");
+
         RuleFor(x => x.SourceCurrency).SetValidator(currencyValidator);
         RuleFor(x => x.TargetCurrency).SetValidator(currencyValidator);
     }

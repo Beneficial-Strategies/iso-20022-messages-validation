@@ -28,55 +28,65 @@ public class ChargesPerType3Validator : AbstractValidator<IChargesPerType3>
     /// </summary>
     public ChargesPerType3Validator()
     {
-        // ── Cross-field constraints ───────────────────────────────────────────────
-        // Both rules express the same mutual-exclusivity between the top-level charges account
-        // agent fields and the per-record equivalents; the spec states it from both directions.
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Type).NotNull().WithMessage("ChargesPerType3.Type is required (1..1).");
 
-        RuleFor(x => x)
-            .Must(x =>
-                !(
-                    x.Record.Any(r => r.ChargesAccountAgent is not null || r.ChargesAccountAgentAccount is not null)
-                    && (x.ChargesAccountAgent is not null || x.ChargesAccountAgentAccount is not null)
+        // The rules below read these members, so they run only when they are present.
+        When(
+            x => x.Type is not null,
+            () =>
+            {
+            // ── Cross-field constraints ───────────────────────────────────────────────
+            // Both rules express the same mutual-exclusivity between the top-level charges account
+            // agent fields and the per-record equivalents; the spec states it from both directions.
+
+            RuleFor(x => x)
+                .Must(x =>
+                    !(
+                        x.Record.Any(r => r.ChargesAccountAgent is not null || r.ChargesAccountAgentAccount is not null)
+                        && (x.ChargesAccountAgent is not null || x.ChargesAccountAgentAccount is not null)
+                    )
                 )
-            )
-            .WithName("ChargesAccountAgent2Rule")
-            .WithMessage(
-                "When Record/ChargesAccountAgent is present or Record/ChargesAccountAgentAccount is "
-                    + "present then ChargesAccountAgent must be absent and ChargesAccountAgentAccount "
-                    + "must be absent (ChargesAccountAgent2Rule)."
-            );
+                .WithName("ChargesAccountAgent2Rule")
+                .WithMessage(
+                    "When Record/ChargesAccountAgent is present or Record/ChargesAccountAgentAccount is "
+                        + "present then ChargesAccountAgent must be absent and ChargesAccountAgentAccount "
+                        + "must be absent (ChargesAccountAgent2Rule)."
+                );
 
-        RuleFor(x => x)
-            .Must(x =>
-                !(
-                    (x.ChargesAccountAgent is not null || x.ChargesAccountAgentAccount is not null)
-                    && x.Record.Any(r => r.ChargesAccountAgent is not null || r.ChargesAccountAgentAccount is not null)
+            RuleFor(x => x)
+                .Must(x =>
+                    !(
+                        (x.ChargesAccountAgent is not null || x.ChargesAccountAgentAccount is not null)
+                        && x.Record.Any(r => r.ChargesAccountAgent is not null || r.ChargesAccountAgentAccount is not null)
+                    )
                 )
-            )
-            .WithName("ChargesAccountAgentRule")
-            .WithMessage(
-                "When ChargesAccountAgent is present or ChargesAccountAgentAccount is present then "
-                    + "Record/ChargesAccountAgent must be absent and Record/ChargesAccountAgentAccount "
-                    + "must be absent (ChargesAccountAgentRule)."
-            );
+                .WithName("ChargesAccountAgentRule")
+                .WithMessage(
+                    "When ChargesAccountAgent is present or ChargesAccountAgentAccount is present then "
+                        + "Record/ChargesAccountAgent must be absent and Record/ChargesAccountAgentAccount "
+                        + "must be absent (ChargesAccountAgentRule)."
+                );
 
-        // ── Field-level rules ──────────────────────────────────────────────────────
+            // ── Field-level rules ──────────────────────────────────────────────────────
 
-        // Type (ChargeType3Choice_): required (1..1) and already `required` C# property — no
-        // rule needed. No validator exists yet for ChargeType3Choice_ variants; nested fields
-        // unvalidated.
+            // Type (ChargeType3Choice_): required (1..1) and already `required` C# property — no
+            // rule needed. No validator exists yet for ChargeType3Choice_ variants; nested fields
+            // unvalidated.
 
-        // AdditionalInformation (Max140Text), ChargesIdentification (Max35Text): optional (0..1)
-        // scalars, length enforced by struct constructors — no rule needed.
+            // AdditionalInformation (Max140Text), ChargesIdentification (Max35Text): optional (0..1)
+            // scalars, length enforced by struct constructors — no rule needed.
 
-        // ChargesAccountAgent (BranchAndFinancialInstitutionIdentification8, 0..1),
-        // ChargesAccountAgentAccount (CashAccount40, 0..1), TotalChargesPerChargeType
-        // (TotalCharges7, 0..1): no validator exists yet for these; nested fields unvalidated
-        // beyond the cross-field constraints already enforced above.
+            // ChargesAccountAgent (BranchAndFinancialInstitutionIdentification8, 0..1),
+            // ChargesAccountAgentAccount (CashAccount40, 0..1), TotalChargesPerChargeType
+            // (TotalCharges7, 0..1): no validator exists yet for these; nested fields unvalidated
+            // beyond the cross-field constraints already enforced above.
 
-        // Record: ChargesPerTypeRecord3, 1..∞ — NEEDS NotEmpty RULE.
-        RuleFor(x => x.Record)
-            .NotEmpty()
-            .WithMessage("ChargesPerType3.Record must contain at least one element (1..*).");
+            // Record: ChargesPerTypeRecord3, 1..∞ — NEEDS NotEmpty RULE.
+            RuleFor(x => x.Record)
+                .NotEmpty()
+                .WithMessage("ChargesPerType3.Record must contain at least one element (1..*).");
+            }
+        );
     }
 }

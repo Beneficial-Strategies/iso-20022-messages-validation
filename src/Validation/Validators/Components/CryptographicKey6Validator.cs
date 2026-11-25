@@ -24,6 +24,9 @@ public class CryptographicKey6Validator : AbstractValidator<ICryptographicKey6>
     /// </summary>
     public CryptographicKey6Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotDefault().WithMessage("CryptographicKey6.Identification is required (1..1).");
+
         RuleFor(x => x.Function)
             .NotEmpty()
             .WithMessage("CryptographicKey6.Function must contain at least one element (1..∞).");

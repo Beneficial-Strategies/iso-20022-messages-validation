@@ -24,6 +24,9 @@ public class CounterpartyAggregation3Validator : AbstractValidator<ICounterparty
     /// </summary>
     public CounterpartyAggregation3Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.CollateralParties).NotNull().WithMessage("CounterpartyAggregation3.CollateralParties is required (1..1).");
+
         RuleFor(x => x.ValuationAmounts)
             .NotEmpty()
             .WithMessage("CounterpartyAggregation3.ValuationAmounts must contain at least one element (1..∞).");

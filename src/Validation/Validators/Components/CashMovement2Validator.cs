@@ -25,6 +25,9 @@ public class CashMovement2Validator : AbstractValidator<ICashMovement2>
     /// </summary>
     public CashMovement2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Amount).NotNull().WithMessage("CashMovement2.Amount is required (1..1).");
+
         RuleFor(x => x.AccountDetails)
             .NotEmpty()
             .WithMessage("CashMovement2.AccountDetails must contain at least one element (1..2).");

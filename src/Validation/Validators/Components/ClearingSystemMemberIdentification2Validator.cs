@@ -39,6 +39,9 @@ public class ClearingSystemMemberIdentification2Validator
         IValidator<IClearingSystemIdentification2Choice> clearingSystemIdentificationValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.MemberIdentification).NotDefault().WithMessage("ClearingSystemMemberIdentification2.MemberIdentification is required (1..1).");
+
         // MemberIdentification: Max35Text, required (1..1) and already `required` C# property —
         // length [1..35] enforced by struct constructor.
 

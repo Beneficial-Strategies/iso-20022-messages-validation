@@ -25,6 +25,11 @@ public class CardPaymentDataSet9Validator : AbstractValidator<ICardPaymentDataSe
     /// </summary>
     public CardPaymentDataSet9Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.DataSetIdentification).NotNull().WithMessage("CardPaymentDataSet9.DataSetIdentification is required (1..1).");
+        RuleFor(x => x.DataSetResult).NotNull().WithMessage("CardPaymentDataSet9.DataSetResult is required (1..1).");
+        RuleFor(x => x.RemoveDataSet).NotDefault().WithMessage("CardPaymentDataSet9.RemoveDataSet is required (1..1).");
+
         RuleFor(x => x.TransactionTotals)
             .NotEmpty()
             .WithMessage("CardPaymentDataSet9.TransactionTotals must contain at least one element (1..∞).");

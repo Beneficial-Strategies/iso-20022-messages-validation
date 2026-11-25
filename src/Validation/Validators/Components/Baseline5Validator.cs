@@ -25,6 +25,17 @@ public class Baseline5Validator : AbstractValidator<IBaseline5>
     /// </summary>
     public Baseline5Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.SubmitterBaselineIdentification).NotNull().WithMessage("Baseline5.SubmitterBaselineIdentification is required (1..1).");
+        RuleFor(x => x.PurchaseOrderReference).NotNull().WithMessage("Baseline5.PurchaseOrderReference is required (1..1).");
+        RuleFor(x => x.Buyer).NotNull().WithMessage("Baseline5.Buyer is required (1..1).");
+        RuleFor(x => x.Seller).NotNull().WithMessage("Baseline5.Seller is required (1..1).");
+        RuleFor(x => x.BuyerBank).NotNull().WithMessage("Baseline5.BuyerBank is required (1..1).");
+        RuleFor(x => x.SellerBank).NotNull().WithMessage("Baseline5.SellerBank is required (1..1).");
+        RuleFor(x => x.Goods).NotNull().WithMessage("Baseline5.Goods is required (1..1).");
+        RuleFor(x => x.CommercialDataSetRequired).NotNull().WithMessage("Baseline5.CommercialDataSetRequired is required (1..1).");
+        RuleFor(x => x.IntentToPayExpected).NotDefault().WithMessage("Baseline5.IntentToPayExpected is required (1..1).");
+
         RuleFor(x => x.PaymentTerms)
             .NotEmpty()
             .WithMessage("Baseline5.PaymentTerms must contain at least one element (1..∞).");

@@ -24,6 +24,9 @@ public class Derivative3Validator : AbstractValidator<IDerivative3>
     /// </summary>
     public Derivative3Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.DerivativeClassification).NotNull().WithMessage("Derivative3.DerivativeClassification is required (1..1).");
+
         RuleFor(x => x.DerivativeUnderlyingLeg)
             .NotEmpty()
             .WithMessage("Derivative3.DerivativeUnderlyingLeg must contain at least one element (1..2).");

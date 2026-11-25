@@ -26,6 +26,11 @@ public class AccountParties5Validator : AbstractValidator<IAccountParties5>
     /// </summary>
     public AccountParties5Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.PrimaryOwner).NotNull().WithMessage("AccountParties5.PrimaryOwner is required (1..1).");
+        RuleFor(x => x.CustodianForMinor).NotNull().WithMessage("AccountParties5.CustodianForMinor is required (1..1).");
+        RuleFor(x => x.Nominee).NotNull().WithMessage("AccountParties5.Nominee is required (1..1).");
+
         RuleFor(x => x.JointOwner)
             .NotEmpty()
             .WithMessage("AccountParties5.JointOwner must contain at least one element (1..5).");

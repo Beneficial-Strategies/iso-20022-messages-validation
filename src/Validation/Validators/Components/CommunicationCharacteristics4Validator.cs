@@ -24,6 +24,9 @@ public class CommunicationCharacteristics4Validator : AbstractValidator<ICommuni
     /// </summary>
     public CommunicationCharacteristics4Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Active).NotDefault().WithMessage("CommunicationCharacteristics4.Active is required (1..1).");
+
         RuleFor(x => x.RemoteParty)
             .NotEmpty()
             .WithMessage("CommunicationCharacteristics4.RemoteParty must contain at least one element (1..∞).");

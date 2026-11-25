@@ -37,6 +37,9 @@ public class AcceptanceResult6Validator : AbstractValidator<IAcceptanceResult6>
     /// </param>
     public AcceptanceResult6Validator(IValidator<IMandateReason1Choice> rejectReasonValidator)
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Accepted).NotDefault().WithMessage("AcceptanceResult6.Accepted is required (1..1).");
+
         When(
             x => x.RejectReason is not null,
             () => RuleFor(x => x.RejectReason).SetValidator(rejectReasonValidator!)

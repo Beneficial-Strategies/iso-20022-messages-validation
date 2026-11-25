@@ -26,6 +26,9 @@ public class DefaultFundReport1Validator : AbstractValidator<IDefaultFundReport1
     /// </summary>
     public DefaultFundReport1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.NetExcessOrDeficit).NotNull().WithMessage("DefaultFundReport1.NetExcessOrDeficit is required (1..1).");
+
         RuleFor(x => x.CollateralDescription)
             .NotEmpty()
             .WithMessage("DefaultFundReport1.CollateralDescription must contain at least one element (1..∞).");

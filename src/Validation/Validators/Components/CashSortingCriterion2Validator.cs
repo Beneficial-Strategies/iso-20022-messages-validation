@@ -26,6 +26,9 @@ public class CashSortingCriterion2Validator : AbstractValidator<ICashSortingCrit
     /// </summary>
     public CashSortingCriterion2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.SortingCriterionType).NotNull().WithMessage("CashSortingCriterion2.SortingCriterionType is required (1..1).");
+
         // SortingCriterionType (SortCriteria1Choice_): required (1..1) and already `required`
         // C# property — no rule needed. No validator exists yet for SortCriteria1Choice_
         // variants; nested fields unvalidated.

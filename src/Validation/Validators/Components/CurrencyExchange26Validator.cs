@@ -40,6 +40,9 @@ public class CurrencyExchange26Validator : AbstractValidator<ICurrencyExchange26
         IValidator<ActiveOrHistoricCurrencyCode> unitCurrencyValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.PreAgreedExchangeRate).NotDefault().WithMessage("CurrencyExchange26.PreAgreedExchangeRate is required (1..1).");
+
         // PreAgreedExchangeRate: required, enforced by struct constructor — no rule needed.
         // QuotationDateTime: optional, lexical form enforced by struct constructor — no rule needed.
         // QuoteIdentification: optional UUIDv4Identifier, pattern enforced by struct constructor — no rule needed.

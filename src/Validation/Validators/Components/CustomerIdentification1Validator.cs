@@ -25,6 +25,9 @@ public class CustomerIdentification1Validator : AbstractValidator<ICustomerIdent
     /// </summary>
     public CustomerIdentification1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Party).NotNull().WithMessage("CustomerIdentification1.Party is required (1..1).");
+
         RuleFor(x => x.AuthorityRequest)
             .NotEmpty()
             .WithMessage("CustomerIdentification1.AuthorityRequest must contain at least one element (1..∞).");

@@ -24,6 +24,9 @@ public class ATMTransaction44Validator : AbstractValidator<IATMTransaction44>
     /// </summary>
     public ATMTransaction44Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.TransactionIdentification).NotNull().WithMessage("ATMTransaction44.TransactionIdentification is required (1..1).");
+
         RuleFor(x => x.TotalAuthorisedAmount)
             .NotEmpty()
             .WithMessage("ATMTransaction44.TotalAuthorisedAmount must contain at least one element (1..∞).");

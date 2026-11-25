@@ -24,6 +24,11 @@ public class AuthenticatedData1Validator : AbstractValidator<IAuthenticatedData1
     /// </summary>
     public AuthenticatedData1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.MACAlgorithm).NotNull().WithMessage("AuthenticatedData1.MACAlgorithm is required (1..1).");
+        RuleFor(x => x.EncapsulatedContent).NotNull().WithMessage("AuthenticatedData1.EncapsulatedContent is required (1..1).");
+        RuleFor(x => x.MAC).NotDefault().WithMessage("AuthenticatedData1.MAC is required (1..1).");
+
         RuleFor(x => x.Recipient)
             .NotEmpty()
             .WithMessage("AuthenticatedData1.Recipient must contain at least one element (1..∞).");

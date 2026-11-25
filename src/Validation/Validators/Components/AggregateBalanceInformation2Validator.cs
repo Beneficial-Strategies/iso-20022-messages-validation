@@ -26,6 +26,10 @@ public class AggregateBalanceInformation2Validator : AbstractValidator<IAggregat
     /// </summary>
     public AggregateBalanceInformation2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.AggregateQuantity).NotNull().WithMessage("AggregateBalanceInformation2.AggregateQuantity is required (1..1).");
+        RuleFor(x => x.FinancialInstrumentDetails).NotNull().WithMessage("AggregateBalanceInformation2.FinancialInstrumentDetails is required (1..1).");
+
         RuleFor(x => x.HoldingValue)
             .NotEmpty()
             .WithMessage("AggregateBalanceInformation2.HoldingValue must contain at least one element (1..∞).");

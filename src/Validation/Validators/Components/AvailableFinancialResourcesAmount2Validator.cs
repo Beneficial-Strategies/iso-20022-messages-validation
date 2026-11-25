@@ -24,6 +24,13 @@ public class AvailableFinancialResourcesAmount2Validator : AbstractValidator<IAv
     /// </summary>
     public AvailableFinancialResourcesAmount2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.TotalInitialMargin).NotNull().WithMessage("AvailableFinancialResourcesAmount2.TotalInitialMargin is required (1..1).");
+        RuleFor(x => x.TotalPrefundedDefaultFund).NotNull().WithMessage("AvailableFinancialResourcesAmount2.TotalPrefundedDefaultFund is required (1..1).");
+        RuleFor(x => x.OtherDefaultFundContribution).NotNull().WithMessage("AvailableFinancialResourcesAmount2.OtherDefaultFundContribution is required (1..1).");
+        RuleFor(x => x.UnfundedMemberCommitment).NotNull().WithMessage("AvailableFinancialResourcesAmount2.UnfundedMemberCommitment is required (1..1).");
+        RuleFor(x => x.UnfundedThirdPartyCommitment).NotNull().WithMessage("AvailableFinancialResourcesAmount2.UnfundedThirdPartyCommitment is required (1..1).");
+
         RuleFor(x => x.CCPSkinInTheGame)
             .NotEmpty()
             .WithMessage("AvailableFinancialResourcesAmount2.CCPSkinInTheGame must contain at least one element (1..∞).");

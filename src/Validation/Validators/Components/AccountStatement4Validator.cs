@@ -28,6 +28,11 @@ public class AccountStatement4Validator : AbstractValidator<IAccountStatement4>
     /// </summary>
     public AccountStatement4Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotDefault().WithMessage("AccountStatement4.Identification is required (1..1).");
+        RuleFor(x => x.CreationDateTime).NotDefault().WithMessage("AccountStatement4.CreationDateTime is required (1..1).");
+        RuleFor(x => x.Account).NotNull().WithMessage("AccountStatement4.Account is required (1..1).");
+
         // Identification, CreationDateTime: required scalars — already `required`; Max35Text
         // length enforced by struct ctor, ISODateTime is a plain DateTime, no further rule.
         // AdditionalStatementInformation, CopyDuplicateIndicator, ElectronicSequenceNumber,

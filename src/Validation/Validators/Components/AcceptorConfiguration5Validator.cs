@@ -24,6 +24,9 @@ public class AcceptorConfiguration5Validator : AbstractValidator<IAcceptorConfig
     /// </summary>
     public AcceptorConfiguration5Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.TerminalManagerIdentification).NotNull().WithMessage("AcceptorConfiguration5.TerminalManagerIdentification is required (1..1).");
+
         RuleFor(x => x.DataSet)
             .NotEmpty()
             .WithMessage("AcceptorConfiguration5.DataSet must contain at least one element (1..∞).");

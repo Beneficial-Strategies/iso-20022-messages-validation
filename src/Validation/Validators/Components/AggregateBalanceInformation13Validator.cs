@@ -25,6 +25,11 @@ public class AggregateBalanceInformation13Validator : AbstractValidator<IAggrega
     /// </summary>
     public AggregateBalanceInformation13Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.FinancialInstrumentIdentification).NotNull().WithMessage("AggregateBalanceInformation13.FinancialInstrumentIdentification is required (1..1).");
+        RuleFor(x => x.AggregateBalance).NotNull().WithMessage("AggregateBalanceInformation13.AggregateBalance is required (1..1).");
+        RuleFor(x => x.AccountBaseCurrencyAmounts).NotNull().WithMessage("AggregateBalanceInformation13.AccountBaseCurrencyAmounts is required (1..1).");
+
         RuleFor(x => x.PriceDetails)
             .NotEmpty()
             .WithMessage("AggregateBalanceInformation13.PriceDetails must contain at least one element (1..∞).");

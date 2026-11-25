@@ -24,6 +24,9 @@ public class CutOffData1Validator : AbstractValidator<ICutOffData1>
     /// </summary>
     public CutOffData1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.ParticipantIdentification).NotNull().WithMessage("CutOffData1.ParticipantIdentification is required (1..1).");
+
         RuleFor(x => x.NettingCutOffDetails)
             .NotEmpty()
             .WithMessage("CutOffData1.NettingCutOffDetails must contain at least one element (1..∞).");

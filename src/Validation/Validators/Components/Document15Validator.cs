@@ -57,6 +57,13 @@ public class Document15Validator : AbstractValidator<IDocument15>
         IValidator<IDocumentType1Choice> typeValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Type).NotNull().WithMessage("Document15.Type is required (1..1).");
+        RuleFor(x => x.Identification).NotDefault().WithMessage("Document15.Identification is required (1..1).");
+        RuleFor(x => x.IssueDate).NotNull().WithMessage("Document15.IssueDate is required (1..1).");
+        RuleFor(x => x.Format).NotNull().WithMessage("Document15.Format is required (1..1).");
+        RuleFor(x => x.Enclosure).NotDefault().WithMessage("Document15.Enclosure is required (1..1).");
+
         When(
             x => x.DigitalSignature is not null,
             () => RuleFor(x => x.DigitalSignature).SetValidator(digitalSignatureValidator!)

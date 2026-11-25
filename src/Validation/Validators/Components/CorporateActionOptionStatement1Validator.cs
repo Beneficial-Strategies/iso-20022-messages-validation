@@ -24,6 +24,10 @@ public class CorporateActionOptionStatement1Validator : AbstractValidator<ICorpo
     /// </summary>
     public CorporateActionOptionStatement1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.OptionNumber).NotDefault().WithMessage("CorporateActionOptionStatement1.OptionNumber is required (1..1).");
+        RuleFor(x => x.OptionType).NotNull().WithMessage("CorporateActionOptionStatement1.OptionType is required (1..1).");
+
         RuleFor(x => x.BuyerProtectionInstructionDetails)
             .NotEmpty()
             .WithMessage("CorporateActionOptionStatement1.BuyerProtectionInstructionDetails must contain at least one element (1..∞).");

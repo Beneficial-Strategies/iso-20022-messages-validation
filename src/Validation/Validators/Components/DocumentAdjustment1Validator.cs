@@ -27,4 +27,13 @@ namespace BeneficialStrategies.Iso20022.Messages.Validation.Components;
 /// policy (see the FluentValidation project's own <c>CLAUDE.md</c>) can record this type as
 /// reviewed rather than silently skipped.
 /// </remarks>
-public class DocumentAdjustment1Validator : AbstractValidator<IDocumentAdjustment1> { }
+public class DocumentAdjustment1Validator : AbstractValidator<IDocumentAdjustment1>
+{
+    /// <summary>Initializes a new instance.</summary>
+    public DocumentAdjustment1Validator()
+    {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Amount).NotNull().WithMessage("DocumentAdjustment1.Amount is required (1..1).");
+
+    }
+}

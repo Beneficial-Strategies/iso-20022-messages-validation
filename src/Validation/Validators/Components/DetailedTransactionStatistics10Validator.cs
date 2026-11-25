@@ -24,6 +24,11 @@ public class DetailedTransactionStatistics10Validator : AbstractValidator<IDetai
     /// </summary>
     public DetailedTransactionStatistics10Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.TotalNumberOfTransactions).NotDefault().WithMessage("DetailedTransactionStatistics10.TotalNumberOfTransactions is required (1..1).");
+        RuleFor(x => x.TotalNumberOfTransactionsAccepted).NotDefault().WithMessage("DetailedTransactionStatistics10.TotalNumberOfTransactionsAccepted is required (1..1).");
+        RuleFor(x => x.TotalNumberOfTransactionsRejected).NotDefault().WithMessage("DetailedTransactionStatistics10.TotalNumberOfTransactionsRejected is required (1..1).");
+
         RuleFor(x => x.NumberOfTransactionsRejected)
             .NotEmpty()
             .WithMessage("DetailedTransactionStatistics10.NumberOfTransactionsRejected must contain at least one element (1..∞).");

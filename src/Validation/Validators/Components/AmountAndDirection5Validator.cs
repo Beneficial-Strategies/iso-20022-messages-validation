@@ -36,16 +36,26 @@ public class AmountAndDirection5Validator : AbstractValidator<IAmountAndDirectio
     /// </summary>
     public AmountAndDirection5Validator()
     {
-        // ── Amount (ActiveCurrencyAndAmount, required 1..1) ──────────────────────────
-        RuleFor(x => (string)x.Amount.Currency)
-            .NotEmpty()
-            .Matches(CurrencyRegex)
-            .WithMessage("AmountAndDirection5.Amount.Currency must be a valid ISO 4217 three-letter currency code (e.g. EUR, USD).");
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Amount).NotNull().WithMessage("AmountAndDirection5.Amount is required (1..1).");
 
-        RuleFor(x => x.Amount.Amount)
-            .GreaterThan(0)
-            .WithMessage("AmountAndDirection5.Amount.Amount must be greater than zero.");
+        // The rules below read these members, so they run only when they are present.
+        When(
+            x => x.Amount is not null,
+            () =>
+            {
+            // ── Amount (ActiveCurrencyAndAmount, required 1..1) ──────────────────────────
+            RuleFor(x => (string)x.Amount.Currency)
+                .NotEmpty()
+                .Matches(CurrencyRegex)
+                .WithMessage("AmountAndDirection5.Amount.Currency must be a valid ISO 4217 three-letter currency code (e.g. EUR, USD).");
 
-        // CreditDebit: closed CreditDebitCode enum, optional — no rule needed.
+            RuleFor(x => x.Amount.Amount)
+                .GreaterThan(0)
+                .WithMessage("AmountAndDirection5.Amount.Amount must be greater than zero.");
+
+            // CreditDebit: closed CreditDebitCode enum, optional — no rule needed.
+            }
+        );
     }
 }

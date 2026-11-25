@@ -24,6 +24,10 @@ public class AccountAndParties3Validator : AbstractValidator<IAccountAndParties3
     /// </summary>
     public AccountAndParties3Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotNull().WithMessage("AccountAndParties3.Identification is required (1..1).");
+        RuleFor(x => x.InvestigatedParties).NotNull().WithMessage("AccountAndParties3.InvestigatedParties is required (1..1).");
+
         RuleFor(x => x.AuthorityRequestType)
             .NotEmpty()
             .WithMessage("AccountAndParties3.AuthorityRequestType must contain at least one element (1..∞).");

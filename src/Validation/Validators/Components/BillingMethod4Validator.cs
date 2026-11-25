@@ -33,6 +33,9 @@ public class BillingMethod4Validator : AbstractValidator<IBillingMethod4>
     /// </param>
     public BillingMethod4Validator(IValidator<ITaxCalculation1> taxCalculationValidator)
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.TaxCalculation).NotNull().WithMessage("BillingMethod4.TaxCalculation is required (1..1).");
+
         // TaxCalculation (TaxCalculation1): required (1..1) and already `required` C# property.
         // Now that TaxCalculation1Validator exists, wire it in — this comment previously said "no
         // validator exists yet," which had gone stale.

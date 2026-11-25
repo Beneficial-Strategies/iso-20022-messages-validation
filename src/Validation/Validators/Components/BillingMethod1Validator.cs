@@ -24,6 +24,11 @@ public class BillingMethod1Validator : AbstractValidator<IBillingMethod1>
     /// </summary>
     public BillingMethod1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.ServiceChargeHostAmount).NotNull().WithMessage("BillingMethod1.ServiceChargeHostAmount is required (1..1).");
+        RuleFor(x => x.ServiceTax).NotNull().WithMessage("BillingMethod1.ServiceTax is required (1..1).");
+        RuleFor(x => x.TotalCharge).NotNull().WithMessage("BillingMethod1.TotalCharge is required (1..1).");
+
         RuleFor(x => x.TaxIdentification)
             .NotEmpty()
             .WithMessage("BillingMethod1.TaxIdentification must contain at least one element (1..3).");

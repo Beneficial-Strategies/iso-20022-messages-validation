@@ -26,6 +26,9 @@ public class DatePeriod3Validator : AbstractValidator<IDatePeriod3>
     /// </summary>
     public DatePeriod3Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.FromDate).NotDefault().WithMessage("DatePeriod3.FromDate is required (1..1).");
+
         // FromDate: required (1..1) and already `required` C# property — format enforced by
         // struct constructor.
         // ToDate: optional — format enforced by struct constructor.

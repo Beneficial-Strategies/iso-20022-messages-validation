@@ -30,6 +30,9 @@ public class DocumentLineType1Validator : AbstractValidator<IDocumentLineType1>
     /// </summary>
     public DocumentLineType1Validator(IValidator<IDocumentLineType1Choice> codeOrProprietaryValidator)
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.CodeOrProprietary).NotNull().WithMessage("DocumentLineType1.CodeOrProprietary is required (1..1).");
+
         RuleFor(x => x.CodeOrProprietary).SetValidator(codeOrProprietaryValidator!);
     }
 

@@ -25,4 +25,13 @@ namespace BeneficialStrategies.Iso20022.Messages.Validation.Components;
 /// first-class type so the coverage-scoping policy (see the FluentValidation project's own
 /// <c>CLAUDE.md</c>) can record this type as reviewed rather than silently skipped.
 /// </remarks>
-public class DebitAuthorisationConfirmation2Validator : AbstractValidator<IDebitAuthorisationConfirmation2> { }
+public class DebitAuthorisationConfirmation2Validator : AbstractValidator<IDebitAuthorisationConfirmation2>
+{
+    /// <summary>Initializes a new instance.</summary>
+    public DebitAuthorisationConfirmation2Validator()
+    {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.DebitAuthorisation).NotDefault().WithMessage("DebitAuthorisationConfirmation2.DebitAuthorisation is required (1..1).");
+
+    }
+}

@@ -25,6 +25,9 @@ public class CorporateActionCashMovements2Validator : AbstractValidator<ICorpora
     /// </summary>
     public CorporateActionCashMovements2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.PostingAmount).NotNull().WithMessage("CorporateActionCashMovements2.PostingAmount is required (1..1).");
+
         RuleFor(x => x.AccountDetails)
             .NotEmpty()
             .WithMessage("CorporateActionCashMovements2.AccountDetails must contain at least one element (1..2).");

@@ -24,6 +24,9 @@ public class AccountBalance3Validator : AbstractValidator<IAccountBalance3>
     /// </summary>
     public AccountBalance3Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.AccountType).NotDefault().WithMessage("AccountBalance3.AccountType is required (1..1).");
+
         RuleFor(x => x.Balance)
             .NotEmpty()
             .WithMessage("AccountBalance3.Balance must contain at least one element (1..∞).");

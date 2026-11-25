@@ -26,6 +26,13 @@ public class CommercialDataSet4Validator : AbstractValidator<ICommercialDataSet4
     /// </summary>
     public CommercialDataSet4Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.DataSetIdentification).NotNull().WithMessage("CommercialDataSet4.DataSetIdentification is required (1..1).");
+        RuleFor(x => x.CommercialDocumentReference).NotNull().WithMessage("CommercialDataSet4.CommercialDocumentReference is required (1..1).");
+        RuleFor(x => x.Buyer).NotNull().WithMessage("CommercialDataSet4.Buyer is required (1..1).");
+        RuleFor(x => x.Seller).NotNull().WithMessage("CommercialDataSet4.Seller is required (1..1).");
+        RuleFor(x => x.SettlementTerms).NotNull().WithMessage("CommercialDataSet4.SettlementTerms is required (1..1).");
+
         RuleFor(x => x.Goods)
             .NotEmpty()
             .WithMessage("CommercialDataSet4.Goods must contain at least one element (1..∞).");

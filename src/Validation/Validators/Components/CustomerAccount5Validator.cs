@@ -24,6 +24,9 @@ public class CustomerAccount5Validator : AbstractValidator<ICustomerAccount5>
     /// </summary>
     public CustomerAccount5Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Currency).NotDefault().WithMessage("CustomerAccount5.Currency is required (1..1).");
+
         RuleFor(x => x.Identification)
             .NotEmpty()
             .WithMessage("CustomerAccount5.Identification must contain at least one element (1..∞).");

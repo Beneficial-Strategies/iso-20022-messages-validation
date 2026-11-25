@@ -28,6 +28,10 @@ public class AccountStatement15Validator : AbstractValidator<IAccountStatement15
     /// </summary>
     public AccountStatement15Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotDefault().WithMessage("AccountStatement15.Identification is required (1..1).");
+        RuleFor(x => x.Account).NotNull().WithMessage("AccountStatement15.Account is required (1..1).");
+
         // Identification: Max35Text, required — already `required`; length enforced by struct ctor.
         // AdditionalStatementInformation, CopyDuplicateIndicator, CreationDateTime,
         // ElectronicSequenceNumber, LegalSequenceNumber: optional (0..1) scalars, no

@@ -24,6 +24,11 @@ public class DetailedTransactionStatistics27Validator : AbstractValidator<IDetai
     /// </summary>
     public DetailedTransactionStatistics27Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.NumberOfOutstandingDerivatives).NotDefault().WithMessage("DetailedTransactionStatistics27.NumberOfOutstandingDerivatives is required (1..1).");
+        RuleFor(x => x.NumberOfOutstandingDerivativesWithNoValuation).NotDefault().WithMessage("DetailedTransactionStatistics27.NumberOfOutstandingDerivativesWithNoValuation is required (1..1).");
+        RuleFor(x => x.NumberOfOutstandingDerivativesWithOutdatedValuation).NotDefault().WithMessage("DetailedTransactionStatistics27.NumberOfOutstandingDerivativesWithOutdatedValuation is required (1..1).");
+
         RuleFor(x => x.Warnings)
             .NotEmpty()
             .WithMessage("DetailedTransactionStatistics27.Warnings must contain at least one element (1..∞).");

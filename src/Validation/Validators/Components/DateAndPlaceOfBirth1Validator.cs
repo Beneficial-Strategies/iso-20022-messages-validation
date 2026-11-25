@@ -37,6 +37,11 @@ public class DateAndPlaceOfBirth1Validator : AbstractValidator<IDateAndPlaceOfBi
     /// </param>
     public DateAndPlaceOfBirth1Validator(IValidator<CountryCode> countryOfBirthValidator)
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.BirthDate).NotDefault().WithMessage("DateAndPlaceOfBirth1.BirthDate is required (1..1).");
+        RuleFor(x => x.CityOfBirth).NotDefault().WithMessage("DateAndPlaceOfBirth1.CityOfBirth is required (1..1).");
+        RuleFor(x => x.CountryOfBirth).NotDefault().WithMessage("DateAndPlaceOfBirth1.CountryOfBirth is required (1..1).");
+
         // BirthDate, CityOfBirth: required (1..1) and already `required` C# properties —
         // format/length enforced by struct constructors.
         // ProvinceOfBirth: Max35Text, optional — length [1..35] enforced by struct constructor.
