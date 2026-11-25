@@ -24,6 +24,11 @@ public class ClearingMember1Validator : AbstractValidator<IClearingMember1>
     /// </summary>
     public ClearingMember1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotNull().WithMessage("ClearingMember1.Identification is required (1..1).");
+        RuleFor(x => x.FuturesCommissionMerchantIndicator).NotDefault().WithMessage("ClearingMember1.FuturesCommissionMerchantIndicator is required (1..1).");
+        RuleFor(x => x.MembershipValidFrom).NotDefault().WithMessage("ClearingMember1.MembershipValidFrom is required (1..1).");
+
         RuleFor(x => x.ClearingAccountOwner)
             .NotEmpty()
             .WithMessage("ClearingMember1.ClearingAccountOwner must contain at least one element (1..∞).");

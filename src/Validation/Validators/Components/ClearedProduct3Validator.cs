@@ -24,6 +24,12 @@ public class ClearedProduct3Validator : AbstractValidator<IClearedProduct3>
     /// </summary>
     public ClearedProduct3Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.CCPProductIdentification).NotNull().WithMessage("ClearedProduct3.CCPProductIdentification is required (1..1).");
+        RuleFor(x => x.Product).NotNull().WithMessage("ClearedProduct3.Product is required (1..1).");
+        RuleFor(x => x.OpenInterest).NotNull().WithMessage("ClearedProduct3.OpenInterest is required (1..1).");
+        RuleFor(x => x.ClearedGrossNotionalAmount).NotNull().WithMessage("ClearedProduct3.ClearedGrossNotionalAmount is required (1..1).");
+
         RuleFor(x => x.TradingVenue)
             .NotEmpty()
             .WithMessage("ClearedProduct3.TradingVenue must contain at least one element (1..∞).");

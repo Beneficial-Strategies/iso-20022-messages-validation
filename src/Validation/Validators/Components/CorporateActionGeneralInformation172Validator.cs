@@ -24,6 +24,11 @@ public class CorporateActionGeneralInformation172Validator : AbstractValidator<I
     /// </summary>
     public CorporateActionGeneralInformation172Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.AgentCorporateActionEventIdentification).NotDefault().WithMessage("CorporateActionGeneralInformation172.AgentCorporateActionEventIdentification is required (1..1).");
+        RuleFor(x => x.EventType).NotNull().WithMessage("CorporateActionGeneralInformation172.EventType is required (1..1).");
+        RuleFor(x => x.MandatoryVoluntaryEventType).NotNull().WithMessage("CorporateActionGeneralInformation172.MandatoryVoluntaryEventType is required (1..1).");
+
         RuleFor(x => x.UnderlyingSecurity)
             .NotEmpty()
             .WithMessage("CorporateActionGeneralInformation172.UnderlyingSecurity must contain at least one element (1..∞).");

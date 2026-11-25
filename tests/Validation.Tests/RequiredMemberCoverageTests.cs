@@ -83,8 +83,17 @@ public class RequiredMemberCoverageTests
         public static T Create<T>() where T : class => Create<T, DefaultProxy>();
 
         /// <inheritdoc/>
-        protected override object? Invoke(MethodInfo? targetMethod, object?[]? args) =>
-            targetMethod!.ReturnType is { IsValueType: true } t && t != typeof(void) ? Activator.CreateInstance(t) : null;
+        protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
+        {
+            var type = targetMethod!.ReturnType;
+            if (type == typeof(void)) return null;
+            if (type.IsValueType) return Activator.CreateInstance(type);
+            // A collection is empty, not null: whether a collection may be empty is another question.
+            if (type.IsGenericType && type.GetGenericArguments().Length == 1
+                && type.IsAssignableFrom(type.GetGenericArguments()[0].MakeArrayType()))
+                return Array.CreateInstance(type.GetGenericArguments()[0], 0);
+            return null;
+        }
     }
 
     /// <summary>

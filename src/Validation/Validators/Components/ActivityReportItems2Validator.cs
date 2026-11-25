@@ -25,6 +25,10 @@ public class ActivityReportItems2Validator : AbstractValidator<IActivityReportIt
     /// </summary>
     public ActivityReportItems2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.TransactionIdentification).NotDefault().WithMessage("ActivityReportItems2.TransactionIdentification is required (1..1).");
+        RuleFor(x => x.ReportedEntity).NotNull().WithMessage("ActivityReportItems2.ReportedEntity is required (1..1).");
+
         RuleFor(x => x.ReportedItem)
             .NotEmpty()
             .WithMessage("ActivityReportItems2.ReportedItem must contain at least one element (1..∞).");

@@ -24,6 +24,15 @@ public class DetailedStatisticsPerCounterparty18Validator : AbstractValidator<ID
     /// </summary>
     public DetailedStatisticsPerCounterparty18Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.ReferenceDate).NotDefault().WithMessage("DetailedStatisticsPerCounterparty18.ReferenceDate is required (1..1).");
+        RuleFor(x => x.TotalNumberOfReports).NotDefault().WithMessage("DetailedStatisticsPerCounterparty18.TotalNumberOfReports is required (1..1).");
+        RuleFor(x => x.TotalNumberOfReportsAccepted).NotDefault().WithMessage("DetailedStatisticsPerCounterparty18.TotalNumberOfReportsAccepted is required (1..1).");
+        RuleFor(x => x.TotalNumberOfReportsRejected).NotDefault().WithMessage("DetailedStatisticsPerCounterparty18.TotalNumberOfReportsRejected is required (1..1).");
+        RuleFor(x => x.TotalNumberOfTransactions).NotDefault().WithMessage("DetailedStatisticsPerCounterparty18.TotalNumberOfTransactions is required (1..1).");
+        RuleFor(x => x.TotalNumberOfTransactionsAccepted).NotNull().WithMessage("DetailedStatisticsPerCounterparty18.TotalNumberOfTransactionsAccepted is required (1..1).");
+        RuleFor(x => x.TotalNumberOfTransactionsRejected).NotNull().WithMessage("DetailedStatisticsPerCounterparty18.TotalNumberOfTransactionsRejected is required (1..1).");
+
         RuleFor(x => x.RejectionStatistics)
             .NotEmpty()
             .WithMessage("DetailedStatisticsPerCounterparty18.RejectionStatistics must contain at least one element (1..∞).");

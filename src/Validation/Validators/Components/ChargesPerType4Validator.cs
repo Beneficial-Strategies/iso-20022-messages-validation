@@ -28,55 +28,65 @@ public class ChargesPerType4Validator : AbstractValidator<IChargesPerType4>
     /// </summary>
     public ChargesPerType4Validator()
     {
-        // ── Cross-field constraints ───────────────────────────────────────────────
-        // Both rules express the same mutual-exclusivity between the top-level charges account
-        // fields and the per-record equivalents; the spec states it from both directions.
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Type).NotNull().WithMessage("ChargesPerType4.Type is required (1..1).");
 
-        RuleFor(x => x)
-            .Must(x =>
-                !(
-                    x.Record.Any(r => r.ChargesAccount is not null || r.ChargesAccountOwner is not null)
-                    && (x.ChargesAccount is not null || x.ChargesAccountOwner is not null)
+        // The rules below read these members, so they run only when they are present.
+        When(
+            x => x.Type is not null,
+            () =>
+            {
+            // ── Cross-field constraints ───────────────────────────────────────────────
+            // Both rules express the same mutual-exclusivity between the top-level charges account
+            // fields and the per-record equivalents; the spec states it from both directions.
+
+            RuleFor(x => x)
+                .Must(x =>
+                    !(
+                        x.Record.Any(r => r.ChargesAccount is not null || r.ChargesAccountOwner is not null)
+                        && (x.ChargesAccount is not null || x.ChargesAccountOwner is not null)
+                    )
                 )
-            )
-            .WithName("ChargesAccountTypeOrRecord2Rule")
-            .WithMessage(
-                "When Record/ChargesAccount is present or Record/ChargesAccountOwner is present "
-                    + "then ChargesAccount must be absent and ChargesAccountOwner must be absent "
-                    + "(ChargesAccountTypeOrRecord2Rule)."
-            );
+                .WithName("ChargesAccountTypeOrRecord2Rule")
+                .WithMessage(
+                    "When Record/ChargesAccount is present or Record/ChargesAccountOwner is present "
+                        + "then ChargesAccount must be absent and ChargesAccountOwner must be absent "
+                        + "(ChargesAccountTypeOrRecord2Rule)."
+                );
 
-        RuleFor(x => x)
-            .Must(x =>
-                !(
-                    (x.ChargesAccount is not null || x.ChargesAccountOwner is not null)
-                    && x.Record.Any(r => r.ChargesAccount is not null || r.ChargesAccountOwner is not null)
+            RuleFor(x => x)
+                .Must(x =>
+                    !(
+                        (x.ChargesAccount is not null || x.ChargesAccountOwner is not null)
+                        && x.Record.Any(r => r.ChargesAccount is not null || r.ChargesAccountOwner is not null)
+                    )
                 )
-            )
-            .WithName("ChargesAccountTypeOrRecord1Rule")
-            .WithMessage(
-                "When ChargesAccount is present or ChargesAccountOwner is present then "
-                    + "Record/ChargesAccount must be absent and Record/ChargesAccountOwner must be "
-                    + "absent (ChargesAccountTypeOrRecord1Rule)."
-            );
+                .WithName("ChargesAccountTypeOrRecord1Rule")
+                .WithMessage(
+                    "When ChargesAccount is present or ChargesAccountOwner is present then "
+                        + "Record/ChargesAccount must be absent and Record/ChargesAccountOwner must be "
+                        + "absent (ChargesAccountTypeOrRecord1Rule)."
+                );
 
-        // ── Field-level rules ──────────────────────────────────────────────────────
+            // ── Field-level rules ──────────────────────────────────────────────────────
 
-        // Type (ChargeType3Choice_): required (1..1) and already `required` C# property — no
-        // rule needed. No validator exists yet for ChargeType3Choice_ variants; nested fields
-        // unvalidated.
+            // Type (ChargeType3Choice_): required (1..1) and already `required` C# property — no
+            // rule needed. No validator exists yet for ChargeType3Choice_ variants; nested fields
+            // unvalidated.
 
-        // AdditionalInformation (Max140Text), ChargesIdentification (Max35Text): optional (0..1)
-        // scalars, length enforced by struct constructors — no rule needed.
+            // AdditionalInformation (Max140Text), ChargesIdentification (Max35Text): optional (0..1)
+            // scalars, length enforced by struct constructors — no rule needed.
 
-        // ChargesAccount (CashAccount40, 0..1), ChargesAccountOwner
-        // (BranchAndFinancialInstitutionIdentification8, 0..1), TotalChargesPerChargeType
-        // (TotalCharges7, 0..1): no validator exists yet for these; nested fields unvalidated
-        // beyond the cross-field constraints already enforced above.
+            // ChargesAccount (CashAccount40, 0..1), ChargesAccountOwner
+            // (BranchAndFinancialInstitutionIdentification8, 0..1), TotalChargesPerChargeType
+            // (TotalCharges7, 0..1): no validator exists yet for these; nested fields unvalidated
+            // beyond the cross-field constraints already enforced above.
 
-        // Record: ChargesPerTypeRecord4, 1..∞ — NEEDS NotEmpty RULE.
-        RuleFor(x => x.Record)
-            .NotEmpty()
-            .WithMessage("ChargesPerType4.Record must contain at least one element (1..*).");
+            // Record: ChargesPerTypeRecord4, 1..∞ — NEEDS NotEmpty RULE.
+            RuleFor(x => x.Record)
+                .NotEmpty()
+                .WithMessage("ChargesPerType4.Record must contain at least one element (1..*).");
+            }
+        );
     }
 }

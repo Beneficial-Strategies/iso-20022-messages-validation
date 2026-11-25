@@ -39,6 +39,9 @@ public class AccountNotification16Validator : AbstractValidator<IAccountNotifica
     /// </summary>
     public AccountNotification16Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotDefault().WithMessage("AccountNotification16.Identification is required (1..1).");
+
         // ── Cross-field constraints ───────────────────────────────────────────────
 
         RuleFor(x => x)

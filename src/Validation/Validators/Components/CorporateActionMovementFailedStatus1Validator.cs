@@ -25,6 +25,9 @@ public class CorporateActionMovementFailedStatus1Validator : AbstractValidator<I
     /// </summary>
     public CorporateActionMovementFailedStatus1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.AgentAccountIdentification).NotDefault().WithMessage("CorporateActionMovementFailedStatus1.AgentAccountIdentification is required (1..1).");
+
         RuleFor(x => x.ResourceDetails)
             .NotEmpty()
             .WithMessage("CorporateActionMovementFailedStatus1.ResourceDetails must contain at least one element (1..∞).");

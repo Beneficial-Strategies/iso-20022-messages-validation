@@ -64,6 +64,12 @@ public class CreditTransferTransaction74Validator : AbstractValidator<ICreditTra
         IValidator<ISupplementaryData1> supplementaryData1Validator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.PaymentIdentification).NotNull().WithMessage("CreditTransferTransaction74.PaymentIdentification is required (1..1).");
+        RuleFor(x => x.Amount).NotNull().WithMessage("CreditTransferTransaction74.Amount is required (1..1).");
+        RuleFor(x => x.CreditorAgent).NotNull().WithMessage("CreditTransferTransaction74.CreditorAgent is required (1..1).");
+        RuleFor(x => x.Creditor).NotNull().WithMessage("CreditTransferTransaction74.Creditor is required (1..1).");
+
         RuleFor(x => x.PaymentIdentification).SetValidator(paymentIdentification6Validator!);
         When(
             x => x.PaymentTypeInformation is not null,

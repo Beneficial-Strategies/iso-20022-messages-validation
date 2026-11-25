@@ -26,6 +26,10 @@ public class AggregateBalancePerSafekeepingPlace2Validator : AbstractValidator<I
     /// </summary>
     public AggregateBalancePerSafekeepingPlace2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.AggregateBalance).NotNull().WithMessage("AggregateBalancePerSafekeepingPlace2.AggregateBalance is required (1..1).");
+        RuleFor(x => x.SafekeepingPlace).NotNull().WithMessage("AggregateBalancePerSafekeepingPlace2.SafekeepingPlace is required (1..1).");
+
         RuleFor(x => x.HoldingValue)
             .NotEmpty()
             .WithMessage("AggregateBalancePerSafekeepingPlace2.HoldingValue must contain at least one element (1..∞).");

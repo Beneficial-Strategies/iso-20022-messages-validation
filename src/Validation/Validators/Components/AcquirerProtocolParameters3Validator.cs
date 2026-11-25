@@ -24,6 +24,9 @@ public class AcquirerProtocolParameters3Validator : AbstractValidator<IAcquirerP
     /// </summary>
     public AcquirerProtocolParameters3Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.ProtectCardData).NotDefault().WithMessage("AcquirerProtocolParameters3.ProtectCardData is required (1..1).");
+
         RuleFor(x => x.AcquirerIdentification)
             .NotEmpty()
             .WithMessage("AcquirerProtocolParameters3.AcquirerIdentification must contain at least one element (1..∞).");

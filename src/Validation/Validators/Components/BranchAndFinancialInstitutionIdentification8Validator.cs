@@ -46,6 +46,9 @@ public class BranchAndFinancialInstitutionIdentification8Validator
         IValidator<IFinancialInstitutionIdentification23> financialInstitutionIdentificationValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.FinancialInstitutionIdentification).NotNull().WithMessage("BranchAndFinancialInstitutionIdentification8.FinancialInstitutionIdentification is required (1..1).");
+
         When(
             x => x.BranchIdentification is not null,
             () => RuleFor(x => x.BranchIdentification).SetValidator(branchIdentificationValidator!)

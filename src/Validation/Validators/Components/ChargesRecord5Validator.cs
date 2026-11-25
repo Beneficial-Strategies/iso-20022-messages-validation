@@ -25,6 +25,9 @@ public class ChargesRecord5Validator : AbstractValidator<IChargesRecord5>
     /// </summary>
     public ChargesRecord5Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Amount).NotNull().WithMessage("ChargesRecord5.Amount is required (1..1).");
+
         // Amount (ActiveCurrencyAndAmount): required (1..1) and already `required` C# property —
         // no rule needed. No validator exists yet for it; nested fields unvalidated.
 

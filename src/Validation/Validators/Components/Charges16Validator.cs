@@ -34,6 +34,10 @@ public class Charges16Validator : AbstractValidator<ICharges16>
         IValidator<IChargeType3Choice> typeValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Amount).NotNull().WithMessage("Charges16.Amount is required (1..1).");
+        RuleFor(x => x.Agent).NotNull().WithMessage("Charges16.Agent is required (1..1).");
+
         RuleFor(x => x.Agent).SetValidator(agentValidator!);
         When(x => x.Type is not null, () => RuleFor(x => x.Type).SetValidator(typeValidator!));
     }

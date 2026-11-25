@@ -33,6 +33,10 @@ public class DateAndType1Validator : AbstractValidator<IDateAndType1>
     /// </param>
     public DateAndType1Validator(IValidator<IDateType2Choice> typeValidator)
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Type).NotNull().WithMessage("DateAndType1.Type is required (1..1).");
+        RuleFor(x => x.Date).NotDefault().WithMessage("DateAndType1.Date is required (1..1).");
+
         // Date: required (1..1) and already `required` C# property — format enforced by struct
         // constructor.
 

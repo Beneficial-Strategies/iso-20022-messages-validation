@@ -24,6 +24,10 @@ public class AmountAndTrigger1Validator : AbstractValidator<IAmountAndTrigger1>
     /// </summary>
     public AmountAndTrigger1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotDefault().WithMessage("AmountAndTrigger1.Identification is required (1..1).");
+        RuleFor(x => x.AmountDetailsChoice_).NotNull().WithMessage("AmountAndTrigger1.AmountDetailsChoice_ is required (1..1).");
+
         RuleFor(x => x.Trigger)
             .NotEmpty()
             .WithMessage("AmountAndTrigger1.Trigger must contain at least one element (1..∞).");

@@ -24,6 +24,9 @@ public class CollateralAccount5Validator : AbstractValidator<ICollateralAccount5
     /// </summary>
     public CollateralAccount5Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotNull().WithMessage("CollateralAccount5.Identification is required (1..1).");
+
         RuleFor(x => x.RelatedMarginAccount)
             .NotEmpty()
             .WithMessage("CollateralAccount5.RelatedMarginAccount must contain at least one element (1..∞).");

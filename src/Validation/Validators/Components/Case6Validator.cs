@@ -34,6 +34,10 @@ public class Case6Validator : AbstractValidator<ICase6>
     /// </param>
     public Case6Validator(IValidator<IParty50Choice> creatorValidator)
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotDefault().WithMessage("Case6.Identification is required (1..1).");
+        RuleFor(x => x.Creator).NotNull().WithMessage("Case6.Creator is required (1..1).");
+
         // Identification: Max35Text, required (1..1) and already `required` C# property — length
         // [1..35] enforced by struct constructor.
         // ReopenCaseIndication: YesNoIndicator, optional — no additional constraint beyond the

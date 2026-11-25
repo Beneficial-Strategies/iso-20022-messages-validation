@@ -25,6 +25,10 @@ public class DetailedInstructionStatus9Validator : AbstractValidator<IDetailedIn
     /// </summary>
     public DetailedInstructionStatus9Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.InstructionIdentification).NotDefault().WithMessage("DetailedInstructionStatus9.InstructionIdentification is required (1..1).");
+        RuleFor(x => x.StandingInstruction).NotDefault().WithMessage("DetailedInstructionStatus9.StandingInstruction is required (1..1).");
+
         RuleFor(x => x.VotePerResolution)
             .NotEmpty()
             .WithMessage("DetailedInstructionStatus9.VotePerResolution must contain at least one element (1..1000).");

@@ -37,6 +37,12 @@ public class CaseAssignment6Validator : AbstractValidator<ICaseAssignment6>
     /// </param>
     public CaseAssignment6Validator(IValidator<IParty50Choice> partyValidator)
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotDefault().WithMessage("CaseAssignment6.Identification is required (1..1).");
+        RuleFor(x => x.Assigner).NotNull().WithMessage("CaseAssignment6.Assigner is required (1..1).");
+        RuleFor(x => x.Assignee).NotNull().WithMessage("CaseAssignment6.Assignee is required (1..1).");
+        RuleFor(x => x.CreationDateTime).NotDefault().WithMessage("CaseAssignment6.CreationDateTime is required (1..1).");
+
         // Identification, CreationDateTime: required (1..1) and already `required` C#
         // properties — length/format enforced by struct constructors.
 

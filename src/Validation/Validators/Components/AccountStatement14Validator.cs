@@ -25,6 +25,10 @@ public class AccountStatement14Validator : AbstractValidator<IAccountStatement14
     /// </summary>
     public AccountStatement14Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotDefault().WithMessage("AccountStatement14.Identification is required (1..1).");
+        RuleFor(x => x.Account).NotNull().WithMessage("AccountStatement14.Account is required (1..1).");
+
         // Identification (Max35Text): required (1..1), already `required` C# property — no
         // rule needed.
         // ElectronicSequenceNumber, LegalSequenceNumber, CopyDuplicateIndicator,

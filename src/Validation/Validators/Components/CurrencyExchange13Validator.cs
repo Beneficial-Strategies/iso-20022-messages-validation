@@ -32,6 +32,11 @@ public class CurrencyExchange13Validator : AbstractValidator<ICurrencyExchange13
     /// </summary>
     public CurrencyExchange13Validator(IValidator<ActiveCurrencyCode> currencyValidator)
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.SourceCurrency).NotDefault().WithMessage("CurrencyExchange13.SourceCurrency is required (1..1).");
+        RuleFor(x => x.TargetCurrency).NotDefault().WithMessage("CurrencyExchange13.TargetCurrency is required (1..1).");
+        RuleFor(x => x.ExchangeRate).NotDefault().WithMessage("CurrencyExchange13.ExchangeRate is required (1..1).");
+
         RuleFor(x => x.SourceCurrency).SetValidator(currencyValidator!);
         RuleFor(x => x.TargetCurrency).SetValidator(currencyValidator!);
         When(

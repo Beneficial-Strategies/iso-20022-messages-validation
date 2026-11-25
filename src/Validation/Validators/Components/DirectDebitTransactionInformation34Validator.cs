@@ -61,6 +61,13 @@ public class DirectDebitTransactionInformation34Validator : AbstractValidator<ID
         IValidator<ISupplementaryData1> supplementaryDataValidator
     )
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.PaymentIdentification).NotNull().WithMessage("DirectDebitTransactionInformation34.PaymentIdentification is required (1..1).");
+        RuleFor(x => x.InstructedAmount).NotNull().WithMessage("DirectDebitTransactionInformation34.InstructedAmount is required (1..1).");
+        RuleFor(x => x.DebtorAgent).NotNull().WithMessage("DirectDebitTransactionInformation34.DebtorAgent is required (1..1).");
+        RuleFor(x => x.Debtor).NotNull().WithMessage("DirectDebitTransactionInformation34.Debtor is required (1..1).");
+        RuleFor(x => x.DebtorAccount).NotNull().WithMessage("DirectDebitTransactionInformation34.DebtorAccount is required (1..1).");
+
         RuleFor(x => x.PaymentIdentification).SetValidator(paymentIdentificationValidator!);
         When(
             x => x.PaymentTypeInformation is not null,

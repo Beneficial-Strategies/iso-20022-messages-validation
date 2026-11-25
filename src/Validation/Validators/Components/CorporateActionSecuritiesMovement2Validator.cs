@@ -25,6 +25,10 @@ public class CorporateActionSecuritiesMovement2Validator : AbstractValidator<ICo
     /// </summary>
     public CorporateActionSecuritiesMovement2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.SecurityIdentification).NotNull().WithMessage("CorporateActionSecuritiesMovement2.SecurityIdentification is required (1..1).");
+        RuleFor(x => x.PostingQuantity).NotNull().WithMessage("CorporateActionSecuritiesMovement2.PostingQuantity is required (1..1).");
+
         RuleFor(x => x.AccountDetails)
             .NotEmpty()
             .WithMessage("CorporateActionSecuritiesMovement2.AccountDetails must contain at least one element (1..2).");

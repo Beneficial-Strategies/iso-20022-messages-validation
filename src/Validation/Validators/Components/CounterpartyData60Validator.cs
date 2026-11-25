@@ -24,6 +24,10 @@ public class CounterpartyData60Validator : AbstractValidator<ICounterpartyData60
     /// </summary>
     public CounterpartyData60Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.ReportingDateTime).NotDefault().WithMessage("CounterpartyData60.ReportingDateTime is required (1..1).");
+        RuleFor(x => x.ReportSubmittingEntity).NotNull().WithMessage("CounterpartyData60.ReportSubmittingEntity is required (1..1).");
+
         RuleFor(x => x.CounterpartyData)
             .NotEmpty()
             .WithMessage("CounterpartyData60.CounterpartyData must contain at least one element (1..2).");

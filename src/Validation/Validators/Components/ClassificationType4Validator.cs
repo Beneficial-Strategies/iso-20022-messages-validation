@@ -24,6 +24,9 @@ public class ClassificationType4Validator : AbstractValidator<IClassificationTyp
     /// </summary>
     public ClassificationType4Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.InformationType).NotDefault().WithMessage("ClassificationType4.InformationType is required (1..1).");
+
         RuleFor(x => x.LegalFramework)
             .NotEmpty()
             .WithMessage("ClassificationType4.LegalFramework must contain at least one element (1..∞).");

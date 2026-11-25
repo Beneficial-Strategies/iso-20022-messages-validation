@@ -24,6 +24,10 @@ public class CreditTransferTransaction38Validator : AbstractValidator<ICreditTra
     /// </summary>
     public CreditTransferTransaction38Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.CreditIdentification).NotDefault().WithMessage("CreditTransferTransaction38.CreditIdentification is required (1..1).");
+        RuleFor(x => x.Creditor).NotNull().WithMessage("CreditTransferTransaction38.Creditor is required (1..1).");
+
         RuleFor(x => x.DirectDebitTransactionInformation)
             .NotEmpty()
             .WithMessage("CreditTransferTransaction38.DirectDebitTransactionInformation must contain at least one element (1..∞).");

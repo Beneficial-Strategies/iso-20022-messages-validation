@@ -24,6 +24,9 @@ public class CertificationRequest2Validator : AbstractValidator<ICertificationRe
     /// </summary>
     public CertificationRequest2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.SubjectPublicKeyInformation).NotNull().WithMessage("CertificationRequest2.SubjectPublicKeyInformation is required (1..1).");
+
         RuleFor(x => x.Attribute)
             .NotEmpty()
             .WithMessage("CertificationRequest2.Attribute must contain at least one element (1..∞).");

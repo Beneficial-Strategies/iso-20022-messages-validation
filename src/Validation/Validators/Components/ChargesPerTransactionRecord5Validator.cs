@@ -25,6 +25,9 @@ public class ChargesPerTransactionRecord5Validator : AbstractValidator<IChargesP
     /// </summary>
     public ChargesPerTransactionRecord5Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.UnderlyingTransaction).NotNull().WithMessage("ChargesPerTransactionRecord5.UnderlyingTransaction is required (1..1).");
+
         // UnderlyingTransaction (TransactionReferences7): required (1..1) and already `required`
         // C# property — no rule needed. No validator exists yet for TransactionReferences7;
         // nested fields unvalidated.

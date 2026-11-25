@@ -26,6 +26,11 @@ public class BusinessLetter1Validator : AbstractValidator<IBusinessLetter1>
     /// </summary>
     public BusinessLetter1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.LetterIdentifier).NotNull().WithMessage("BusinessLetter1.LetterIdentifier is required (1..1).");
+        RuleFor(x => x.Date).NotDefault().WithMessage("BusinessLetter1.Date is required (1..1).");
+        RuleFor(x => x.Originator).NotNull().WithMessage("BusinessLetter1.Originator is required (1..1).");
+
         RuleFor(x => x.AuthorisationUser)
             .NotEmpty()
             .WithMessage("BusinessLetter1.AuthorisationUser must contain at least one element (1..∞).");

@@ -24,6 +24,9 @@ public class BusinessDay8Validator : AbstractValidator<IBusinessDay8>
     /// </summary>
     public BusinessDay8Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.BusinessDayOrError).NotNull().WithMessage("BusinessDay8.BusinessDayOrError is required (1..1).");
+
         RuleFor(x => x.SystemIdentification)
             .NotEmpty()
             .WithMessage("BusinessDay8.SystemIdentification must contain at least one element (1..∞).");

@@ -29,6 +29,10 @@ public class DocumentAmount1Validator : AbstractValidator<IDocumentAmount1>
     /// </summary>
     public DocumentAmount1Validator(IValidator<IDocumentAmountType1Choice> typeValidator)
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Type).NotNull().WithMessage("DocumentAmount1.Type is required (1..1).");
+        RuleFor(x => x.Amount).NotNull().WithMessage("DocumentAmount1.Amount is required (1..1).");
+
         RuleFor(x => x.Type).SetValidator(typeValidator!);
     }
 

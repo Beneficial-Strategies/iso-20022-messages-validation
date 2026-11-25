@@ -24,6 +24,9 @@ public class AccountSubLevel23Validator : AbstractValidator<IAccountSubLevel23>
     /// </summary>
     public AccountSubLevel23Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.AccountHolder).NotNull().WithMessage("AccountSubLevel23.AccountHolder is required (1..1).");
+
         RuleFor(x => x.ShareholdingBalance)
             .NotEmpty()
             .WithMessage("AccountSubLevel23.ShareholdingBalance must contain at least one element (1..∞).");

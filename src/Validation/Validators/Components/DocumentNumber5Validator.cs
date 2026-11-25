@@ -25,6 +25,9 @@ public class DocumentNumber5Validator : AbstractValidator<IDocumentNumber5>
     /// </summary>
     public DocumentNumber5Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Number).NotNull().WithMessage("DocumentNumber5.Number is required (1..1).");
+
         RuleFor(x => x.References)
             .NotEmpty()
             .WithMessage("DocumentNumber5.References must contain at least one element (1..∞).");

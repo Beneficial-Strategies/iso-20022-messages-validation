@@ -24,6 +24,9 @@ public class CloseLink5Validator : AbstractValidator<ICloseLink5>
     /// </summary>
     public CloseLink5Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.PartyIdentification).NotNull().WithMessage("CloseLink5.PartyIdentification is required (1..1).");
+
         RuleFor(x => x.SecurityIdentification)
             .NotEmpty()
             .WithMessage("CloseLink5.SecurityIdentification must contain at least one element (1..∞).");
