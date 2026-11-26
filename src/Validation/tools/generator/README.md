@@ -53,6 +53,12 @@ For `pacs.008.001.14`: 166 tests, 153 pass, 13 are known differences. Eleven are
 validators do not have (and whose tests use data that breaks them); two are a rule the hand-written validator adds that the
 specification's constraints do not state (an amount of zero is refused).
 
+For `pain.001.001.13` (67 generated validators): 121 tests, 117 pass, 4 are known differences, all one rule of the
+specification (`NonChequePaymentMethodRule`) that the hand-written validator lacks.
+
+A rule that names an alternative of a choice (`DeliveryMethod/Code`) is read as the variant interface of the choice
+(`DeliveryMethod as Choices.ChequeDeliveryMethod1Choice.ICode`) and, when compared with a value, by its `Value`.
+
 ```
 python3 run_oracle.py --census <folder of the pages> --message pacs.008.001.14 \
     [--messages <clone of iso-20022-messages>] [--primitives <clone of iso-20022-primitives>]
@@ -65,4 +71,4 @@ python3 -m unittest -q test_generator
   are skipped.
 * The constraints with no expression (about half), and the facets of the simple types (not in the data).
 * Choices: the validators of the hand-written package are reused.
-* More than one message at a time, and the index that lets the DI load a family of messages (or one component) with what it needs.
+* More than one message at a time (each message is generated and checked on its own so far), and the index that lets the DI load a family of messages (or one component) with what it needs.
