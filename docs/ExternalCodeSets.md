@@ -71,6 +71,44 @@ Register your override *after* `AddIso20022Validators()` — the last registrati
 service type wins, so this replaces the in-memory default for `CountryCode` only; every other
 external code type keeps using it.
 
+## Checking against the live list
+
+ISO replaces its external code sets a few times a year, and banks add codes of their own between releases. To check a code
+against the **current** list instead of the values the library was built with, read the lists from a host that serves them:
+
+```C#
+services.AddIso20022Validators();
+services.AddIso20022LiveExternalCodes(); // https://iso-20022-external-codesets.beneficialstrategies.com
+```
+
+The host follows ISO's file nightly and serves one JSON file per code set (`/{CodeSetName}`); a company can run its own copy
+(see the repository `iso-20022-external-codesets`) and pass its address: `AddIso20022LiveExternalCodes(new Uri("https://codes.example.com"))`.
+Call it after `AddIso20022Validators()`; a registry you registered for one code set still wins for that one.
+
+These are the choices of this package as one client of the host. What the host's files mean (a missing code set, an empty list, lists that are
+not closed) is defined in the host's README, under *Writing a client*; the policies below are ours.
+
+How it behaves, so that validation stays fast and does not fail because a host is down:
+
+* A code set is read on **first use** (the first validation waits, at most `FirstReadTimeout`, five seconds) and again after
+  `RefreshInterval` (an hour). A list that has expired is still used while the new one is read in the background.
+* A failed read **keeps the last list**. With no list at all (the host is down at the first read, or does not have the code set)
+  `WhenUnavailable` decides: `UseBuiltInValues` (the default), `Accept`, or `Reject`. A failed read is not retried for a minute.
+* A code set that ISO publishes **no list** for (the field is free text) accepts any value.
+* A value that is not on the list is **refused**. The host's own documentation notes that these lists are not closed (ISO adds
+  codes between releases); a value that is valid but newer than the host's release is refused until the host catches up.
+
+```C#
+services.AddIso20022LiveExternalCodes(configure: o =>
+{
+    o.RefreshInterval = TimeSpan.FromMinutes(15);
+    o.WhenUnavailable = ExternalCodeUnavailablePolicy.Accept;
+});
+```
+
+To read the lists from somewhere else (a database, a file), implement `IExternalCodeSource` and register it; `LiveExternalCodeRegistry<TCode>`
+does the caching. `RefreshAsync()` reads a list now, for a start-up check.
+
 ## Coverage
 
 Coverage today:
