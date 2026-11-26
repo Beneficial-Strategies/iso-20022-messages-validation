@@ -23,4 +23,13 @@ namespace BeneficialStrategies.Iso20022.Messages.Validation.Components;
 /// policy (see the FluentValidation project's own <c>CLAUDE.md</c>) can record this type as
 /// reviewed rather than silently skipped.
 /// </remarks>
-public class ProprietaryData6Validator : AbstractValidator<IProprietaryData6> { }
+public class ProprietaryData6Validator : AbstractValidator<IProprietaryData6>
+{
+    /// <summary>Initializes a new instance.</summary>
+    public ProprietaryData6Validator()
+    {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Any).NotNull().WithMessage("ProprietaryData6.Any is required (1..1).");
+
+    }
+}

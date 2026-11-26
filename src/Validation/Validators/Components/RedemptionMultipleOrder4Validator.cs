@@ -25,6 +25,9 @@ public class RedemptionMultipleOrder4Validator : AbstractValidator<IRedemptionMu
     /// </summary>
     public RedemptionMultipleOrder4Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.InvestmentAccountDetails).NotNull().WithMessage("RedemptionMultipleOrder4.InvestmentAccountDetails is required (1..1).");
+
         RuleFor(x => x.IndividualOrderDetails)
             .NotEmpty()
             .WithMessage("RedemptionMultipleOrder4.IndividualOrderDetails must contain at least one element (1..∞).");

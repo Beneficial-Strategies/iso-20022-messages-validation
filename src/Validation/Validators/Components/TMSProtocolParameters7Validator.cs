@@ -24,6 +24,11 @@ public class TMSProtocolParameters7Validator : AbstractValidator<ITMSProtocolPar
     /// </summary>
     public TMSProtocolParameters7Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.TerminalManagerIdentification).NotNull().WithMessage("TMSProtocolParameters7.TerminalManagerIdentification is required (1..1).");
+        RuleFor(x => x.Version).NotDefault().WithMessage("TMSProtocolParameters7.Version is required (1..1).");
+        RuleFor(x => x.HostIdentification).NotDefault().WithMessage("TMSProtocolParameters7.HostIdentification is required (1..1).");
+
         RuleFor(x => x.MaintenanceService)
             .NotEmpty()
             .WithMessage("TMSProtocolParameters7.MaintenanceService must contain at least one element (1..∞).");

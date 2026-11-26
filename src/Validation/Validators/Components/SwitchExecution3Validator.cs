@@ -26,6 +26,11 @@ public class SwitchExecution3Validator : AbstractValidator<ISwitchExecution3>
     /// </summary>
     public SwitchExecution3Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.DealReference).NotDefault().WithMessage("SwitchExecution3.DealReference is required (1..1).");
+        RuleFor(x => x.OrderReference).NotDefault().WithMessage("SwitchExecution3.OrderReference is required (1..1).");
+        RuleFor(x => x.InvestmentAccountDetails).NotNull().WithMessage("SwitchExecution3.InvestmentAccountDetails is required (1..1).");
+
         RuleFor(x => x.RedemptionLegDetails)
             .NotEmpty()
             .WithMessage("SwitchExecution3.RedemptionLegDetails must contain at least one element (1..∞).");

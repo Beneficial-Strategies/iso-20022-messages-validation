@@ -24,6 +24,9 @@ public class TrackerStatusAndTransaction19Validator : AbstractValidator<ITracker
     /// </summary>
     public TrackerStatusAndTransaction19Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.TransactionStatus).NotNull().WithMessage("TrackerStatusAndTransaction19.TransactionStatus is required (1..1).");
+
         RuleFor(x => x.Transaction)
             .NotEmpty()
             .WithMessage("TrackerStatusAndTransaction19.Transaction must contain at least one element (1..∞).");

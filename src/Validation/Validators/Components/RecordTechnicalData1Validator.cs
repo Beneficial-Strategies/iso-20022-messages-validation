@@ -24,6 +24,9 @@ public class RecordTechnicalData1Validator : AbstractValidator<IRecordTechnicalD
     /// </summary>
     public RecordTechnicalData1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.ReceiptDateTime).NotDefault().WithMessage("RecordTechnicalData1.ReceiptDateTime is required (1..1).");
+
         RuleFor(x => x.ExchangeReason)
             .NotEmpty()
             .WithMessage("RecordTechnicalData1.ExchangeReason must contain at least one element (1..∞).");

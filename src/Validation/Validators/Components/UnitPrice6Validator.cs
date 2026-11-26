@@ -24,6 +24,11 @@ public class UnitPrice6Validator : AbstractValidator<IUnitPrice6>
     /// </summary>
     public UnitPrice6Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Type).NotNull().WithMessage("UnitPrice6.Type is required (1..1).");
+        RuleFor(x => x.ForExecutionIndicator).NotDefault().WithMessage("UnitPrice6.ForExecutionIndicator is required (1..1).");
+        RuleFor(x => x.CumDividendIndicator).NotDefault().WithMessage("UnitPrice6.CumDividendIndicator is required (1..1).");
+
         RuleFor(x => x.ValueInInvestmentCurrency)
             .NotEmpty()
             .WithMessage("UnitPrice6.ValueInInvestmentCurrency must contain at least one element (1..∞).");

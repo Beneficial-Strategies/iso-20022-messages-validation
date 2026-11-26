@@ -25,6 +25,9 @@ public class QualifiedPartyIdentification1Validator : AbstractValidator<IQualifi
     /// </summary>
     public QualifiedPartyIdentification1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Identification).NotDefault().WithMessage("QualifiedPartyIdentification1.Identification is required (1..1).");
+
         RuleFor(x => x.Party)
             .NotEmpty()
             .WithMessage("QualifiedPartyIdentification1.Party must contain at least one element (1..∞).");

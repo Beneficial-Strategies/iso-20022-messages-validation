@@ -25,6 +25,10 @@ public class SecuritiesProceeds1Validator : AbstractValidator<ISecuritiesProceed
     /// </summary>
     public SecuritiesProceeds1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.SecurityIdentification).NotNull().WithMessage("SecuritiesProceeds1.SecurityIdentification is required (1..1).");
+        RuleFor(x => x.PostingQuantity).NotNull().WithMessage("SecuritiesProceeds1.PostingQuantity is required (1..1).");
+
         RuleFor(x => x.AccountDetails)
             .NotEmpty()
             .WithMessage("SecuritiesProceeds1.AccountDetails must contain at least one element (1..2).");

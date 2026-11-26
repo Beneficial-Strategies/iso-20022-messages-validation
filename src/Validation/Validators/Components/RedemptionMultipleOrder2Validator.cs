@@ -51,6 +51,9 @@ public class RedemptionMultipleOrder2Validator : AbstractValidator<IRedemptionMu
     /// </summary>
     public RedemptionMultipleOrder2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.InvestmentAccountDetails).NotNull().WithMessage("RedemptionMultipleOrder2.InvestmentAccountDetails is required (1..1).");
+
         // IndividualOrderDetails is 1..∞ but the C# model allows empty (model defect — see XML doc).
         RuleFor(x => x.IndividualOrderDetails)
             .NotEmpty()

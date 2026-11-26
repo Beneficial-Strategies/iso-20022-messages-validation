@@ -25,6 +25,10 @@ public class TransactionReconciliation1Validator : AbstractValidator<ITransactio
     /// </summary>
     public TransactionReconciliation1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.ReconciliationTransactionIdentification).NotNull().WithMessage("TransactionReconciliation1.ReconciliationTransactionIdentification is required (1..1).");
+        RuleFor(x => x.ReconciliationIdentification).NotDefault().WithMessage("TransactionReconciliation1.ReconciliationIdentification is required (1..1).");
+
         RuleFor(x => x.TransactionTotals)
             .NotEmpty()
             .WithMessage("TransactionReconciliation1.TransactionTotals must contain at least one element (1..∞).");

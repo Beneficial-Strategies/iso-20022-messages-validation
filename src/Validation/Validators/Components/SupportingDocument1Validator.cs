@@ -25,6 +25,13 @@ public class SupportingDocument1Validator : AbstractValidator<ISupportingDocumen
     /// </summary>
     public SupportingDocument1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.SupportingDocumentIdentification).NotDefault().WithMessage("SupportingDocument1.SupportingDocumentIdentification is required (1..1).");
+        RuleFor(x => x.Certificate).NotNull().WithMessage("SupportingDocument1.Certificate is required (1..1).");
+        RuleFor(x => x.AccountOwner).NotNull().WithMessage("SupportingDocument1.AccountOwner is required (1..1).");
+        RuleFor(x => x.AccountServicer).NotNull().WithMessage("SupportingDocument1.AccountServicer is required (1..1).");
+        RuleFor(x => x.ContractReference).NotNull().WithMessage("SupportingDocument1.ContractReference is required (1..1).");
+
         RuleFor(x => x.Entry)
             .NotEmpty()
             .WithMessage("SupportingDocument1.Entry must contain at least one element (1..∞).");

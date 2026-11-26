@@ -24,6 +24,9 @@ public class ServiceProviderParameters1Validator : AbstractValidator<IServicePro
     /// </summary>
     public ServiceProviderParameters1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Version).NotDefault().WithMessage("ServiceProviderParameters1.Version is required (1..1).");
+
         RuleFor(x => x.ServiceProviderIdentification)
             .NotEmpty()
             .WithMessage("ServiceProviderParameters1.ServiceProviderIdentification must contain at least one element (1..∞).");

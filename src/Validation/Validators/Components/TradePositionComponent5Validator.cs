@@ -24,6 +24,9 @@ public class TradePositionComponent5Validator : AbstractValidator<ITradePosition
     /// </summary>
     public TradePositionComponent5Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.CommonTradeData).NotNull().WithMessage("TradePositionComponent5.CommonTradeData is required (1..1).");
+
         RuleFor(x => x.CounterpartySpecificData)
             .NotEmpty()
             .WithMessage("TradePositionComponent5.CounterpartySpecificData must contain at least one element (1..2).");

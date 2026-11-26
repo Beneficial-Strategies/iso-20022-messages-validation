@@ -25,6 +25,9 @@ public class SubscriptionMultipleOrder3Validator : AbstractValidator<ISubscripti
     /// </summary>
     public SubscriptionMultipleOrder3Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.InvestmentAccountDetails).NotNull().WithMessage("SubscriptionMultipleOrder3.InvestmentAccountDetails is required (1..1).");
+
         RuleFor(x => x.IndividualOrderDetails)
             .NotEmpty()
             .WithMessage("SubscriptionMultipleOrder3.IndividualOrderDetails must contain at least one element (1..∞).");

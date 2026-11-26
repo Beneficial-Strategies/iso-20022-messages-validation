@@ -25,6 +25,11 @@ public class StatementGroup3Validator : AbstractValidator<IStatementGroup3>
     /// </summary>
     public StatementGroup3Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.GroupIdentification).NotDefault().WithMessage("StatementGroup3.GroupIdentification is required (1..1).");
+        RuleFor(x => x.Sender).NotNull().WithMessage("StatementGroup3.Sender is required (1..1).");
+        RuleFor(x => x.Receiver).NotNull().WithMessage("StatementGroup3.Receiver is required (1..1).");
+
         // GroupIdentification, Receiver, Sender: required (1..1) scalars, already `required`
         // in the C# model — no rule needed.
 

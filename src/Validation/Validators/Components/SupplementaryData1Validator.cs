@@ -41,6 +41,9 @@ public class SupplementaryData1Validator : AbstractValidator<ISupplementaryData1
     /// </summary>
     public SupplementaryData1Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Envelope).NotNull().WithMessage("SupplementaryData1.Envelope is required (1..1).");
+
         // PlaceAndName: Max350Text, optional — length [1..350] enforced by struct constructor.
         // Envelope: SupplementaryDataEnvelope1, required (1..1) and already `required` C#
         // property; the type itself is an empty stub with nothing further to validate.

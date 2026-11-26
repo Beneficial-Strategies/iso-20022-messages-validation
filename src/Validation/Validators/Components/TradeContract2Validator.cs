@@ -25,6 +25,13 @@ public class TradeContract2Validator : AbstractValidator<ITradeContract2>
     /// </summary>
     public TradeContract2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.Amount).NotNull().WithMessage("TradeContract2.Amount is required (1..1).");
+        RuleFor(x => x.MaturityDate).NotDefault().WithMessage("TradeContract2.MaturityDate is required (1..1).");
+        RuleFor(x => x.ProlongationFlag).NotDefault().WithMessage("TradeContract2.ProlongationFlag is required (1..1).");
+        RuleFor(x => x.StartDate).NotDefault().WithMessage("TradeContract2.StartDate is required (1..1).");
+        RuleFor(x => x.SettlementCurrency).NotDefault().WithMessage("TradeContract2.SettlementCurrency is required (1..1).");
+
         RuleFor(x => x.Buyer)
             .NotEmpty()
             .WithMessage("TradeContract2.Buyer must contain at least one element (1..∞).");

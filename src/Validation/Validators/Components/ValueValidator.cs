@@ -26,6 +26,9 @@ public class ValueValidator : AbstractValidator<IValue>
     /// </summary>
     public ValueValidator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.BaseCurrencyItem).NotNull().WithMessage("Value.BaseCurrencyItem is required (1..1).");
+
         // BaseCurrencyItem (ActiveOrHistoricCurrencyAndAmount): required (1..1) and already
         // `required` C# property — no rule needed. No validator exists for
         // ActiveOrHistoricCurrencyAndAmount, but Currency and Amount are already `required`.

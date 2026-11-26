@@ -24,6 +24,9 @@ public class TradeStateReport10Validator : AbstractValidator<ITradeStateReport10
     /// </summary>
     public TradeStateReport10Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.CommonTradeData).NotNull().WithMessage("TradeStateReport10.CommonTradeData is required (1..1).");
+
         RuleFor(x => x.CounterpartySpecificData)
             .NotEmpty()
             .WithMessage("TradeStateReport10.CounterpartySpecificData must contain at least one element (1..2).");

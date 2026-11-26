@@ -24,6 +24,9 @@ public class StatusReport3Validator : AbstractValidator<IStatusReport3>
     /// </summary>
     public StatusReport3Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.POIIdentification).NotNull().WithMessage("StatusReport3.POIIdentification is required (1..1).");
+
         RuleFor(x => x.DataSet)
             .NotEmpty()
             .WithMessage("StatusReport3.DataSet must contain at least one element (1..∞).");

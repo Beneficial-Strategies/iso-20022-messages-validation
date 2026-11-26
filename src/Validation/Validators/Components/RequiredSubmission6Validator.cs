@@ -25,6 +25,10 @@ public class RequiredSubmission6Validator : AbstractValidator<IRequiredSubmissio
     /// </summary>
     public RequiredSubmission6Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.CertificateType).NotDefault().WithMessage("RequiredSubmission6.CertificateType is required (1..1).");
+        RuleFor(x => x.CertificateTypeDescription).NotDefault().WithMessage("RequiredSubmission6.CertificateTypeDescription is required (1..1).");
+
         RuleFor(x => x.Submitter)
             .NotEmpty()
             .WithMessage("RequiredSubmission6.Submitter must contain at least one element (1..∞).");

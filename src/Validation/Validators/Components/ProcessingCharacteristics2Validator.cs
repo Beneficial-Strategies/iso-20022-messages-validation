@@ -24,6 +24,17 @@ public class ProcessingCharacteristics2Validator : AbstractValidator<IProcessing
     /// </summary>
     public ProcessingCharacteristics2Validator()
     {
+        // Required members (1..1): the interface marks them only by type, so a null or default is refused here.
+        RuleFor(x => x.InitialInvestment).NotNull().WithMessage("ProcessingCharacteristics2.InitialInvestment is required (1..1).");
+        RuleFor(x => x.SubsequentInvestment).NotNull().WithMessage("ProcessingCharacteristics2.SubsequentInvestment is required (1..1).");
+        RuleFor(x => x.AmountIndicator).NotDefault().WithMessage("ProcessingCharacteristics2.AmountIndicator is required (1..1).");
+        RuleFor(x => x.UnitsIndicator).NotDefault().WithMessage("ProcessingCharacteristics2.UnitsIndicator is required (1..1).");
+        RuleFor(x => x.MainFundOrderDeskLocation).NotNull().WithMessage("ProcessingCharacteristics2.MainFundOrderDeskLocation is required (1..1).");
+        RuleFor(x => x.DealingCutOffTime).NotDefault().WithMessage("ProcessingCharacteristics2.DealingCutOffTime is required (1..1).");
+        RuleFor(x => x.DealingCutOffTimeFrame).NotNull().WithMessage("ProcessingCharacteristics2.DealingCutOffTimeFrame is required (1..1).");
+        RuleFor(x => x.DealingFrequencyDescription).NotDefault().WithMessage("ProcessingCharacteristics2.DealingFrequencyDescription is required (1..1).");
+        RuleFor(x => x.SettlementCycle).NotNull().WithMessage("ProcessingCharacteristics2.SettlementCycle is required (1..1).");
+
         RuleFor(x => x.DealingCurrencyAccepted)
             .NotEmpty()
             .WithMessage("ProcessingCharacteristics2.DealingCurrencyAccepted must contain at least one element (1..∞).");
