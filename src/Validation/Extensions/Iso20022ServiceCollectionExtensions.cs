@@ -242,6 +242,33 @@ public static class Iso20022ServiceCollectionExtensions
     }
 
     /// <summary>
+    /// Checks every external code set against its live list, read from a host that serves ISO's external code sets
+    /// (by default <c>https://iso-20022-external-codesets.beneficialstrategies.com</c>), instead of the values the library was built with.
+    /// Call it after <c>AddIso20022Validators</c>; a registry you registered for one code set still wins for that one.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="baseAddress">The host; the public one when <see langword="null"/>. A company can run its own copy.</param>
+    /// <param name="configure">Changes the refresh interval, the first-read timeout, or what happens while the host cannot be read.</param>
+    /// <param name="client">The HTTP client to read with; a new one (with a five-second timeout) when <see langword="null"/>.</param>
+    /// <returns>The service collection.</returns>
+    public static IServiceCollection AddIso20022LiveExternalCodes(
+        this IServiceCollection services,
+        Uri? baseAddress = null,
+        Action<LiveExternalCodeOptions>? configure = null,
+        HttpClient? client = null
+    )
+    {
+        var options = new LiveExternalCodeOptions();
+        configure?.Invoke(options);
+        services.AddSingleton(options);
+        services.AddSingleton<IExternalCodeSource>(_ =>
+            new HttpExternalCodeSource(client ?? new HttpClient { Timeout = TimeSpan.FromSeconds(5) }, baseAddress)
+        );
+        services.AddSingleton(typeof(IExternalCodeRegistry<>), typeof(LiveExternalCodeRegistry<>));
+        return services;
+    }
+
+    /// <summary>
     /// Registers the open-generic default <see cref="IExternalCodeRegistry{TCode}"/> — one
     /// registration line covers every external code set type, present or future, via .NET's
     /// open-generic DI resolution. <see cref="ServiceCollectionDescriptorExtensions.TryAdd(IServiceCollection,ServiceDescriptor)"/>
