@@ -1,0 +1,32 @@
+{
+ "rule": "ReversedInstructedAmountAndExchangeRate2Rule",
+ "text": "If ReversedInstructedAmount is present and the currency is the same as the currency in InterbankSettlementAmount, then ExchangeRate is not allowed.",
+ "reading": "if ReversedInstructedAmount is present in the currency of ReversedInterbankSettlementAmount, ExchangeRate is absent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/ExchangeRate"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/ReversedInstructedAmount"
+     ],
+     [
+      "EqualToNode",
+      "/ReversedInstructedAmount/@Currency",
+      "/ReversedInterbankSettlementAmount/@Currency"
+     ]
+    ]
+   }
+  }
+ ]
+}

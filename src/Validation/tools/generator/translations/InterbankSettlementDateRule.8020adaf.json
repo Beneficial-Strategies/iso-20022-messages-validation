@@ -1,0 +1,47 @@
+{
+ "rule": "InterbankSettlementDateRule",
+ "text": "If GroupHeader/InterbankSettlementDate is present, then TransactionInformation/InterbankSettlementDate is not allowed. If GroupHeader/InterbankSettlementDate is not present, then TransactionInformation/InterbankSettlementDate must be present.",
+ "reading": "InterbankSettlementDate is in the GroupHeader or in every TransactionInformation, not both",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/TransactionInformation[*]/InterbankSettlementDate"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/GroupHeader/InterbankSettlementDate"
+     ]
+    ]
+   }
+  },
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/TransactionInformation[*]/InterbankSettlementDate"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/GroupHeader/InterbankSettlementDate"
+     ]
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,29 @@
+{
+ "rule": "GroupCancellation2Rule",
+ "text": "If GroupHeader/GroupCancellation is false, then NumberOfTransactions must equal the number of occurrences of TransactionInformation.",
+ "reading": "if GroupCancellation is false, NumberOfTransactions is the number of TransactionInformation",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/GroupHeader/NumberOfTransactions",
+      "number of occurrences of TransactionInformation"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/GroupHeader/GroupCancellation",
+      "false"
+     ]
+    ]
+   }
+  }
+ ]
+}

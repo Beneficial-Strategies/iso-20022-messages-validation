@@ -1,0 +1,51 @@
+{
+ "rule": "AccountOwnerRule",
+ "text": "AccountOwner must be present or Modification(*)/AccountOwner must be present, but not both.",
+ "reading": "AccountOwner is present, or Modification has AccountOwner in every item, and not both",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/Modification"
+     ],
+     [
+      "Presence",
+      "/Modification[*]/AccountOwner"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/AccountOwner"
+     ]
+    ]
+   }
+  },
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/Modification[*]/AccountOwner"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/AccountOwner"
+     ]
+    ]
+   }
+  }
+ ]
+}

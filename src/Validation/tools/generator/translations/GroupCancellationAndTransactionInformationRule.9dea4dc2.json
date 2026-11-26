@@ -1,0 +1,49 @@
+{
+ "rule": "GroupCancellationAndTransactionInformationRule",
+ "text": "If GroupHeader/GroupCancellation is true, then TransactionInformation is not allowed. If GroupHeader/GroupCancellation is false, then at least one occurrence of TransactionInformation must be present.",
+ "reading": "if GroupCancellation is true there is no TransactionInformation, if false there is at least one",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/TransactionInformation"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/GroupHeader/GroupCancellation",
+      "true"
+     ]
+    ]
+   }
+  },
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/TransactionInformation"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/GroupHeader/GroupCancellation",
+      "false"
+     ]
+    ]
+   }
+  }
+ ]
+}

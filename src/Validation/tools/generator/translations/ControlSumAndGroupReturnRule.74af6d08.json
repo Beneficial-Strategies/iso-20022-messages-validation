@@ -1,0 +1,28 @@
+{
+ "rule": "ControlSumAndGroupReturnRule",
+ "text": "If GroupReturn is true, then ControlSum is not allowed.",
+ "reading": "if GroupReturn is true, ControlSum is absent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/ControlSum"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/GroupReturn",
+      "true"
+     ]
+    ]
+   }
+  }
+ ]
+}

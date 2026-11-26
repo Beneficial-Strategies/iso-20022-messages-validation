@@ -1,0 +1,49 @@
+{
+ "rule": "GroupReturnAndTransactionInformationRule",
+ "text": "If GroupHeader/GroupReturn is true, then TransactionInformation is not allowed. If GroupHeader/GroupReturn is false, then at least one occurrence of TransactionInformation must be present.",
+ "reading": "if GroupReturn is true there is no TransactionInformation, if false there is at least one",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/TransactionInformation"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/GroupHeader/GroupReturn",
+      "true"
+     ]
+    ]
+   }
+  },
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/TransactionInformation"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/GroupHeader/GroupReturn",
+      "false"
+     ]
+    ]
+   }
+  }
+ ]
+}

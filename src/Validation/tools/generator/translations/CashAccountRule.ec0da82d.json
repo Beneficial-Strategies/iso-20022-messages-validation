@@ -1,0 +1,51 @@
+{
+ "rule": "CashAccountRule",
+ "text": "CashAccount must be present or Movement(*)/CashAccount must be present, but not both.",
+ "reading": "CashAccount is present, or Movement has CashAccount in every item, and not both",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/Movement"
+     ],
+     [
+      "Presence",
+      "/Movement[*]/CashAccount"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/CashAccount"
+     ]
+    ]
+   }
+  },
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/Movement[*]/CashAccount"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/CashAccount"
+     ]
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,27 @@
+{
+ "rule": "PaymentTypeInformationRule",
+ "text": "If PaymentTypeInformation is present, then DirectDebitTransactionInformation/PaymentTypeInformation is not allowed.",
+ "reading": "if PaymentTypeInformation is present, no DirectDebitTransactionInformation has PaymentTypeInformation",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/DirectDebitTransactionInformation[*]/PaymentTypeInformation"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/PaymentTypeInformation"
+     ]
+    ]
+   }
+  }
+ ]
+}

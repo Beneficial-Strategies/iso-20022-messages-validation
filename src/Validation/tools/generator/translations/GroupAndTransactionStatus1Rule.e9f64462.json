@@ -1,0 +1,109 @@
+{
+ "rule": "GroupAndTransactionStatus1Rule",
+ "text": "If OriginalGroupInformationAndStatus/GroupStatus is present and is equal to ACTC, ACCP, ACSP or ACSC, ACCR or ACWC, then TransactionInformationAndStatus/TransactionStatus must be different from RJCT. .",
+ "reading": "if GroupStatus is ACTC, ACCP, ACSP, ACSC, ACCR or ACWC, no transaction status is RJCT",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "DifferentFromValue",
+      "/TransactionInformationAndStatus[*]/TransactionStatus",
+      "RJCT"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "OR",
+    "rules": [
+     [
+      "EqualToValue",
+      "/OriginalGroupInformationAndStatus/GroupStatus",
+      "ACTC"
+     ],
+     [
+      "EqualToValue",
+      "/OriginalGroupInformationAndStatus/GroupStatus",
+      "ACCP"
+     ],
+     [
+      "EqualToValue",
+      "/OriginalGroupInformationAndStatus/GroupStatus",
+      "ACSP"
+     ],
+     [
+      "EqualToValue",
+      "/OriginalGroupInformationAndStatus/GroupStatus",
+      "ACSC"
+     ],
+     [
+      "EqualToValue",
+      "/OriginalGroupInformationAndStatus/GroupStatus",
+      "ACCR"
+     ],
+     [
+      "EqualToValue",
+      "/OriginalGroupInformationAndStatus/GroupStatus",
+      "ACWC"
+     ]
+    ]
+   }
+  }
+ ],
+ "lenient_codes": true,
+ "alternatives": [
+  {
+   "reading": "if GroupStatus is ACTC, ACCP, ACSP, ACSC, ACCR or ACWC, no transaction status is RJCT (the transactions are inside OriginalPaymentInformationAndStatus)",
+   "rules": [
+    {
+     "must": {
+      "connector": "AND",
+      "rules": [
+       [
+        "DifferentFromValue",
+        "/OriginalPaymentInformationAndStatus[*]/TransactionInformationAndStatus[*]/TransactionStatus",
+        "RJCT"
+       ]
+      ]
+     },
+     "when": {
+      "connector": "OR",
+      "rules": [
+       [
+        "EqualToValue",
+        "/OriginalGroupInformationAndStatus/GroupStatus",
+        "ACTC"
+       ],
+       [
+        "EqualToValue",
+        "/OriginalGroupInformationAndStatus/GroupStatus",
+        "ACCP"
+       ],
+       [
+        "EqualToValue",
+        "/OriginalGroupInformationAndStatus/GroupStatus",
+        "ACSP"
+       ],
+       [
+        "EqualToValue",
+        "/OriginalGroupInformationAndStatus/GroupStatus",
+        "ACSC"
+       ],
+       [
+        "EqualToValue",
+        "/OriginalGroupInformationAndStatus/GroupStatus",
+        "ACCR"
+       ],
+       [
+        "EqualToValue",
+        "/OriginalGroupInformationAndStatus/GroupStatus",
+        "ACWC"
+       ]
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

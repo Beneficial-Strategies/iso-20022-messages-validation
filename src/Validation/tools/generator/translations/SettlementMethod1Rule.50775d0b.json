@@ -1,0 +1,33 @@
+{
+ "rule": "SettlementMethod1Rule",
+ "text": "If SettlementMethod is equal to INDA or INGA then: - SettlementAccount may be present; - ClearingSystem is not allowed.",
+ "reading": "if SettlementMethod is INDA or INGA, ClearingSystem is absent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/ClearingSystem"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "OR",
+    "rules": [
+     [
+      "EqualToValue",
+      "/SettlementMethod",
+      "INDA"
+     ],
+     [
+      "EqualToValue",
+      "/SettlementMethod",
+      "INGA"
+     ]
+    ]
+   }
+  }
+ ]
+}

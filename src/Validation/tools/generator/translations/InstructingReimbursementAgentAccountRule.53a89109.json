@@ -1,0 +1,27 @@
+{
+ "rule": "InstructingReimbursementAgentAccountRule",
+ "text": "If InstructingReimbursementAgent is not present, then InstructingReimbursementAgentAccount is not allowed.",
+ "reading": "if InstructingReimbursementAgent is absent, InstructingReimbursementAgentAccount is absent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/InstructingReimbursementAgentAccount"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/InstructingReimbursementAgent"
+     ]
+    ]
+   }
+  }
+ ]
+}

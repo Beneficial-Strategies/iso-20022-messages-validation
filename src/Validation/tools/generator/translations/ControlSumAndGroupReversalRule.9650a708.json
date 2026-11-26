@@ -1,0 +1,28 @@
+{
+ "rule": "ControlSumAndGroupReversalRule",
+ "text": "If GroupReversal is true, then ControlSum is not allowed.",
+ "reading": "if GroupReversal is true, ControlSum is absent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/ControlSum"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/GroupReversal",
+      "true"
+     ]
+    ]
+   }
+  }
+ ]
+}

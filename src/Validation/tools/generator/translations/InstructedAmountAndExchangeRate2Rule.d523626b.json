@@ -1,0 +1,32 @@
+{
+ "rule": "InstructedAmountAndExchangeRate2Rule",
+ "text": "If InstructedAmount is present and the currency is the same as the currency in InterbankSettlementAmount, then ExchangeRate is not allowed.",
+ "reading": "if InstructedAmount is present in the currency of InterbankSettlementAmount, ExchangeRate is absent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/ExchangeRate"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/InstructedAmount"
+     ],
+     [
+      "EqualToNode",
+      "/InstructedAmount/@Currency",
+      "/InterbankSettlementAmount/@Currency"
+     ]
+    ]
+   }
+  }
+ ]
+}

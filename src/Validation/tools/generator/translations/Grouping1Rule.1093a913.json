@@ -1,0 +1,30 @@
+{
+ "rule": "Grouping1Rule",
+ "text": "If GroupHeader/Grouping is present and equals GRPD, then one and only one occurrence of PaymentInformation must be present.",
+ "reading": "if Grouping is GRPD, there is exactly one PaymentInformation",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "CountEquals",
+      "/PaymentInformation",
+      "1"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/GroupHeader/Grouping",
+      "GRPD"
+     ]
+    ]
+   }
+  }
+ ],
+ "vacuous_without_condition_element": true
+}

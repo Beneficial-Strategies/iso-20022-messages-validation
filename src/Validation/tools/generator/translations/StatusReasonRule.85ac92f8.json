@@ -1,0 +1,28 @@
+{
+ "rule": "StatusReasonRule",
+ "text": "If StatusReason/Code is equal to 'NARR', then at least one occurrence of AddititionalStatusReasonInformation must be present.",
+ "reading": "if StatusReason is NARR, at least one AdditionalStatusReasonInformation is present",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/AdditionalStatusReasonInformation"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/StatusReason/Code",
+      "NARR"
+     ]
+    ]
+   }
+  }
+ ]
+}

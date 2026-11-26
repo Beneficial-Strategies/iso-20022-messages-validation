@@ -1,0 +1,27 @@
+{
+ "rule": "DebtorAgentAccountRule",
+ "text": "If DebtorAgent is not present, then DebtorAgentAccount is not allowed.",
+ "reading": "if DebtorAgent is absent, DebtorAgentAccount is absent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/DebtorAgentAccount"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/DebtorAgent"
+     ]
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,28 @@
+{
+ "rule": "TotalReversedInterbankSettlementAmount2Rule",
+ "text": "GroupHeader/TotalReversedInterbankSettlementAmount must equal the sum of all individual TransactionInformation/ReversedInterbankSettlementAmount when present.",
+ "reading": "if TotalReversedInterbankSettlementAmount is present, it is the sum of TransactionInformation/ReversedInterbankSettlementAmount",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/GroupHeader/TotalReversedInterbankSettlementAmount",
+      "sum of TransactionInformation/ReversedInterbankSettlementAmount"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/GroupHeader/TotalReversedInterbankSettlementAmount"
+     ]
+    ]
+   }
+  }
+ ]
+}

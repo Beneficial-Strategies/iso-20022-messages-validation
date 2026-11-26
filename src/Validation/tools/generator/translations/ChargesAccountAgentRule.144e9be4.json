@@ -1,0 +1,28 @@
+{
+ "rule": "ChargesAccountAgentRule",
+ "text": "If ChargesAccountAgent is present, then it must contain a branch of the CreditorAgent. It must not contain a completely different agent.",
+ "reading": "if ChargesAccountAgent is present, it is a branch of the CreditorAgent (an error only when both carry the same kind of identifier and they differ)",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "IsBranchOf",
+      "/ChargesAccountAgent",
+      "/CreditorAgent"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/ChargesAccountAgent"
+     ]
+    ]
+   }
+  }
+ ]
+}

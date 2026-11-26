@@ -1,0 +1,28 @@
+{
+ "rule": "TotalInterbankSettlementAmount1Rule",
+ "text": "If GroupHeader/TotalInterbankSettlementAmount is present, then all occurrences of CreditTransferTransactionInformation/InterbankSettlementAmount must have the same currency as the currency of GroupHeader/TotalInterbankSettlementAmount. .",
+ "reading": "if TotalInterbankSettlementAmount is present, every CreditTransferTransactionInformation/InterbankSettlementAmount has its currency",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "SameInAll",
+      "/GroupHeader/TotalInterbankSettlementAmount/@Currency",
+      "/CreditTransferTransactionInformation[*]/InterbankSettlementAmount/@Currency"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/GroupHeader/TotalInterbankSettlementAmount"
+     ]
+    ]
+   }
+  }
+ ]
+}

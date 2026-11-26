@@ -1,0 +1,28 @@
+{
+ "rule": "ChequeInstructionRule",
+ "text": "If PaymentMethod is CHK, then CreditTransferTransaction/ChequeInstruction is optional. If PaymentMethod is different from CHK, then CreditTransferTransaction/ChequeInstruction is not allowed. Rule rationale: ChequeInstructionDetails may be present if the payment method is Cheque. It must not be present if the payment method is 'Transfer'.",
+ "reading": "if PaymentMethod is not CHK, no CreditTransferTransaction has ChequeInstruction",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/CreditTransferTransaction[*]/ChequeInstruction"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "DifferentFromValue",
+      "/PaymentMethod",
+      "CHK"
+     ]
+    ]
+   }
+  }
+ ]
+}

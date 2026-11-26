@@ -1,0 +1,27 @@
+{
+ "rule": "PaymentTypeInformationRule",
+ "text": "If GroupHeader/PaymentTypeInformation is present, then CreditTransferTransactionInformation/PaymentTypeInformation is not allowed.",
+ "reading": "if GroupHeader/PaymentTypeInformation is present, no CreditTransferTransactionInformation has PaymentTypeInformation",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/CreditTransferTransactionInformation[*]/PaymentTypeInformation"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/GroupHeader/PaymentTypeInformation"
+     ]
+    ]
+   }
+  }
+ ]
+}

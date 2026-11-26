@@ -1,0 +1,29 @@
+{
+ "rule": "SettlementMethodRule",
+ "text": "GroupHeader/SettlementInformation/SettlementMethod/COVE is not allowed when returning direct debit transactions.",
+ "reading": "if SettlementMethod is COVE, no returned transaction is a return of a direct debit (the original message is pacs.003)",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "DifferentFromValue",
+      "substring(/TransactionInformation[*]/OriginalGroupInformation/OriginalMessageNameIdentification,1,8)",
+      "pacs.003"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/GroupHeader/SettlementInformation/SettlementMethod",
+      "COVE"
+     ]
+    ]
+   }
+  }
+ ]
+}

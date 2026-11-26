@@ -1,0 +1,39 @@
+{
+ "rule": "GroupStatusRejectedRule",
+ "text": "If OriginalGroupInformationAndStatus/GroupStatus is present and is equal to RJCT (Rejected), then OriginalPaymentInformationAndStatus/PaymentInformationStatus, if present, must be equal to RJCT (Rejected).",
+ "reading": "if GroupStatus is RJCT, a PaymentInformationStatus that is present is RJCT",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/PaymentInformationStatus",
+      "RJCT"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/OriginalGroupInformationAndStatus/GroupStatus",
+      "RJCT"
+     ]
+    ]
+   },
+   "each": "/OriginalPaymentInformationAndStatus",
+   "eachWhen": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/PaymentInformationStatus"
+     ]
+    ]
+   }
+  }
+ ]
+}

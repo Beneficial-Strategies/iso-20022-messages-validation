@@ -1,0 +1,28 @@
+{
+ "rule": "GroupReversal2Rule",
+ "text": "If GroupHeader/GroupReversal is true, then OriginalGroupInformation/ReversalReasonInformation/ReversalReason must present.",
+ "reading": "if GroupReversal is true, ReversalReason is present",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/OriginalGroupInformation/ReversalReasonInformation/ReversalReason"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/GroupHeader/GroupReversal",
+      "true"
+     ]
+    ]
+   }
+  }
+ ]
+}

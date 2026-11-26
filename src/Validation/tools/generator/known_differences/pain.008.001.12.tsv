@@ -1,0 +1,3 @@
+# Differences between the hand-written tests and the generated validators of pain.008.001.12 (run_oracle.py).
+# test<TAB>reason. A failure that is not listed is unexpected; a listed test that no longer fails is to be removed.
+BeneficialStrategies.Iso20022.Messages.Validation.Components.StructuredRegulatoryReporting5ValidatorTests.EmptyMessage_NoValidationErrors	The hand-written validator lacks the rule(s) of the specification ReportingCodeAndInformationRule, and its test data breaks them.

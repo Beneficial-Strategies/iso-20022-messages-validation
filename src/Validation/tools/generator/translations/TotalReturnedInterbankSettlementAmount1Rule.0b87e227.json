@@ -1,0 +1,28 @@
+{
+ "rule": "TotalReturnedInterbankSettlementAmount1Rule",
+ "text": "If GroupHeader/TotalReturnedInterbankSettlementAmount is present, then all occurrences of TransactionInformation/ReturnedInterbankSettlementAmount must have the same currency as the currency of GroupHeader/TotalReturnedInterbankSettlementAmount. .",
+ "reading": "if TotalReturnedInterbankSettlementAmount is present, every TransactionInformation/ReturnedInterbankSettlementAmount has its currency",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "SameInAll",
+      "/GroupHeader/TotalReturnedInterbankSettlementAmount/@Currency",
+      "/TransactionInformation[*]/ReturnedInterbankSettlementAmount/@Currency"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/GroupHeader/TotalReturnedInterbankSettlementAmount"
+     ]
+    ]
+   }
+  }
+ ]
+}

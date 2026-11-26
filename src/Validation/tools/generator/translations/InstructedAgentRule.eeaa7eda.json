@@ -1,0 +1,18 @@
+{
+ "rule": "InstructedAgentRule",
+ "text": "GroupHeader/InstructedAgent is not allowed.",
+ "reading": "GroupHeader/InstructedAgent is absent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/GroupHeader/InstructedAgent"
+     ]
+    ]
+   }
+  }
+ ]
+}

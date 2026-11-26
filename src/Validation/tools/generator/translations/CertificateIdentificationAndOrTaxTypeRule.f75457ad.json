@@ -1,0 +1,27 @@
+{
+ "rule": "CertificateIdentificationAndOrTaxTypeRule",
+ "text": "If CertificateIdentification is not present, then TaxType is mandatory. If CertificateIdentification is present, then TaxType is optional.",
+ "reading": "if CertificateIdentification is absent, TaxType is present",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/TaxType"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/CertificateIdentification"
+     ]
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,5 @@
+{
+ "rule": "UnderlyingCustomerCreditTransferRule",
+ "text": "The UnderlyingCustomerCreditTransfer element can only be present if present in the original transaction being returned.",
+ "known_issue": "depends on the original transaction that is being returned, which is not in the message"
+}

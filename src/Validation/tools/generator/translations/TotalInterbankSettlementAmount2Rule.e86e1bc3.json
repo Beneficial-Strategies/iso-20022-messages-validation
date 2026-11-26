@@ -1,0 +1,28 @@
+{
+ "rule": "TotalInterbankSettlementAmount2Rule",
+ "text": "If GroupHeader/TotalInterbankSettlementAmount is present, then it must equal to the sum of all occurrences of CreditTransferTransactionInformation/InterbankSettlementAmount.",
+ "reading": "if TotalInterbankSettlementAmount is present, it is the sum of CreditTransferTransactionInformation/InterbankSettlementAmount",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/GroupHeader/TotalInterbankSettlementAmount",
+      "sum of CreditTransferTransactionInformation/InterbankSettlementAmount"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/GroupHeader/TotalInterbankSettlementAmount"
+     ]
+    ]
+   }
+  }
+ ]
+}

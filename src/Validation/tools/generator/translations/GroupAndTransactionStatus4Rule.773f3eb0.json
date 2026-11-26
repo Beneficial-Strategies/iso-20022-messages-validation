@@ -1,0 +1,57 @@
+{
+ "rule": "GroupAndTransactionStatus4Rule",
+ "text": "If OriginalGroupInformationAndStatus/GroupStatus is present and is equal to RCVD, then TransactionInformationAndStatus/TransactionStatus is not allowed. .",
+ "reading": "if GroupStatus is RCVD, TransactionInformationAndStatus is absent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/TransactionInformationAndStatus"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/OriginalGroupInformationAndStatus/GroupStatus",
+      "RCVD"
+     ]
+    ]
+   }
+  }
+ ],
+ "lenient_codes": true,
+ "alternatives": [
+  {
+   "reading": "if GroupStatus is RCVD, TransactionInformationAndStatus is absent (the transactions are inside OriginalPaymentInformationAndStatus)",
+   "rules": [
+    {
+     "must": {
+      "connector": "AND",
+      "rules": [
+       [
+        "Absence",
+        "/OriginalPaymentInformationAndStatus[*]/TransactionInformationAndStatus"
+       ]
+      ]
+     },
+     "when": {
+      "connector": "AND",
+      "rules": [
+       [
+        "EqualToValue",
+        "/OriginalGroupInformationAndStatus/GroupStatus",
+        "RCVD"
+       ]
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

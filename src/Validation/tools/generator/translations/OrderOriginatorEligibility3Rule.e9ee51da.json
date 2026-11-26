@@ -1,0 +1,27 @@
+{
+ "rule": "OrderOriginatorEligibility3Rule",
+ "text": "Either InvestmentAccountDetails/OrderOriginatorEligibility or (one or more instances of IndividualOrderDetails/RelatedPartiesDetails/OrderOriginatorEligibility) may be present, but not both.",
+ "reading": "InvestmentAccountDetails/OrderOriginatorEligibility and the one of the items are not both present",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/IndividualOrderDetails[*]/RelatedPartiesDetails[*]/OrderOriginatorEligibility"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/InvestmentAccountDetails/OrderOriginatorEligibility"
+     ]
+    ]
+   }
+  }
+ ]
+}

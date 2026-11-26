@@ -1,0 +1,27 @@
+{
+ "rule": "IntermediaryAgent1AccountRule",
+ "text": "If IntermediaryAgent1 is not present, then IntermediaryAgent1Account is not allowed.",
+ "reading": "if IntermediaryAgent1 is absent, IntermediaryAgent1Account is absent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/IntermediaryAgent1Account"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/IntermediaryAgent1"
+     ]
+    ]
+   }
+  }
+ ]
+}

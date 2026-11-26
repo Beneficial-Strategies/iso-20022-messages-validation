@@ -1,0 +1,27 @@
+{
+ "rule": "InstructingAgentRule",
+ "text": "If GroupHeader/InstructingAgent is present, then TransactionInformationAndStatus/InstructingAgent is not allowed. .",
+ "reading": "if GroupHeader/InstructingAgent is present, no TransactionInformationAndStatus has InstructingAgent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/TransactionInformationAndStatus[*]/InstructingAgent"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/GroupHeader/InstructingAgent"
+     ]
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,31 @@
+{
+ "rule": "ThirdReimbursementAgentRule",
+ "text": "If ThirdReimbursementAgent is present, then InstructingReimbursementAgent and InstructedReimbursementAgent must both be present.",
+ "reading": "if ThirdReimbursementAgent is present, so are InstructingReimbursementAgent and InstructedReimbursementAgent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/InstructingReimbursementAgent"
+     ],
+     [
+      "Presence",
+      "/InstructedReimbursementAgent"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/ThirdReimbursementAgent"
+     ]
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,51 @@
+{
+ "rule": "SafekeepingAccountRule",
+ "text": "SafekeepingAccount must be present or Transaction(*)/SafekeepingAccount must be present, but not both.",
+ "reading": "SafekeepingAccount is present, or Transaction has SafekeepingAccount in every item, and not both",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/Transaction"
+     ],
+     [
+      "Presence",
+      "/Transaction[*]/SafekeepingAccount"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/SafekeepingAccount"
+     ]
+    ]
+   }
+  },
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/Transaction[*]/SafekeepingAccount"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/SafekeepingAccount"
+     ]
+    ]
+   }
+  }
+ ]
+}

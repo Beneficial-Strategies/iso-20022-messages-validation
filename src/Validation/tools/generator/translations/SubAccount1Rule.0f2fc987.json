@@ -1,0 +1,27 @@
+{
+ "rule": "SubAccount1Rule",
+ "text": "If SubAccountIdentification is present, then AccountIdentification is mandatory.",
+ "reading": "if SubAccountIdentification is present, AccountIdentification is present",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/AccountIdentification"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/SubAccountIdentification"
+     ]
+    ]
+   }
+  }
+ ]
+}

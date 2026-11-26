@@ -1,0 +1,5 @@
+{
+ "rule": "CashAccountServicerRule",
+ "text": "CashAccountServicer must be present or Movement(*)/AccountOwner must be present, but not both.",
+ "hand": "the text names Movement(*)/AccountOwner where CashAccountServicer is meant (a mistake in the specification's text): the reading has to be ruled on"
+}

@@ -3,6 +3,7 @@
     python3 -m unittest -q test_generator        (from this folder)
 """
 import os
+import json
 import tempfile
 import unittest
 from collections import OrderedDict
@@ -77,9 +78,14 @@ class RuleTests(RuleBase):
         e = self.expr(rule("SimpleRule", ("mustBe", "AND", [("Absence", "/Coll[*]/X", None)])))
         self.assertEqual(e, "(x?.Coll ?? []).All(i1 => !(i1?.X is not null))")
 
+    def test_absence_without_an_index_means_no_item_has_it(self):
+        e = self.expr(rule("SimpleRule", ("mustBe", "AND", [("Absence", "/Coll/X", None)])))
+        self.assertEqual(e, "(x?.Coll ?? []).All(i1 => !(i1?.X is not null))")
+
     def test_presence_of_every_item(self):
+        # every item has an X, and there is an item: with no item at all, X is not present
         e = self.expr(rule("SimpleRule", ("mustBe", "AND", [("Presence", "/Coll[*]/X", None)])))
-        self.assertEqual(e, "(x?.Coll ?? []).All(i1 => i1?.X is not null)")
+        self.assertEqual(e, "((x?.Coll ?? []).All(i1 => i1?.X is not null)) && ((x?.Coll ?? []).Any(i2 => i2?.X is not null))")
 
     def test_a_complex_rule_is_a_condition_and_a_consequence(self):
         e = self.expr(
@@ -269,6 +275,91 @@ class HandWrittenRuleTests(unittest.TestCase):
             report, code = self.emit(d)
         self.assertNotIn("E.SomeGuideline", report["pending"])
         self.assertIn("SomeGuideline: a guideline of the specification", code)
+
+
+class TranslationTests(unittest.TestCase):
+    """A rule given in prose is read once, kept in translations/, and applied to every type that has the same text."""
+
+    PROSE = "If Name is present, then Coll must not have an X."
+    ENTITY = {
+        "name": "E",
+        "children": [{"name": "Name", "xmlElementName": "messageElement", "minOccurs": "1", "maxOccurs": "1"},
+                     {"name": "ProseRule", "xmlElementName": "constraint", "definition": "  If Name is present,\n then Coll must not have an X. "}],
+    }
+
+    def translation(self, path):
+        return {"rule": "ProseRule", "text": self.PROSE, "reading": "r",
+                "rules": [{"when": {"rules": [["Presence", "/Name"]]}, "must": {"rules": [["Absence", path]]}}]}
+
+    def emit(self, translation, text_changed=False):
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, gv.text_key("ProseRule", self.PROSE) + ".json"), "w") as f:
+                json.dump(translation, f)
+            old, gv.TRANSLATIONS_DIR, gv.RULES_DIRS = gv.TRANSLATIONS_DIR, d, [d]
+            try:
+                m = FakeModel()
+                m.ifaces["IE"] = OrderedDict(Name=("Max35Text", False, False), Coll=("IB", False, True))
+                entity = json.loads(json.dumps(self.ENTITY))
+                if text_changed:
+                    entity["children"][1]["definition"] += " (changed)"
+                report = {k: [] for k in ("no_interface", "mismatch", "prose_only", "guidelines", "unsupported", "pending", "generated_rules", "translated_rules")}
+                return report, gv.emit_type(gv.Gen(m), entity, report)[1]
+            finally:
+                gv.TRANSLATIONS_DIR, gv.RULES_DIRS = old, []
+
+    def test_the_translation_becomes_a_rule_and_says_where_it_comes_from(self):
+        report, code = self.emit(self.translation("/Coll[*]/X"))
+        self.assertEqual(report["pending"], [])
+        self.assertEqual(report["translated_rules"], ["E.ProseRule"])
+        self.assertIn("(the rule is read from the prose (translations/ProseRule.", code)
+        self.assertIn(".Must(x => !(x?.Name is not null) || ((x?.Coll ?? []).All(i1 => !(i1?.X is not null))))", code)
+        self.assertNotIn("partial", code)
+
+    def test_a_translation_that_does_not_fit_the_type_leaves_the_rule_pending(self):
+        report, code = self.emit(self.translation("/Nope/X"))
+        self.assertEqual(report["pending"], ["E.ProseRule"])
+        self.assertIn("does not fit this type", code)
+
+    def test_a_change_in_the_text_of_the_specification_is_not_silently_translated(self):
+        report, _ = self.emit(self.translation("/Coll[*]/X"), text_changed=True)
+        self.assertEqual(report["pending"], ["E.ProseRule"])
+
+    def test_the_same_value_in_all_items_ignores_absent_values(self):
+        g = gv.Gen(FakeModel())
+        e = g.section("x", "IA", ("AND", [("SameInAll", "/Coll[*]/X", None)]))
+        self.assertEqual(e, "RuleOps.AllSame((x?.Coll ?? []).Select(i1 => i1?.X))")
+
+
+class TranslationFilesTests(unittest.TestCase):
+    """The files in translations/ are data that a generator run trusts, so they are checked as such."""
+
+    def files(self):
+        return sorted(f for f in os.listdir(gv.TRANSLATIONS_DIR) if f.endswith(".json"))
+
+    def test_each_file_is_named_by_its_rule_and_the_hash_of_its_text(self):
+        for f in self.files():
+            with open(os.path.join(gv.TRANSLATIONS_DIR, f), encoding="utf-8") as fh:
+                t = json.load(fh)
+            self.assertEqual(f, gv.text_key(t["rule"], t["text"]) + ".json", f)
+
+    def test_each_file_says_what_it_is_or_why_it_is_not_a_reading(self):
+        for f in self.files():
+            with open(os.path.join(gv.TRANSLATIONS_DIR, f), encoding="utf-8") as fh:
+                t = json.load(fh)
+            self.assertTrue(t.get("rules") or t.get("known_issue") or t.get("hand"), f)
+            if t.get("rules"):
+                self.assertTrue(t.get("reading"), f)
+
+    def test_each_reading_uses_only_the_rule_types_the_generator_knows(self):
+        known = {"Presence", "Absence", "EqualToValue", "DifferentFromValue", "EqualToNode", "DifferentFromNode", "WithInList",
+                 "NotWithInList", "SameInAll", "CountEquals", "IsBranchOf"}
+        for f in self.files():
+            with open(os.path.join(gv.TRANSLATIONS_DIR, f), encoding="utf-8") as fh:
+                raw = json.load(fh)
+            for r in raw.get("rules", []) + [x for a in raw.get("alternatives", []) for x in a["rules"]]:
+                for sec in ("must", "when", "eachWhen"):
+                    for rule in (r.get(sec) or {"rules": []})["rules"]:
+                        self.assertIn(rule[0], known, f)
 
 
 class ChoiceTests(unittest.TestCase):

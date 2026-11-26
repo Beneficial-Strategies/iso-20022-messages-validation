@@ -1,0 +1,27 @@
+{
+ "rule": "ChargesInformationAndInstructedAmountRule",
+ "text": "If ChargesInformation/ChargesAmount is present, then InstructedAmount must be present.",
+ "reading": "if ChargesInformation/ChargesAmount is present, InstructedAmount is present",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/InstructedAmount"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/ChargesInformation/ChargesAmount"
+     ]
+    ]
+   }
+  }
+ ]
+}

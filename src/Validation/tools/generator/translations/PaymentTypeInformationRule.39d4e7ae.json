@@ -1,0 +1,27 @@
+{
+ "rule": "PaymentTypeInformationRule",
+ "text": "If PaymentTypeInformation is present, then CreditTransferTransactionInformation/PaymentTypeInformation is not allowed.",
+ "reading": "if PaymentTypeInformation is present, no CreditTransferTransactionInformation has PaymentTypeInformation",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/CreditTransferTransactionInformation[*]/PaymentTypeInformation"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/PaymentTypeInformation"
+     ]
+    ]
+   }
+  }
+ ]
+}

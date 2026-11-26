@@ -1,0 +1,32 @@
+{
+ "rule": "InstructedAmountAndExchangeRate1Rule",
+ "text": "If InstructedAmount is present and the currency is different from the currency in InterbankSettlementAmount, then ExchangeRate must be present.",
+ "reading": "if InstructedAmount is present in a currency other than InterbankSettlementAmount's, ExchangeRate is present",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/ExchangeRate"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/InstructedAmount"
+     ],
+     [
+      "DifferentFromNode",
+      "/InstructedAmount/@Currency",
+      "/InterbankSettlementAmount/@Currency"
+     ]
+    ]
+   }
+  }
+ ]
+}

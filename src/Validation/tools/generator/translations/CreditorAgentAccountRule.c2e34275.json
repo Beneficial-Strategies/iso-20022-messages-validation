@@ -1,0 +1,27 @@
+{
+ "rule": "CreditorAgentAccountRule",
+ "text": "If CreditorAgent is not present, then CreditorAgentAccount is not allowed.",
+ "reading": "if CreditorAgent is absent, CreditorAgentAccount is absent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/CreditorAgentAccount"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/CreditorAgent"
+     ]
+    ]
+   }
+  }
+ ]
+}

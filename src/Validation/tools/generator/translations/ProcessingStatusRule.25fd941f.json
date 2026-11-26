@@ -1,0 +1,51 @@
+{
+ "rule": "ProcessingStatusRule",
+ "text": "ProcessingStatus must be present or Modification(*)/ProcessingStatus must be present, but not both.",
+ "reading": "ProcessingStatus is present, or Modification has ProcessingStatus in every item, and not both",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/Modification"
+     ],
+     [
+      "Presence",
+      "/Modification[*]/ProcessingStatus"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/ProcessingStatus"
+     ]
+    ]
+   }
+  },
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/Modification[*]/ProcessingStatus"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/ProcessingStatus"
+     ]
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,44 @@
+{
+ "rule": "SettlementMethod3Rule",
+ "text": "If SettlementMethod is equal to CLRG then: - SettlementAccount is not allowed; - Reimbursement agent(s) is(are) not allowed; - ClearingSystem must be present.",
+ "reading": "if SettlementMethod is CLRG, SettlementAccount and the reimbursement agents are absent and ClearingSystem is present",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/SettlementAccount"
+     ],
+     [
+      "Absence",
+      "/InstructingReimbursementAgent"
+     ],
+     [
+      "Absence",
+      "/InstructedReimbursementAgent"
+     ],
+     [
+      "Absence",
+      "/ThirdReimbursementAgent"
+     ],
+     [
+      "Presence",
+      "/ClearingSystem"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/SettlementMethod",
+      "CLRG"
+     ]
+    ]
+   }
+  }
+ ]
+}

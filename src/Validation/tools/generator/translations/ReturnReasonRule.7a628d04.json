@@ -1,0 +1,28 @@
+{
+ "rule": "ReturnReasonRule",
+ "text": "If ReturnReason/Code is equal to 'NARR', then at least one occurrence of AddititionalReturnReasonInformation must be present.",
+ "reading": "if ReturnReason is NARR, at least one AdditionalReturnReasonInformation is present",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/AdditionalReturnReasonInformation"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/ReturnReason/Code",
+      "NARR"
+     ]
+    ]
+   }
+  }
+ ]
+}

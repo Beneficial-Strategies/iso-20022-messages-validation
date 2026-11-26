@@ -1,0 +1,5 @@
+{
+ "rule": "SupplementaryDataRule",
+ "text": "This component may not be used without the explicit approval of a SEG and submission to the RA of ISO 20022 compliant structure(s) to be used in the Envelope element.",
+ "known_issue": "a matter of governance (approval of a standards evaluation group), not of the message's data"
+}

@@ -1,0 +1,27 @@
+{
+ "rule": "InstructedAgentRule",
+ "text": "If GroupHeader/InstructedAgent is present, then DirectDebitTransactionInformation/InstructedAgent is not allowed.",
+ "reading": "if GroupHeader/InstructedAgent is present, no DirectDebitTransactionInformation has InstructedAgent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/DirectDebitTransactionInformation[*]/InstructedAgent"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/GroupHeader/InstructedAgent"
+     ]
+    ]
+   }
+  }
+ ]
+}

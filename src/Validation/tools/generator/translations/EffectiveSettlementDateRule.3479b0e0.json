@@ -1,0 +1,27 @@
+{
+ "rule": "EffectiveSettlementDateRule",
+ "text": "Either TransferDetails\\EffectiveSettlementDate or SettlementDetails\\EffectiveSettlementDate may be present, but not both.",
+ "reading": "the date of TransferDetails and of SettlementDetails are not both present",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/SettlementDetails/EffectiveSettlementDate"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/TransferDetails/EffectiveSettlementDate"
+     ]
+    ]
+   }
+  }
+ ]
+}

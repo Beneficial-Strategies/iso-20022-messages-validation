@@ -1,0 +1,27 @@
+{
+ "rule": "BulkCashSettlementDetails1Rule",
+ "text": "Either IndividualOrderDetails/CashSettlementDetails or BulkCashSettlementDetails may be present, but not both.",
+ "reading": "IndividualOrderDetails/CashSettlementDetails and BulkCashSettlementDetails are not both present",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/BulkCashSettlementDetails"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/IndividualOrderDetails/CashSettlementDetails"
+     ]
+    ]
+   }
+  }
+ ]
+}
