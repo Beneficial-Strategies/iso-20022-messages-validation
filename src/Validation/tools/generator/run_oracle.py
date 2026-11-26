@@ -59,9 +59,10 @@ def main():
         # The hand-written tests build a PaymentIdentification13 with only an EndToEndIdentification, which the
         # specification forbids (TransactionIdentificationPresenceRule: TransactionIdentification or UETR). The
         # data is made valid so that this one rule does not hide the others.
-        s = s.replace(
-            '.Set(x2 => x2.EndToEndIdentification).To("E2E-001")',
-            '.Set(x2 => x2.EndToEndIdentification).To("E2E-001").Set(x2 => x2.TransactionIdentification).To("TX-001")',
+        s = re.sub(
+            r'(Make<IPaymentIdentification13>\(b2 => b2\s*\.Set\(x2 => x2\.EndToEndIdentification\)\.To\("E2E-001"\))',
+            r'\1.Set(x2 => x2.TransactionIdentification).To("TX-001")',
+            s,
         )
         if re.search(r"Gen\." + t + r"Validator\(\s*[^)\s]", s):
             # the hand-written validator takes arguments (an external code set registry): not generated yet

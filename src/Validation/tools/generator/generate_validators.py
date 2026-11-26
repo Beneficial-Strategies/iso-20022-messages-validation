@@ -110,6 +110,8 @@ class Model:
         self.hand = hand_validators()
 
     def kind(self, t):
+        if t.startswith("V|"):
+            return "class"  # a choice variant (see Gen.variant)
         if t in self.ifaces:
             return "choice" if not self.ifaces[t] and self.is_choice(t) else "iface"
         if t in self.enums or t.endswith("Code") and t not in self.structs:
@@ -168,12 +170,44 @@ class Gen:
         self.uid += 1
         return f"i{self.uid}"
 
-    # ---- member access; returns (c# expr, type, nullable-chain)
+    # ---- member access; returns (type, nullable, collection)
     def member(self, cur, itype, name):
+        if itype.startswith("V|"):  # the value of a choice variant: its own type
+            itype = itype.split("|")[2]
         props = self.m.ifaces.get(itype)
-        if props is None or name not in props:
-            raise Unsupported(f"{itype} has no member {name}")
-        return props[name]
+        if props is not None and name in props:
+            return props[name]
+        v = self.variant(itype, name)
+        if v is not None:
+            return v
+        raise Unsupported(f"{itype} has no member {name}")
+
+    def variant(self, itype, name):
+        """A choice is an interface with one variant interface per alternative (Choices/<Choice>/I<Name>.cs), whose
+        `Value` is the alternative. The path of a rule names the alternative; it is `cur as Variant`."""
+        if not self.m.is_choice(itype):
+            return None
+        f = MSGS + f"Choices/{itype[1:]}/I{name}.cs"
+        if not os.path.exists(f):
+            return None
+        vm = re.search(r"^\s*([\w<>\.\?]+)\s+Value\s*\{\s*get;", open(f, encoding="utf-8").read(), re.M)
+        if vm is None:
+            return None
+        return (f"V|{itype[1:]}.I{name}|{vm.group(1).rstrip('?')}", True, False)
+
+    def access(self, cur, ctype, name, t):
+        """the C# expression of member `name` of `cur`"""
+        if t.startswith("V|"):
+            return f"({cur} as BeneficialStrategies.Iso20022.Choices.{t.split('|')[1]})"
+        if ctype.startswith("V|"):
+            return f"{cur}?.Value?.{name}"
+        return f"{cur}?.{name}"
+
+    def unwrap(self, e, t):
+        """a variant compared with a value is compared by its Value"""
+        if t.startswith("V|"):
+            return f"{e}?.Value", t.split("|")[2]
+        return e, t
 
     def walk(self, root_var, root_type, path, leaf):
         """Writes `leaf(expr, type, collection)` over the path with [*] as all(...)."""
@@ -188,7 +222,7 @@ class Gen:
             if name.startswith("@"):
                 raise Unsupported(f"attribute {name}")
             t, nullable, coll = self.member(cur, ctype, name)
-            acc = f"{cur}?.{name}"
+            acc = self.access(cur, ctype, name, t)
             if coll:
                 if idx == "*":
                     v = self.var()
@@ -217,7 +251,7 @@ class Gen:
             if name == "@Currency":
                 return f"{cur}?.Currency", "ActiveCurrencyCode"
             t, nullable, coll = self.member(cur, ctype, name)
-            cur = f"{cur}?.{name}"
+            cur = self.access(cur, ctype, name, t)
             if coll:
                 if idx not in (None,):
                     raise Unsupported("indexed collection on the right of a comparison")
@@ -240,7 +274,7 @@ class Gen:
         if typ in ("EqualToNode", "DifferentFromNode"):
             rexpr, rtype = self.expr_of(x, itype, right)
             op = "==" if typ == "EqualToNode" else "!="
-            return self.walk(x, itype, left, lambda e, t, c: f"{e} {op} {rexpr}")
+            return self.walk(x, itype, left, lambda e, t, c: f"{self.unwrap(e, t)[0]} {op} {self.unwrap(rexpr, rtype)[0]}")
         if typ in ("EqualToValue", "DifferentFromValue"):
             neg = typ == "DifferentFromValue"
             agg = re.match(r"^(sum of|number of occurrences of) (/?[\w/\[\]\*@]+)$", right or "")
@@ -260,6 +294,7 @@ class Gen:
                 return lhs_body
             lit = right
             def cmp(e, t, c):
+                e, t = self.unwrap(e, t)
                 k = self.m.kind(t)
                 if k == "enum":
                     mem = enum_members(t)
@@ -274,7 +309,7 @@ class Gen:
             if members is None:
                 raise Unsupported(f"list {code} is not an enum")
             self.lists[code] = sorted(members)
-            body = self.walk(x, itype, left, lambda e, t, c: f"RuleOps.InList({e}, CodeLists.{code})")
+            body = self.walk(x, itype, left, lambda e, t, c: f"RuleOps.InList({self.unwrap(e, t)[0]}, CodeLists.{code})")
             return body if typ == "WithInList" else f"!({body})"
         raise Unsupported(f"rule type {typ}")
 
