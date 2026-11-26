@@ -38,7 +38,7 @@ marker; do not fall back to a per-type universal_lookup call unless this manifes
 2026-08-27 deployment (an older cached coverage-checksums.json won't have this field at all).
 
 Two-step process, since checksums can only come from a live MCP call (this script has no network
-access) and the Common model files can only be read from a checked-out repo (the MCP session
+access) and the model files can only be read from checked-out repositories (the MCP session
 can't see them):
   1. In a Claude session with MCP access: call get_spec_snapshot for every artifactType per the
      existing snapshot-sync-plan skill's own convention (append each page to one
@@ -46,13 +46,19 @@ can't see them):
      already produces — no new download step is introduced.
   2. Run this script against that file:
        python3 build_coverage_checksums.py snapshot-sync/{date}/spec-snapshot.tsv
-     It scans the Common project for every model type's own [IsoId("...")] attribute, joins that
+     It scans the Messages and Primitives repositories for every model type's own [IsoId("...")] attribute, joins that
      against every validator's AbstractValidator<T>/ExternalCodesetAbstractValidator<T>
      declaration, looks up each resulting id's checksum (and status/removalDate) in the
      spec-snapshot TSV, and writes coverage-checksums.json (git-diffable — see below).
 
 Usage:
     python3 build_coverage_checksums.py <spec-snapshot.tsv> [<more.tsv> ...] [--out PATH] [--snapshot-date YYYY-MM-DD]
+                                        [--messages PATH] [--primitives PATH] [--validators PATH] [--strict]
+
+    --messages, --primitives: the clones of iso-20022-messages and iso-20022-primitives (default:
+    the folders next to this repository, or ISO20022_MESSAGES_REPO / ISO20022_PRIMITIVES_REPO).
+    --validators: the folder of the validators (default: Validators next to this tools folder).
+    --strict: exit 1 if any validator's type could not be resolved to an IsoId (CI uses this).
 
     --snapshot-date: the MCP snapshot date this data came from (from get_repository_statistics —
     not embedded in the TSV itself), recorded in the manifest's _meta for future readers. Optional
@@ -86,11 +92,25 @@ import json
 import glob
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-FV_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
-COMMON_ROOT = os.path.abspath(os.path.join(FV_ROOT, "..", "Common"))
-# the code sets, simple types and amounts moved to their own project (#26)
-PRIMITIVES_ROOT = os.path.abspath(os.path.join(FV_ROOT, "..", "Primitives"))
+FV_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))  # src/Validation
+REPO_ROOT = os.path.abspath(os.path.join(FV_ROOT, "..", ".."))
 DEFAULT_OUT = os.path.join(FV_ROOT, "coverage-checksums.json")
+
+# The model is in two other repositories, cloned next to this one by default. Their folders are
+# set by --messages / --primitives (or the environment variables ISO20022_MESSAGES_REPO and
+# ISO20022_PRIMITIVES_REPO): the path of the clone, not of its src folder.
+MESSAGES_ROOT = os.path.abspath(
+    os.environ.get("ISO20022_MESSAGES_REPO", os.path.join(REPO_ROOT, "..", "iso-20022-messages"))
+)
+PRIMITIVES_ROOT = os.path.abspath(
+    os.environ.get("ISO20022_PRIMITIVES_REPO", os.path.join(REPO_ROOT, "..", "iso-20022-primitives"))
+)
+
+# The interfaces of the messages, components and choices are named I<Name>; the manifest is keyed
+# by <Name> (<Name>_ for a choice, the name of its record's base class), as it was when the
+# validators took the records, so that its diff stays readable.
+INTERFACES = set()
+CHOICE_INTERFACES = set()
 
 ISOID_RE = re.compile(r'\[IsoId\("([^"]+)"\)\]')
 VALIDATOR_DECL_RE = re.compile(
@@ -123,7 +143,7 @@ CHECKSUM_RECORD_TYPES = {
 
 
 def build_type_to_isoid():
-    """Scan Common and Primitives for every model type's own IsoId, keyed by simple type name.
+    """Scan the Messages and Primitives repositories for every model type's own IsoId, keyed by simple type name.
 
     First IsoId occurrence in a file = that type's own id (true for Components/MessageDefinitions/
     single-type files, and for Codesets since the enum-level attribute always precedes every
@@ -135,8 +155,14 @@ def build_type_to_isoid():
     """
     type_to_isoid = {}
     dupes = []
-    scan = [(COMMON_ROOT, d) for d in ["Components", "Choices", "Codesets", "MessageDefinitions", "Amounts", "ExternalSchema"]]
-    scan += [(PRIMITIVES_ROOT, d) for d in ["Codesets", "SimpleTypes", "Amounts", "ExternalSchema"]]
+    messages_src = os.path.join(MESSAGES_ROOT, "src", "Messages")
+    primitives_src = os.path.join(PRIMITIVES_ROOT, "src", "Primitives")
+    for src in (messages_src, primitives_src):
+        if not os.path.isdir(src):
+            print(f"ERROR: {src} not found; give the clone's path with --messages / --primitives", file=sys.stderr)
+            sys.exit(2)
+    scan = [(messages_src, d) for d in ["Components", "Choices", "MessageDefinitions"]]
+    scan += [(primitives_src, d) for d in ["Codesets", "SimpleTypes", "Amounts", "ExternalSchema", "UserDefined"]]
     for project_root, scan_dir in scan:
         root = os.path.join(project_root, scan_dir)
         if not os.path.isdir(root):
@@ -155,16 +181,20 @@ def build_type_to_isoid():
                     continue
                 type_name = fn[:-3]
                 isoid = m.group(1)
+                if project_root == messages_src:
+                    INTERFACES.add(type_name)
+                    if scan_dir == "Choices":
+                        CHOICE_INTERFACES.add(type_name)
                 if type_name in type_to_isoid and type_to_isoid[type_name] != isoid:
                     dupes.append((type_name, type_to_isoid[type_name], isoid, path))
                 type_to_isoid[type_name] = isoid
     return type_to_isoid, dupes
 
 
-def scan_validators():
+def scan_validators(validators_root=None):
     """Every validator file's (relpath, validatorClassName, validatedTypeSimpleName)."""
     results = []
-    for dirpath, _, filenames in os.walk(os.path.join(FV_ROOT, "Validators")):
+    for dirpath, _, filenames in os.walk(validators_root or os.path.join(FV_ROOT, "Validators")):
         for fn in filenames:
             if not fn.endswith(".cs"):
                 continue
@@ -229,13 +259,37 @@ def load_checksums(tsv_paths):
     return id_to_checksum
 
 
+def manifest_key(validated_type):
+    """IFoo -> Foo (IFooChoice -> FooChoice_) for an interface of the messages repository; any other type name unchanged."""
+    if validated_type not in INTERFACES:
+        return validated_type
+    return validated_type[1:] + ("_" if validated_type in CHOICE_INTERFACES else "")
+
+
 def main():
+    global MESSAGES_ROOT, PRIMITIVES_ROOT
     args = sys.argv[1:]
     out_path = DEFAULT_OUT
+    if "--messages" in args:
+        i = args.index("--messages")
+        MESSAGES_ROOT = os.path.abspath(args[i + 1])
+        del args[i : i + 2]
+    if "--primitives" in args:
+        i = args.index("--primitives")
+        PRIMITIVES_ROOT = os.path.abspath(args[i + 1])
+        del args[i : i + 2]
     if "--out" in args:
         i = args.index("--out")
         out_path = args[i + 1]
         del args[i : i + 2]
+    validators_root = None
+    if "--validators" in args:
+        i = args.index("--validators")
+        validators_root = os.path.abspath(args[i + 1])
+        del args[i : i + 2]
+    strict = "--strict" in args
+    if strict:
+        args.remove("--strict")
     snapshot_date = None
     if "--snapshot-date" in args:
         i = args.index("--snapshot-date")
@@ -261,7 +315,7 @@ def main():
         for d in dupes:
             print(f"  {d[0]}: {d[1]} -> {d[2]} (last seen at {d[3]})", file=sys.stderr)
 
-    validators = scan_validators()
+    validators = scan_validators(validators_root)
     print(f"Validator files scanned: {len(validators)}", file=sys.stderr)
 
     id_to_checksum = load_checksums(tsv_paths)
@@ -275,12 +329,12 @@ def main():
             continue
         isoid = type_to_isoid.get(validated_type)
         if isoid is None:
-            unresolved_type.append((relpath, f"validated type '{validated_type}' has no IsoId in Common"))
+            unresolved_type.append((relpath, f"validated type '{validated_type}' has no IsoId in the model repositories"))
             continue
 
         hit = id_to_checksum.get(isoid)
         if hit is None:
-            manifest[validated_type] = {
+            manifest[manifest_key(validated_type)] = {
                 "isoId": isoid,
                 "checksum": None,
                 "recordType": None,
@@ -291,7 +345,7 @@ def main():
         else:
             record_type, registration_status, removal_date, checksum = hit
             is_obsolete = registration_status == "Obsolete"
-            manifest[validated_type] = {
+            manifest[manifest_key(validated_type)] = {
                 "isoId": isoid,
                 "checksum": checksum,
                 "recordType": record_type,
@@ -339,6 +393,8 @@ def main():
         json.dump(payload, f, indent=2, sort_keys=True)
         f.write("\n")
     print(f"Wrote {out_path}", file=sys.stderr)
+    if strict and unresolved_type:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

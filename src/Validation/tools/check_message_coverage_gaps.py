@@ -49,7 +49,7 @@ Usage:
     python3 check_message_coverage_gaps.py <spec-snapshot.tsv> [<more.tsv> ...] [--json PATH]
 
     Reads FullySupportedMessages from
-    ../FluentValidation.Tests/CoverageCompletenessTests.cs
+    ../../tests/Validation.Tests/CoverageCompletenessTests.cs
     (relative to this script) by default — override with --coverage-tests-file if the layout ever
     changes. Prints a human-readable report to stdout; --json also writes the same findings as
     structured JSON for a calling skill/session to act on programmatically. Exit code is 1 if any
@@ -64,9 +64,9 @@ import re
 import sys
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-FV_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
+FV_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))  # src/Validation
 DEFAULT_COVERAGE_TESTS_FILE = os.path.abspath(
-    os.path.join(FV_ROOT, "..", "FluentValidation.Tests", "CoverageCompletenessTests.cs")
+    os.path.join(FV_ROOT, "..", "..", "tests", "Validation.Tests", "CoverageCompletenessTests.cs")
 )
 
 TYPEOF_RE = re.compile(r"typeof\((\w+)\)")
@@ -97,7 +97,8 @@ def load_fully_supported_names(coverage_tests_file):
     if not m:
         print(f"ERROR: could not find FullySupportedMessages array in {coverage_tests_file}", file=sys.stderr)
         sys.exit(2)
-    return TYPEOF_RE.findall(m.group(1))
+    # The tests list the interfaces, typeof(IFooV05); the snapshot names the message FooV05.
+    return [re.sub(r"^I(?=[A-Z])", "", n) for n in TYPEOF_RE.findall(m.group(1))]
 
 
 def load_msgdef_rows(tsv_paths):
