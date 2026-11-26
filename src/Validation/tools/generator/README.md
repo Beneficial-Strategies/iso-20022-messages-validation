@@ -15,6 +15,10 @@ validator per message and component:
   checked by the validator of its code set, which is injected; the generator writes that validator too, unless one is hand-written. It
   reads the registry of the code set, so `AddIso20022LiveExternalCodes()` checks it against the live list. The code types that are
   enums are closed by the type and need nothing;
+* a choice is validated alternative by alternative (`<Choice>_Validator`, an `InlineValidator` per alternative registered with
+  `SetVariantValidators`), from the variant interfaces of the model: the `Value` of an alternative is required when the interface
+  says so and is checked by its own validator, and so is any other member of it. The hand-written choice validators were mostly empty
+  (46 of 62), so they are no longer reused;
 * every constraint of the specification that has a machine-readable expression (a `RuleDefinition`), as a rule that carries the
   ISO name of the constraint, a reading of it in one line, and the specification's own text in the comment and the message;
 * every constraint that has no expression (a rule in prose, or a guideline) as a comment with its text, and a line in
@@ -36,6 +40,10 @@ The 7,500 expressions of the specification use eight rule types (`Presence`, `Ab
 * `sum of` and `number of occurrences of` on the right of `EqualToValue`; `@Currency` is the currency of an amount.
 * `WithInList`: the code is one of the codes of the named code set.
 
+Three phrasings of a count (`number of occurrences of X`, `Number Occurrences X`) are read as the number of items. An expression that
+compares with a **phrase** (`Branch of DebtorAgent`, 28 times in the data) describes the rule instead of stating it; compared
+literally it would refuse every message, so it is not generated, and the report lists it as unsupported (a rule to write by hand).
+
 This is a reading, checked against the hand-written validators below; it is not confirmed by the authors of the specification.
 
 ## The data
@@ -53,12 +61,15 @@ project under `artifacts/`. A test that fails is a difference between a hand-wri
 generator bug), and each has to be read. `known_differences/<message>.tsv` lists, with the reason, the ones that are understood;
 the run fails on any other, and on a listed one that stops failing.
 
-For `pacs.008.001.14`: 169 tests, 156 pass, 13 are known differences. Eleven are rules of the specification the hand-written
+For `pacs.008.001.14`: 226 tests, 213 pass, 13 are known differences. Eleven are rules of the specification the hand-written
 validators do not have (and whose tests use data that breaks them); two are a rule the hand-written validator adds that the
 specification's constraints do not state (an amount of zero is refused).
 
-For `pain.001.001.13` (67 generated validators): 127 tests, 123 pass, 4 are known differences, all one rule of the
+For `pain.001.001.13` (a second message; 67 generated validators): 189 tests, 185 pass, 4 are known differences, all one rule of the
 specification (`NonChequePaymentMethodRule`) that the hand-written validator lacks.
+
+`pain.008.001.12`: 172 tests, all pass, no known differences. `head.001.001.02` (the business application header, which has no
+hand-written validators at all) generates and compiles, including the validators of four open codes that were generated.
 
 A rule that names an alternative of a choice (`DeliveryMethod/Code`) is read as the variant interface of the choice
 (`DeliveryMethod as Choices.ChequeDeliveryMethod1Choice.ICode`) and, when compared with a value, by its `Value`.
@@ -72,5 +83,4 @@ python3 -m unittest -q test_generator
 ## Not done
 
 * The constraints with no expression (about half), and the facets of the simple types (not in the data).
-* Choices: the validators of the hand-written package are reused.
-* More than one message at a time (each message is generated and checked on its own so far), and the index that lets the DI load a family of messages (or one component) with what it needs.
+* More than one message at a time (each message is generated and checked on its own so far), the choices' own constraints (none seen), and the index that lets the DI load a family of messages (or one component) with what it needs.

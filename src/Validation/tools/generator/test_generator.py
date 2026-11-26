@@ -113,6 +113,16 @@ class RuleTests(RuleBase):
         e = self.expr(rule("SimpleRule", ("mustBe", "AND", [("EqualToValue", "/Name", "number of occurrences of Coll")])))
         self.assertIn(".Count()", e)
 
+    def test_the_phrases_the_data_uses_for_a_count_are_counts(self):
+        for phrase in ("Number Occurrences Coll", "number occurrences Coll", "number of occurrences of Coll"):
+            e = self.expr(rule("SimpleRule", ("mustBe", "AND", [("EqualToValue", "/Name", phrase)])))
+            self.assertIn(".Count()", e, phrase)
+
+    def test_a_phrase_that_describes_the_rule_is_reported_not_compared(self):
+        # "Branch of DebtorAgent" is a description in the data; compared literally it would refuse every message
+        with self.assertRaises(gv.Unsupported):
+            self.expr(rule("SimpleRule", ("mustBe", "AND", [("EqualToValue", "/Name", "Branch of DebtorAgent")])))
+
     def test_an_unknown_member_is_reported_not_guessed(self):
         with self.assertRaises(gv.Unsupported):
             self.expr(rule("SimpleRule", ("mustBe", "AND", [("Presence", "/Nope", None)])))
@@ -186,6 +196,31 @@ class ExternalCodeTests(unittest.TestCase):
     def test_a_required_code_is_also_required_to_have_a_value(self):
         _, code = self.emit()
         self.assertIn("RuleFor(x => x.Purpose).NotDefaultValue()", code)
+
+
+class ChoiceTests(unittest.TestCase):
+    """A choice is validated alternative by alternative, from the variant interfaces of the model."""
+
+    def test_each_alternative_gets_its_value_validated(self):
+        with tempfile.TemporaryDirectory() as d:
+            os.makedirs(os.path.join(d, "Choices", "XChoice"))
+            with open(os.path.join(d, "Choices", "XChoice", "IAlpha.cs"), "w") as f:
+                f.write("public interface IAlpha : IXChoice, IIsoChoiceVariant\n{\n    IB Value { get; }\n    IB? Extra { get; }\n}\n")
+            with open(os.path.join(d, "Choices", "XChoice", "IBeta.cs"), "w") as f:
+                f.write("public interface IBeta : IXChoice, IIsoChoiceVariant\n{\n    Max35Text Value { get; }\n}\n")
+            old, gv.MSGS = gv.MSGS, d + os.sep
+            try:
+                g = gv.Gen(FakeModel())
+                cls, code = gv.emit_choice(g, {"name": "XChoice"}, {"mismatch": []})
+            finally:
+                gv.MSGS = old
+        self.assertEqual(cls, "XChoice_Validator")
+        self.assertIn("new InlineValidator<BeneficialStrategies.Iso20022.Choices.XChoice.IAlpha>()", code)
+        self.assertIn("alphaVariantValidator.RuleFor(x => x.Value).NotNull()", code)  # required: not nullable on the interface
+        self.assertIn("alphaVariantValidator.RuleFor(x => x.Value).SetValidator(bValidator!);", code)
+        self.assertIn("alphaVariantValidator.When(x => x.Extra is not null", code)  # optional: only when present
+        self.assertIn("betaVariantValidator.RuleFor(x => x.Value).NotDefaultValue()", code)
+        self.assertIn("this.SetVariantValidators", code)
 
 
 class PathTests(unittest.TestCase):

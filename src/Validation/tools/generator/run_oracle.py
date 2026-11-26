@@ -50,12 +50,14 @@ def main():
 
     copied, no_test = 0, []
     for t in types:
-        found = glob.glob(os.path.join(TESTS, "Validators", "*", f"{t}ValidatorTests.cs"))
+        # the validator of a choice is named X_Validator, the others XValidator
+        suf = next((x for x in ("", "_") if glob.glob(os.path.join(TESTS, "Validators", "*", f"{t}{x}ValidatorTests.cs"))), "")
+        found = glob.glob(os.path.join(TESTS, "Validators", "*", f"{t}{suf}ValidatorTests.cs"))
         if not found:
             no_test.append(t)
             continue
         s = open(found[0], encoding="utf-8").read()
-        s = re.sub(r"(?<![\w.])" + t + r"Validator\b", "Gen." + t + "Validator", s)
+        s = re.sub(r"(?<![\w.])" + t + suf + r"Validator\b", "Gen." + t + suf + "Validator", s)
         # The hand-written tests build a PaymentIdentification13 with only an EndToEndIdentification, which the
         # specification forbids (TransactionIdentificationPresenceRule: TransactionIdentification or UETR). The
         # data is made valid so that this one rule does not hide the others.
@@ -64,7 +66,7 @@ def main():
             r'\1.Set(x2 => x2.TransactionIdentification).To("TX-001")',
             s,
         )
-        open(os.path.join(work, "oracle", f"{t}ValidatorTests.cs"), "w", encoding="utf-8").write(s)
+        open(os.path.join(work, "oracle", f"{t}{suf}ValidatorTests.cs"), "w", encoding="utf-8").write(s)
         copied += 1
     print(f"{copied} hand-written test files copied; {len(no_test)} generated types have none: {', '.join(no_test)}")
 
@@ -91,6 +93,10 @@ def main():
 """
     open(os.path.join(work, "Oracle.csproj"), "w", encoding="utf-8").write(csproj)
     shutil.copy(os.path.join(TESTS, "GlobalUsings.cs"), os.path.join(work, "GlobalUsings.cs"))
+    # the namespace of the message's business area (the tests' own usings name only camt, pacs and pain)
+    area = args.message.split(".")[0]
+    with open(os.path.join(work, "GlobalUsings.cs"), "a", encoding="utf-8") as fh:
+        fh.write(f"global using BeneficialStrategies.Iso20022.{area};\n")
 
     subprocess.run(["dotnet", "test", "-c", "Release", "--logger", "trx;LogFileName=results.trx"], cwd=work, check=False)
 
