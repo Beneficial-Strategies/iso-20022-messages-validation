@@ -28,6 +28,22 @@ The output is a set of files meant to be **checked in**: a regeneration is a dif
 for one message can be seen to touch another. The loop variables are numbered again in each file for that reason, and two runs
 give identical files.
 
+## What is written by hand
+
+Some rules cannot be generated: the 1,000 or so whose only statement is prose, the 28 whose expression is a phrase, a few that
+refer to an element the type does not have (the rule is of the message that contains it), and a few written as text instead of a
+rule definition. They are **not left out**: each is written by hand, once, from what it means.
+
+A type with such a rule is generated as a `partial` class that ends its constructor with `AddHandWrittenRules()`. The hand-written
+rules are in `<Type>Validator.Rules.cs` next to it, which the generator never touches, so git shows what was generated and what
+was written by a person, rule by rule. The rule keeps the ISO name (`.WithName("ChargesAccountAgentRule")`), and that name is how
+the generator finds it: a rule it does not generate and does not find there is **pending**, listed in `report.json` and marked
+`NOT IMPLEMENTED` in the generated file. A validator with a pending rule is not complete, and is not put in the package.
+
+A rule that cannot be measured on the model at all is a warning with the text of the rule (see #19), not a hole.
+
+A component can be generated on its own (`--type PostalAddress27`, with what it reaches), for finishing a validator that already exists.
+
 ## The reading of the rule language
 
 The 7,500 expressions of the specification use eight rule types (`Presence`, `Absence`, `EqualToValue`, `EqualToNode`,
@@ -71,6 +87,8 @@ specification (`NonChequePaymentMethodRule`) that the hand-written validator lac
 `pain.008.001.12`: 172 tests, all pass, no known differences. `head.001.001.02` (the business application header, which has no
 hand-written validators at all) generates and compiles, including the validators of four open codes that were generated.
 
+Of the 7,525 expressions in the specification, 7,438 (98.8%) generate. The rest are the hand-written group above.
+
 A rule that names an alternative of a choice (`DeliveryMethod/Code`) is read as the variant interface of the choice
 (`DeliveryMethod as Choices.ChequeDeliveryMethod1Choice.ICode`) and, when compared with a value, by its `Value`.
 
@@ -83,4 +101,4 @@ python3 -m unittest -q test_generator
 ## Not done
 
 * The constraints with no expression (about half), and the facets of the simple types (not in the data).
-* More than one message at a time (each message is generated and checked on its own so far), the choices' own constraints (none seen), and the index that lets the DI load a family of messages (or one component) with what it needs.
+* More than one message at a time (each message is generated and checked on its own so far), the choices' own constraints (none seen), the hand-written rules themselves (none written yet), and the index that lets the DI load a family of messages (or one component) with what it needs.

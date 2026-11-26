@@ -123,6 +123,33 @@ class RuleTests(RuleBase):
         with self.assertRaises(gv.Unsupported):
             self.expr(rule("SimpleRule", ("mustBe", "AND", [("EqualToValue", "/Name", "Branch of DebtorAgent")])))
 
+    def test_the_specifications_own_misspellings_are_read_as_the_member(self):
+        self.assertEqual(gv.segs("/TransactionInformation/ReversedInterbankSttlementAmount")[1][0], "ReversedInterbankSettlementAmount")
+
+    def test_the_first_item_on_the_right_of_a_comparison(self):
+        e = self.expr(rule("SimpleRule", ("mustBe", "AND", [("EqualToNode", "/Name", "/Coll[1]/X")])))
+        self.assertIn("x?.Coll?.Skip(0).FirstOrDefault()?.X", e)
+
+    def test_every_item_on_the_right_of_a_comparison_is_reported(self):
+        with self.assertRaises(gv.Unsupported):
+            self.expr(rule("SimpleRule", ("mustBe", "AND", [("EqualToNode", "/Name", "/Coll[*]/X")])))
+
+    def test_substring_of_a_value(self):
+        e = self.expr(rule("SimpleRule", ("mustBe", "AND", [("DifferentFromValue", "substring(/Name,1,8)", "pacs.003")])))
+        self.assertEqual(e, '!RuleOps.IsText(RuleOps.Substring(x?.Name, 1, 8), "pacs.003")')
+
+    def test_a_code_written_as_its_value_is_the_member_that_has_it(self):
+        with tempfile.TemporaryDirectory() as d:
+            os.makedirs(os.path.join(d, "Codesets"))
+            with open(os.path.join(d, "Codesets", "Mode1Code.cs"), "w") as f:
+                f.write('public enum Mode1Code\n{\n    [EnumMember(Value = "ALFA")]\n    Alpha = 1,\n    [EnumMember(Value = "BETA")]\n    Beta = 2,\n}\n')
+            old, gv.PRIM = gv.PRIM, d + os.sep
+            try:
+                e = self.expr(rule("SimpleRule", ("mustBe", "AND", [("EqualToValue", "/Mode", "BETA")])))
+            finally:
+                gv.PRIM = old
+        self.assertEqual(e, "x?.Mode == Mode1Code.Beta")
+
     def test_an_unknown_member_is_reported_not_guessed(self):
         with self.assertRaises(gv.Unsupported):
             self.expr(rule("SimpleRule", ("mustBe", "AND", [("Presence", "/Nope", None)])))
@@ -196,6 +223,52 @@ class ExternalCodeTests(unittest.TestCase):
     def test_a_required_code_is_also_required_to_have_a_value(self):
         _, code = self.emit()
         self.assertIn("RuleFor(x => x.Purpose).NotDefaultValue()", code)
+
+
+class HandWrittenRuleTests(unittest.TestCase):
+    """A rule that is not generated is written by hand, next to the validator, and the generator finds it there."""
+
+    ENTITY = {
+        "name": "E",
+        "children": [
+            {"name": "Name", "xmlElementName": "messageElement", "minOccurs": "1", "maxOccurs": "1"},
+            {"name": "ProseRule", "xmlElementName": "constraint", "definition": "Name must be what the prose says."},
+            {"name": "SomeGuideline", "xmlElementName": "constraint", "definition": "Advice."},
+        ],
+    }
+
+    def emit(self, rules_dir):
+        old, gv.RULES_DIRS = gv.RULES_DIRS, [rules_dir]
+        try:
+            m = FakeModel()
+            m.ifaces["IE"] = OrderedDict(Name=("Max35Text", False, False))
+            report = {k: [] for k in ("no_interface", "mismatch", "prose_only", "guidelines", "unsupported", "pending", "generated_rules")}
+            return report, gv.emit_type(gv.Gen(m), self.ENTITY, report)[1]
+        finally:
+            gv.RULES_DIRS = old
+
+    def test_a_prose_rule_with_no_hand_written_rule_is_pending(self):
+        with tempfile.TemporaryDirectory() as d:
+            report, code = self.emit(d)
+        self.assertEqual(report["pending"], ["E.ProseRule"])
+        self.assertIn("ProseRule: NOT IMPLEMENTED", code)
+        self.assertIn("public partial class EValidator", code)
+        self.assertIn("AddHandWrittenRules();", code)
+        self.assertIn("partial void AddHandWrittenRules();", code)
+
+    def test_a_prose_rule_found_in_the_rules_file_is_implemented(self):
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, "EValidator.Rules.cs"), "w") as f:
+                f.write('public partial class EValidator { partial void AddHandWrittenRules() { RuleFor(x => x).Must(x => true).WithName("ProseRule"); } }')
+            report, code = self.emit(d)
+        self.assertEqual(report["pending"], [])
+        self.assertIn("ProseRule: implemented by hand in EValidator.Rules.cs", code)
+
+    def test_a_guideline_is_a_comment_and_is_not_pending(self):
+        with tempfile.TemporaryDirectory() as d:
+            report, code = self.emit(d)
+        self.assertNotIn("E.SomeGuideline", report["pending"])
+        self.assertIn("SomeGuideline: a guideline of the specification", code)
 
 
 class ChoiceTests(unittest.TestCase):
