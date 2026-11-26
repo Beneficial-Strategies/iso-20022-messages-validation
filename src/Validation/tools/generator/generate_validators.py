@@ -33,6 +33,7 @@ REPO_ROOT = os.path.abspath(os.path.join(HERE, "..", "..", "..", ".."))
 CENSUS = None
 MSGS = None
 PRIM = None
+RULES_DIRS = []  # where the hand-written rules (<Type>Validator.Rules.cs) are
 VAL = os.path.join(REPO_ROOT, "src", "Validation", "Validators") + os.sep
 XSI = "{http://www.w3.org/2001/XMLSchema-instance}type"
 
@@ -93,6 +94,18 @@ def enum_members(name):
         body = s[s.index("enum " + name):]
         return set(re.findall(r"^\s*(\w+)\s*(?:=|,)", body, re.M))
     return None
+
+
+def enum_values(name):
+    """the code (the value in the XML) -> the name of the member, for an enum of the primitives"""
+    if PRIM is None:
+        return {}
+    for f in glob.glob(PRIM + f"Codesets/{name}.cs"):
+        with open(f, encoding="utf-8") as fh:
+            s = fh.read()
+        body = s[s.index("enum " + name):]
+        return dict(re.findall(r'\[EnumMember\(Value = "([^"]+)"\)\][\s\S]*?^\s*(\w+)\s*(?:=|,)', body, re.M))
+    return {}
 
 
 def open_codes():
@@ -168,6 +181,14 @@ def parse_rule(xml):
     return kind, section("mustBe"), section("onCondition")
 
 
+# Misspellings in the specification's own expressions (the member of the model is spelled correctly). Each is a mistake of the
+# data, not a different element; the list is the whole of what the data has, found by generating every expression.
+SPEC_TYPOS = {
+    "ReversedInterbankSttlementAmount": "ReversedInterbankSettlementAmount",
+    "ReturnedInterbankSttlementAmount": "ReturnedInterbankSettlementAmount",
+}
+
+
 def segs(path):
     parts = [p for p in path.strip("/").split("/") if p]
     out = []
@@ -175,7 +196,7 @@ def segs(path):
         m = re.match(r"^(@?\w+)(?:\[(\*|\d+)\])?$", p)
         if not m:
             raise Unsupported(f"path segment '{p}'")
-        out.append((m.group(1), m.group(2)))
+        out.append((SPEC_TYPOS.get(m.group(1), m.group(1)), m.group(2)))
     return out
 
 
@@ -192,8 +213,14 @@ class Gen:
 
     # ---- member access; returns (type, nullable, collection)
     def member(self, cur, itype, name):
-        if itype.startswith("V|"):  # the value of a choice variant: its own type
-            itype = itype.split("|")[2]
+        if itype.startswith("V|"):
+            if itype.split("|")[2]:  # the alternative holds a Value: its members are the Value's
+                itype = itype.split("|")[2]
+            else:  # the alternative is a group of elements
+                props = self.variant_props(itype)
+                if name in props:
+                    return props[name]
+                raise Unsupported(f"{itype.split('|')[1]} has no member {name}")
         props = self.m.ifaces.get(itype)
         if props is not None and name in props:
             return props[name]
@@ -203,29 +230,35 @@ class Gen:
         raise Unsupported(f"{itype} has no member {name}")
 
     def variant(self, itype, name):
-        """A choice is an interface with one variant interface per alternative (Choices/<Choice>/I<Name>.cs), whose
-        `Value` is the alternative. The path of a rule names the alternative; it is `cur as Variant`."""
+        """A choice is an interface with one variant interface per alternative (Choices/<Choice>/I<Name>.cs). An alternative has a
+        `Value` (the thing the alternative holds) or, when the alternative is a group of elements, members of its own. The path of a
+        rule names the alternative; it is `cur as Variant`."""
         if not self.m.is_choice(itype):
             return None
         f = MSGS + f"Choices/{itype[1:]}/I{name}.cs"
         if not os.path.exists(f):
             return None
-        vm = re.search(r"^\s*([\w<>\.\?]+)\s+Value\s*\{\s*get;", open(f, encoding="utf-8").read(), re.M)
-        if vm is None:
-            return None
-        return (f"V|{itype[1:]}.I{name}|{vm.group(1).rstrip('?')}", True, False)
+        with open(f, encoding="utf-8") as fh:
+            vm = re.search(r"^\s*([\w<>\.\?]+)\s+Value\s*\{\s*get;", fh.read(), re.M)
+        return (f"V|{itype[1:]}.I{name}|{vm.group(1).rstrip('?') if vm else ''}", True, False)
+
+    def variant_props(self, token):
+        """the members of an alternative that has no Value"""
+        choice, vname = token.split("|")[1].split(".")
+        with open(MSGS + f"Choices/{choice}/{vname}.cs", encoding="utf-8") as fh:
+            return parse_props(fh.read())
 
     def access(self, cur, ctype, name, t):
         """the C# expression of member `name` of `cur`"""
         if t.startswith("V|"):
             return f"({cur} as BeneficialStrategies.Iso20022.Choices.{t.split('|')[1]})"
         if ctype.startswith("V|"):
-            return f"{cur}?.Value?.{name}"
+            return f"{cur}?.Value?.{name}" if ctype.split("|")[2] else f"{cur}?.{name}"
         return f"{cur}?.{name}"
 
     def unwrap(self, e, t):
         """a variant compared with a value is compared by its Value"""
-        if t.startswith("V|"):
+        if t.startswith("V|") and t.split("|")[2]:
             return f"{e}?.Value", t.split("|")[2]
         return e, t
 
@@ -273,8 +306,10 @@ class Gen:
             t, nullable, coll = self.member(cur, ctype, name)
             cur = self.access(cur, ctype, name, t)
             if coll:
-                if idx not in (None,):
-                    raise Unsupported("indexed collection on the right of a comparison")
+                if idx is not None and idx.isdigit():
+                    cur = f"{cur}?.Skip({int(idx) - 1}).FirstOrDefault()"  # the first item (or n-th)
+                elif idx is not None:
+                    raise Unsupported("every item on the right of a comparison")
             ctype = t
         return cur, ctype
 
@@ -313,6 +348,10 @@ class Gen:
                 lhs_body = self.walk(x, itype, left, lambda e, t, c: f"RuleOps.Number({e}) {'!=' if neg else '=='} {rhs}")
                 return lhs_body
             lit = right
+            sub = re.match(r"^substring\((.+),\s*(\d+),\s*(\d+)\)$", left)
+            if sub and not re.search(r"\s", lit or ""):
+                path, a, n = sub.groups()
+                return self.walk(x, itype, path, lambda e, t, c: f"{'!' if neg else ''}RuleOps.IsText(RuleOps.Substring({self.unwrap(e, t)[0]}, {a}, {n}), \"{lit}\")")
             if re.search(r"\s", lit or ""):
                 # The data has a few expressions whose "value" is a phrase ("Branch of DebtorAgent"): they describe a rule
                 # instead of stating it, and compared literally they would refuse every message. Not generated; reported.
@@ -322,9 +361,12 @@ class Gen:
                 k = self.m.kind(t)
                 if k == "enum":
                     mem = enum_members(t)
+                    name = lit
                     if mem is not None and lit not in mem:
-                        raise Unsupported(f"{lit} is not a member of {t}")
-                    return f"{e} {'!=' if neg else '=='} {t}.{lit}"
+                        name = enum_values(t).get(lit)  # the data writes the code (ISSU), the model names the member
+                        if name is None:
+                            raise Unsupported(f"{lit} is not a member of {t}")
+                    return f"{e} {'!=' if neg else '=='} {t}.{name}"
                 return f"{'!' if neg else ''}RuleOps.IsText({e}, \"{lit}\")"
             return self.walk(x, itype, left, cmp)
         if typ in ("WithInList", "NotWithInList"):
@@ -377,6 +419,14 @@ def emit_code_validator(t):
         f"    public {t}Validator(BeneficialStrategies.Iso20022.Messages.Validation.IExternalCodeRegistry<BeneficialStrategies.Iso20022.Codesets.{t}> registry)\n        : base(registry) {{ }}\n\n"
         f"    public {t}Validator() {{ }}\n}}\n"
     )
+
+
+def hand_rules_file(name):
+    """the hand-written rules of a type (`<Type>Validator.Rules.cs`, next to the validator), or None"""
+    for d in RULES_DIRS:
+        for f in glob.glob(os.path.join(d, "**", f"{name}Validator.Rules.cs"), recursive=True):
+            return f
+    return None
 
 
 def emit_type(g, e, report):
@@ -450,6 +500,25 @@ def emit_type(g, e, report):
 
     # constraints
     rule_lines = []
+    hand_file = hand_rules_file(name)
+    hand_text = ""
+    if hand_file:
+        with open(hand_file, encoding="utf-8") as fh:
+            hand_text = fh.read()
+    needs_hand = False  # a rule that is not generated: it is written by hand, in <Type>Validator.Rules.cs
+
+    def by_hand(cname, why, prose):
+        """the comment of a rule that is not generated: written by hand (and found there), or not implemented yet"""
+        nonlocal needs_hand
+        needs_hand = True
+        if f'WithName("{cname}")' in hand_text:
+            rule_lines.append(f"// {cname}: implemented by hand in {name}Validator.Rules.cs ({why}).")
+        else:
+            report["pending"].append(f"{name}.{cname}")
+            rule_lines.append(f"// {cname}: NOT IMPLEMENTED, to be written by hand in {name}Validator.Rules.cs ({why}).")
+        rule_lines.append(f"//   {prose}")
+        rule_lines.append("")
+
     for c in consts:
         cname = c["name"]
         ex = c.get("attributes", {}).get("expression")
@@ -457,16 +526,22 @@ def emit_type(g, e, report):
         if not ex:
             kind = "guideline" if cname.endswith("Guideline") else "prose"
             report["prose_only" if kind == "prose" else "guidelines"].append(f"{name}.{cname}")
-            rule_lines.append(f"// {cname}: not implemented, the specification gives no expression ({'guideline' if kind == 'guideline' else 'prose only'}):")
-            rule_lines.append(f"//   {prose}")
+            if kind == "guideline":
+                rule_lines.append(f"// {cname}: a guideline of the specification, not a rule to check:")
+                rule_lines.append(f"//   {prose}")
+                rule_lines.append("")
+            else:
+                by_hand(cname, "the specification gives the rule in prose only", prose)
             continue
         try:
             kind, must, cond = parse_rule(ex)
             body_must = g.section("x", itype, must)
             expr = body_must if (kind == "SimpleRule" or cond is None) else f"!({g.section('x', itype, cond)}) || ({body_must})"
-        except Unsupported as u:
+        except (Unsupported, ET.ParseError) as u:
+            if isinstance(u, ET.ParseError):
+                u = "the expression is text, not a rule definition"
             report["unsupported"].append(f"{name}.{cname}: {u}")
-            rule_lines.append(f"// {cname}: not generated ({u}). {prose}")
+            by_hand(cname, str(u), prose)
             continue
         report["generated_rules"].append(f"{name}.{cname}")
         cond_t = ("if " + g.english(cond) + ": " if cond is not None and kind != "SimpleRule" else "")
@@ -493,7 +568,7 @@ def emit_type(g, e, report):
     out.append("namespace Gen;")
     out.append("")
     out.append(f"/// <summary>Validates <see cref=\"{itype}\"/> per the ISO 20022 specification.</summary>")
-    out.append(f"public class {cls} : AbstractValidator<{itype}>")
+    out.append(f"public {'partial ' if needs_hand else ''}class {cls} : AbstractValidator<{itype}>")
     out.append("{")
     if all_vals:
         out.append(f"    public {cls}(\n        {params}\n    )")
@@ -502,7 +577,13 @@ def emit_type(g, e, report):
     out.append("    {")
     for l in lines + ([""] if lines and rule_lines else []) + rule_lines:
         out.append(("        " + l) if l else "")
+    if needs_hand:
+        out.append("        AddHandWrittenRules();")
     out.append("    }")
+    if needs_hand:
+        out.append("")
+        out.append("    /// <summary>The rules of the specification that are written by hand, in <c>" + cls + ".Rules.cs</c>.</summary>")
+        out.append("    partial void AddHandWrittenRules();")
     if all_vals:
         out.append("")
         out.append(f"    public {cls}()\n        : this({', '.join(default_for(t) for t, _ in all_vals)}) {{ }}")
@@ -618,11 +699,26 @@ internal static class RuleOps
     internal static IRuleBuilderOptions<T, TProperty> NotDefaultValue<T, TProperty>(this IRuleBuilder<T, TProperty> rb) where TProperty : struct =>
         rb.Must(v => !EqualityComparer<TProperty>.Default.Equals(v, default));
 
+    /// <summary>The part of the text of the value that starts at position <c>start</c> (the first is 1) and is at most <c>length</c> long.</summary>
+    internal static string? Substring(object? v, int start, int length)
+    {
+        var s = v?.ToString();
+        return s is null || start > s.Length ? null : s.Substring(start - 1, Math.Min(length, s.Length - start + 1));
+    }
+
     internal static bool Has(object? v) => v is not null;
 
     internal static bool InList(object? v, IReadOnlySet<string> names) => v is not null && names.Contains(v.ToString()!);
 }
 '''
+
+def find_type(idx, name):
+    """The id of the message component or choice of this name, for example PostalAddress27."""
+    for i, e in idx.items():
+        if e["name"] == name and e.get("xmlElementName") == "topLevelDictionaryEntry":
+            return i
+    sys.exit(f"no component {name} in the pages of the specification")
+
 
 def find_message(idx, identifier):
     """The id of the message definition with this identifier, for example pacs.008.001.14."""
@@ -634,10 +730,13 @@ def find_message(idx, identifier):
 
 
 def main():
-    global CENSUS, MSGS, PRIM, VAL
+    global CENSUS, MSGS, PRIM, VAL, RULES_DIRS
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--census", required=True, help="folder of the saved pages of the specification")
-    ap.add_argument("--message", required=True, help="identifier of the message, for example pacs.008.001.14")
+    what = ap.add_mutually_exclusive_group(required=True)
+    what.add_argument("--message", help="identifier of the message, for example pacs.008.001.14")
+    what.add_argument("--type", help="a message component or choice on its own, for example PostalAddress27 (with what it reaches)")
+    ap.add_argument("--rules", action="append", help="folder of the hand-written rules (<Type>Validator.Rules.cs); the validators folder by default")
     ap.add_argument("--out", required=True, help="folder to write the validators to")
     ap.add_argument("--messages", default=os.path.join(REPO_ROOT, "..", "iso-20022-messages"), help="clone of iso-20022-messages")
     ap.add_argument("--primitives", default=os.path.join(REPO_ROOT, "..", "iso-20022-primitives"), help="clone of iso-20022-primitives")
@@ -647,12 +746,13 @@ def main():
     MSGS = os.path.join(os.path.abspath(args.messages), "src", "Messages") + os.sep
     PRIM = os.path.join(os.path.abspath(args.primitives), "src", "Primitives") + os.sep
     VAL = os.path.abspath(args.validators) + os.sep
+    RULES_DIRS = [os.path.abspath(d) for d in (args.rules or [VAL])]
     outdir = args.out
     os.makedirs(outdir, exist_ok=True)
     model = Model()
-    msg_id = find_message(model.idx, args.message)
+    msg_id = find_message(model.idx, args.message) if args.message else find_type(model.idx, args.type)
     g = Gen(model)
-    report = {k: [] for k in ("no_interface", "mismatch", "prose_only", "guidelines", "unsupported", "generated_rules", "generated_types", "reused_hand_validators")}
+    report = {k: [] for k in ("no_interface", "mismatch", "prose_only", "guidelines", "unsupported", "pending", "generated_rules", "generated_types", "reused_hand_validators")}
     seen, st = {msg_id}, [msg_id]
     order = []
     while st:

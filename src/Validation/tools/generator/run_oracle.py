@@ -31,7 +31,10 @@ TESTS = os.path.join(REPO, "tests", "Validation.Tests")
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--census", required=True)
-    ap.add_argument("--message", required=True)
+    what = ap.add_mutually_exclusive_group(required=True)
+    what.add_argument("--message", help="for example pacs.008.001.14")
+    what.add_argument("--type", help="a component or choice on its own, for example PostalAddress27")
+    ap.add_argument("--rules", action="append", help="folder of the hand-written rules (<Type>Validator.Rules.cs); the validators folder by default")
     ap.add_argument("--messages", default=os.path.join(REPO, "..", "iso-20022-messages"))
     ap.add_argument("--primitives", default=os.path.join(REPO, "..", "iso-20022-primitives"))
     args = ap.parse_args()
@@ -42,11 +45,21 @@ def main():
     os.makedirs(os.path.join(work, "oracle"))
 
     subprocess.run(
-        [sys.executable, os.path.join(HERE, "generate_validators.py"), "--census", args.census, "--message", args.message,
+        [sys.executable, os.path.join(HERE, "generate_validators.py"), "--census", args.census,
+         *(["--message", args.message] if args.message else ["--type", args.type]),
+         *[a for d in (args.rules or []) for a in ("--rules", d)],
          "--out", out, "--messages", args.messages, "--primitives", args.primitives],
         check=True,
     )
     types = json.load(open(os.path.join(out, "report.json")))["generated_types"]
+
+    # the hand-written rules of the generated types (<Type>Validator.Rules.cs), in the namespace of the generated files
+    for d in args.rules or [os.path.join(REPO, "src", "Validation", "Validators")]:
+        for f in glob.glob(os.path.join(d, "**", "*Validator.Rules.cs"), recursive=True):
+            t = os.path.basename(f)[: -len("Validator.Rules.cs")]
+            if t in types:
+                text = re.sub(r"^namespace [\w.]+;", "namespace Gen;", open(f, encoding="utf-8").read(), flags=re.M)
+                open(os.path.join(out, os.path.basename(f)), "w", encoding="utf-8").write(text)
 
     copied, no_test = 0, []
     for t in types:
@@ -94,9 +107,10 @@ def main():
     open(os.path.join(work, "Oracle.csproj"), "w", encoding="utf-8").write(csproj)
     shutil.copy(os.path.join(TESTS, "GlobalUsings.cs"), os.path.join(work, "GlobalUsings.cs"))
     # the namespace of the message's business area (the tests' own usings name only camt, pacs and pain)
-    area = args.message.split(".")[0]
+    areas = [os.path.basename(d) for d in glob.glob(os.path.join(args.messages, "src", "Messages", "MessageDefinitions", "*")) if os.path.isdir(d)]
     with open(os.path.join(work, "GlobalUsings.cs"), "a", encoding="utf-8") as fh:
-        fh.write(f"global using BeneficialStrategies.Iso20022.{area};\n")
+        for area in sorted(set(areas) - {"camt", "pacs", "pain"}):
+            fh.write(f"global using BeneficialStrategies.Iso20022.{area};\n")
 
     subprocess.run(["dotnet", "test", "-c", "Release", "--logger", "trx;LogFileName=results.trx"], cwd=work, check=False)
 
@@ -105,7 +119,7 @@ def main():
     root = ET.parse(os.path.join(work, "TestResults", "results.trx")).getroot()
     results = root.findall(".//t:UnitTestResult", ns)
     failed = sorted(r.get("testName") for r in results if r.get("outcome") == "Failed")
-    known_file = os.path.join(HERE, "known_differences", args.message + ".tsv")
+    known_file = os.path.join(HERE, "known_differences", (args.message or args.type) + ".tsv")
     known = {}
     if os.path.exists(known_file):
         for line in open(known_file, encoding="utf-8"):
