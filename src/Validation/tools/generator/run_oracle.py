@@ -48,7 +48,7 @@ def main():
     )
     types = json.load(open(os.path.join(out, "report.json")))["generated_types"]
 
-    copied, no_test, needs_args = 0, [], []
+    copied, no_test = 0, []
     for t in types:
         found = glob.glob(os.path.join(TESTS, "Validators", "*", f"{t}ValidatorTests.cs"))
         if not found:
@@ -64,14 +64,9 @@ def main():
             r'\1.Set(x2 => x2.TransactionIdentification).To("TX-001")',
             s,
         )
-        if re.search(r"Gen\." + t + r"Validator\(\s*[^)\s]", s):
-            # the hand-written validator takes arguments (an external code set registry): not generated yet
-            needs_args.append(t)
-            continue
         open(os.path.join(work, "oracle", f"{t}ValidatorTests.cs"), "w", encoding="utf-8").write(s)
         copied += 1
     print(f"{copied} hand-written test files copied; {len(no_test)} generated types have none: {', '.join(no_test)}")
-    print(f"skipped, their validator takes arguments (external code sets, not generated yet): {', '.join(needs_args) or 'none'}")
 
     tests_csproj = open(glob.glob(os.path.join(TESTS, "*.csproj"))[0], encoding="utf-8").read()
     packages = [

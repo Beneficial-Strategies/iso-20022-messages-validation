@@ -11,6 +11,10 @@ validator per message and component:
 
 * the structure: a required member is checked (`NotNull`, or `NotDefault` for a struct), a collection that needs an item is
   checked for one, each child gets its own validator (injected, with a constructor that builds the defaults);
+* a member whose type is an open code (one of the 171 code types whose values come from outside the model, `IIsoExternalCode`) is
+  checked by the validator of its code set, which is injected; the generator writes that validator too, unless one is hand-written. It
+  reads the registry of the code set, so `AddIso20022LiveExternalCodes()` checks it against the live list. The code types that are
+  enums are closed by the type and need nothing;
 * every constraint of the specification that has a machine-readable expression (a `RuleDefinition`), as a rule that carries the
   ISO name of the constraint, a reading of it in one line, and the specification's own text in the comment and the message;
 * every constraint that has no expression (a rule in prose, or a guideline) as a comment with its text, and a line in
@@ -49,11 +53,11 @@ project under `artifacts/`. A test that fails is a difference between a hand-wri
 generator bug), and each has to be read. `known_differences/<message>.tsv` lists, with the reason, the ones that are understood;
 the run fails on any other, and on a listed one that stops failing.
 
-For `pacs.008.001.14`: 166 tests, 153 pass, 13 are known differences. Eleven are rules of the specification the hand-written
+For `pacs.008.001.14`: 169 tests, 156 pass, 13 are known differences. Eleven are rules of the specification the hand-written
 validators do not have (and whose tests use data that breaks them); two are a rule the hand-written validator adds that the
 specification's constraints do not state (an amount of zero is refused).
 
-For `pain.001.001.13` (67 generated validators): 121 tests, 117 pass, 4 are known differences, all one rule of the
+For `pain.001.001.13` (67 generated validators): 127 tests, 123 pass, 4 are known differences, all one rule of the
 specification (`NonChequePaymentMethodRule`) that the hand-written validator lacks.
 
 A rule that names an alternative of a choice (`DeliveryMethod/Code`) is read as the variant interface of the choice
@@ -67,8 +71,6 @@ python3 -m unittest -q test_generator
 
 ## Not done
 
-* Code sets from outside ISO (the registry validators): the hand-written tests of `RegulatoryAuthority2` take a registry and
-  are skipped.
 * The constraints with no expression (about half), and the facets of the simple types (not in the data).
 * Choices: the validators of the hand-written package are reused.
 * More than one message at a time (each message is generated and checked on its own so far), and the index that lets the DI load a family of messages (or one component) with what it needs.

@@ -28,10 +28,16 @@ class FakeModel:
             "IB": OrderedDict(X=("Max35Text", True, False), D=("ISODate", True, False)),
             "IC": OrderedDict(),
             "IKind": OrderedDict(),
+            "IE": OrderedDict(
+                Country=("CountryCode", True, False),
+                Purpose=("ExternalPurpose9Code", False, False),
+                Others=("ExternalPurpose9Code", False, True),
+            ),
         }
         self.structs = {"Max35Text", "ISODate"}
         self.enums = {"Mode1Code"}
         self.hand = {}
+        self.ext_codes = {"CountryCode", "ExternalPurpose9Code"}
 
     def kind(self, t):
         return gv.Model.kind(self, t)
@@ -143,6 +149,43 @@ class VariantTests(RuleBase):
     def test_an_alternative_that_does_not_exist_is_reported(self):
         with self.assertRaises(gv.Unsupported):
             self.expr(rule("SimpleRule", ("mustBe", "AND", [("Presence", "/Kind/Nope", None)])))
+
+
+class ExternalCodeTests(unittest.TestCase):
+    """A member whose type is an open code is checked by the validator of its code set, which is injected."""
+
+    def emit(self):
+        m = FakeModel()
+        m.hand = {"CountryCode": ("CountryCodeValidator", "Codesets")}  # a hand-written one; the other is generated
+        e = {
+            "name": "E",
+            "children": [
+                {"name": "Country", "xmlElementName": "messageElement", "minOccurs": "0", "maxOccurs": "1"},
+                {"name": "Purpose", "xmlElementName": "messageElement", "minOccurs": "1", "maxOccurs": "1"},
+                {"name": "Others", "xmlElementName": "messageElement", "minOccurs": "0"},
+            ],
+        }
+        g = gv.Gen(m)
+        report = {k: [] for k in ("no_interface", "mismatch", "prose_only", "guidelines", "unsupported", "generated_rules")}
+        return g, gv.emit_type(g, e, report)[1]
+
+    def test_each_open_code_member_is_checked_by_an_injected_validator(self):
+        g, code = self.emit()
+        self.assertIn("IValidator<CountryCode> countryCodeValidator", code)
+        self.assertIn("IValidator<ExternalPurpose9Code> externalPurpose9CodeValidator", code)
+        self.assertIn("When(x => x.Country is not null, () => RuleFor(x => x.Country!.Value).SetValidator(countryCodeValidator!));", code)
+        self.assertIn("RuleFor(x => x.Purpose).SetValidator(externalPurpose9CodeValidator!);", code)
+        self.assertIn("RuleForEach(x => x.Others).SetValidator(externalPurpose9CodeValidator!);", code)
+        self.assertEqual(g.ext_used, {"CountryCode", "ExternalPurpose9Code"})
+
+    def test_the_default_constructor_uses_the_hand_written_validator_or_the_generated_one(self):
+        _, code = self.emit()
+        self.assertIn("new BeneficialStrategies.Iso20022.Messages.Validation.CodesetValidators.CountryCodeValidator()", code)
+        self.assertIn("new ExternalPurpose9CodeValidator()", code)
+
+    def test_a_required_code_is_also_required_to_have_a_value(self):
+        _, code = self.emit()
+        self.assertIn("RuleFor(x => x.Purpose).NotDefaultValue()", code)
 
 
 class PathTests(unittest.TestCase):
