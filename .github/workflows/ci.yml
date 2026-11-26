@@ -1,10 +1,11 @@
 name: CI
 
+# feature/full-coverage is the integration branch of the work on full coverage (#19): its pull requests are checked like those into main.
 on:
   push:
-    branches: [main]
+    branches: [main, feature/full-coverage]
   pull_request:
-    branches: [main]
+    branches: [main, feature/full-coverage]
 
 jobs:
   build-and-test:
