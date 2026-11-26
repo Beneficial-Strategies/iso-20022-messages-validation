@@ -23,4 +23,4 @@ FluentValidation validators for the interfaces of the ISO 20022 messages, compon
 ## Validators
 
 The guidance for writing and maintaining the 1,300 validators (coverage policy, the two-constructor pattern, how a rule is derived from the specification) is in `docs/Validators.md`; dependency-injection scoping is in `docs/RegisteringValidators.md` and external code sets in `docs/ExternalCodeSets.md`.
-The scripts in `src/Validation/tools/` are from the monorepo and still point at its folders (`src/Common`, `src/Primitives`); they need to be repointed at the Messages repository before they run (see the issue on this repository).
+The coverage scripts in `src/Validation/tools/` (`build_coverage_checksums.py`, `check_message_coverage_gaps.py`) read the model from clones of `iso-20022-messages` and `iso-20022-primitives` next to this repository (or `--messages`, `--primitives`); `python3 -m unittest -q test_coverage_scripts` in that folder tests them, and CI runs them against fresh clones.

@@ -36,6 +36,26 @@ jobs:
       - name: Check the licenses of the packages we depend on
         run: tools/licenses/check.sh
 
+      # The coverage scripts read the model from the two repositories it comes from. They are cloned here, and the
+      # script must find an IsoId for the type of every validator: a folder that moves in either fails this step.
+      - uses: actions/checkout@v4
+        with:
+          repository: Beneficial-Strategies/iso-20022-messages
+          path: _models/iso-20022-messages
+      - uses: actions/checkout@v4
+        with:
+          repository: Beneficial-Strategies/iso-20022-primitives
+          path: _models/iso-20022-primitives
+
+      - name: The coverage scripts find the model and the validators
+        run: |
+          python3 -m unittest -q test_coverage_scripts
+          python3 build_coverage_checksums.py /dev/null --strict --out "$RUNNER_TEMP/coverage-checksums.json"
+        working-directory: src/Validation/tools
+        env:
+          ISO20022_MESSAGES_REPO: ${{ github.workspace }}/_models/iso-20022-messages
+          ISO20022_PRIMITIVES_REPO: ${{ github.workspace }}/_models/iso-20022-primitives
+
       - name: Test the release and package tooling
         run: |
           python3 -m unittest -q test_prepare_release
