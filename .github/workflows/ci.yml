@@ -57,6 +57,10 @@ jobs:
           ISO20022_MESSAGES_REPO: ${{ github.workspace }}/_models/iso-20022-messages
           ISO20022_PRIMITIVES_REPO: ${{ github.workspace }}/_models/iso-20022-primitives
 
+      - name: Test the validator generator (prototype)
+        run: python3 -m unittest -q test_generator
+        working-directory: src/Validation/tools/generator
+
       - name: Test the release and package tooling
         run: |
           python3 -m unittest -q test_prepare_release
