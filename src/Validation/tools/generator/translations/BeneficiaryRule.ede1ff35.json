@@ -1,0 +1,27 @@
+{
+ "rule": "BeneficiaryRule",
+ "text": "If CustodianForMinor is present, then at least one occurrence of Beneficiary must be present.",
+ "reading": "if CustodianForMinor is present, at least one Beneficiary is present",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/Beneficiary"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/CustodianForMinor"
+     ]
+    ]
+   }
+  }
+ ]
+}

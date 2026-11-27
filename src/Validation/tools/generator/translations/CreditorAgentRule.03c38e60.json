@@ -1,0 +1,101 @@
+{
+ "rule": "CreditorAgentRule",
+ "text": "If PaymentMethod is CHK and if CreditTransferTransactionInformation/ ChequeInstruction/DeliveryMethod is present and is equal to MLFA, CRFA, RGFA or PUFA, then CreditTransferTransactionInformation/CreditorAgent is mandatory. If PaymentMethod is CHK and if CreditTransferTransactionInformation/ ChequeInstruction/DeliveryMethod is not present or is not equal to MLFA, CRFA, RGFA or PUFA, then CreditTransferTransactionInformation/CreditorAgent is not allowed.",
+ "reading": "if PaymentMethod is CHK: a CreditTransferTransactionInformation whose cheque delivery is to the final agent has a CreditorAgent, and one whose delivery is not has none",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/CreditorAgent"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/PaymentMethod",
+      "CHK"
+     ]
+    ]
+   },
+   "each": "/CreditTransferTransactionInformation",
+   "eachWhen": {
+    "connector": "OR",
+    "rules": [
+     [
+      "EqualToValue",
+      "/ChequeInstruction/DeliveryMethod/Code",
+      "CRFA"
+     ],
+     [
+      "EqualToValue",
+      "/ChequeInstruction/DeliveryMethod/Code",
+      "MLFA"
+     ],
+     [
+      "EqualToValue",
+      "/ChequeInstruction/DeliveryMethod/Code",
+      "PUFA"
+     ],
+     [
+      "EqualToValue",
+      "/ChequeInstruction/DeliveryMethod/Code",
+      "RGFA"
+     ]
+    ]
+   }
+  },
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/CreditorAgent"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/PaymentMethod",
+      "CHK"
+     ]
+    ]
+   },
+   "each": "/CreditTransferTransactionInformation",
+   "eachWhen": {
+    "connector": "AND",
+    "rules": [
+     [
+      "DifferentFromValue",
+      "/ChequeInstruction/DeliveryMethod/Code",
+      "CRFA"
+     ],
+     [
+      "DifferentFromValue",
+      "/ChequeInstruction/DeliveryMethod/Code",
+      "MLFA"
+     ],
+     [
+      "DifferentFromValue",
+      "/ChequeInstruction/DeliveryMethod/Code",
+      "PUFA"
+     ],
+     [
+      "DifferentFromValue",
+      "/ChequeInstruction/DeliveryMethod/Code",
+      "RGFA"
+     ]
+    ]
+   }
+  }
+ ]
+}

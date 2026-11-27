@@ -1,0 +1,27 @@
+{
+ "rule": "ThirdReimbursementAgentAccountRule",
+ "text": "If ThirdReimbursementAgent is not present, then ThirdReimbursementAgentAccount is not allowed.",
+ "reading": "if ThirdReimbursementAgent is absent, ThirdReimbursementAgentAccount is absent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/ThirdReimbursementAgentAccount"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/ThirdReimbursementAgent"
+     ]
+    ]
+   }
+  }
+ ]
+}

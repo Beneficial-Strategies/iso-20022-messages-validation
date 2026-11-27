@@ -1,0 +1,18 @@
+{
+ "rule": "ForwardingAgentRule",
+ "text": "GroupHeader/ForwardingAgent is not allowed. .",
+ "reading": "GroupHeader/ForwardingAgent is absent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/GroupHeader/ForwardingAgent"
+     ]
+    ]
+   }
+  }
+ ]
+}

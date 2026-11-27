@@ -1,0 +1,51 @@
+{
+ "rule": "CashAccountRule",
+ "text": "CashAccount must be present or Cancellation(*)/CashAccount must be present, but not both.",
+ "reading": "CashAccount is present, or Cancellation has CashAccount in every item, and not both",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/Cancellation"
+     ],
+     [
+      "Presence",
+      "/Cancellation[*]/CashAccount"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/CashAccount"
+     ]
+    ]
+   }
+  },
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/Cancellation[*]/CashAccount"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/CashAccount"
+     ]
+    ]
+   }
+  }
+ ]
+}

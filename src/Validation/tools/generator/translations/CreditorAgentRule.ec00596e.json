@@ -1,0 +1,18 @@
+{
+ "rule": "CreditorAgentRule",
+ "text": "GroupHeader/CreditorAgent is not allowed.",
+ "reading": "GroupHeader/CreditorAgent is absent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/GroupHeader/CreditorAgent"
+     ]
+    ]
+   }
+  }
+ ]
+}

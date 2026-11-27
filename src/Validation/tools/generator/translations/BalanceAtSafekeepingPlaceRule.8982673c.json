@@ -1,0 +1,27 @@
+{
+ "rule": "BalanceAtSafekeepingPlaceRule",
+ "text": "If SafekeepingPlace is present, then BalanceAtSafekeepingPlace is not allowed.",
+ "reading": "if SafekeepingPlace is present, BalanceAtSafekeepingPlace is absent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/BalanceAtSafekeepingPlace"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/SafekeepingPlace"
+     ]
+    ]
+   }
+  }
+ ]
+}

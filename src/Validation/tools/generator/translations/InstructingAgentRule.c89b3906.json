@@ -1,0 +1,27 @@
+{
+ "rule": "InstructingAgentRule",
+ "text": "If GroupHeader/InstructingAgent is present, then CreditTransferTransactionInformation/InstructingAgent is not allowed. .",
+ "reading": "if GroupHeader/InstructingAgent is present, no CreditTransferTransactionInformation has InstructingAgent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/CreditTransferTransactionInformation[*]/InstructingAgent"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/GroupHeader/InstructingAgent"
+     ]
+    ]
+   }
+  }
+ ]
+}

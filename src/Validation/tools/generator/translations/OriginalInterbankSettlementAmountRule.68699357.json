@@ -1,0 +1,18 @@
+{
+ "rule": "OriginalInterbankSettlementAmountRule",
+ "text": "TransactionInformation/OriginalInterbankSettlementAmount is not allowed.",
+ "reading": "no TransactionInformation has OriginalInterbankSettlementAmount",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/TransactionInformation[*]/OriginalInterbankSettlementAmount"
+     ]
+    ]
+   }
+  }
+ ]
+}

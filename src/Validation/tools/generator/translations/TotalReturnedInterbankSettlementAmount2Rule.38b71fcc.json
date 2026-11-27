@@ -1,0 +1,28 @@
+{
+ "rule": "TotalReturnedInterbankSettlementAmount2Rule",
+ "text": "GroupHeader/TotalReturnedInterbankSettlementAmount must equal the sum of all occurrences of TransactionInformation/ReturnedInterbankSettlementAmount when present.",
+ "reading": "if TotalReturnedInterbankSettlementAmount is present, it is the sum of TransactionInformation/ReturnedInterbankSettlementAmount",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/GroupHeader/TotalReturnedInterbankSettlementAmount",
+      "sum of TransactionInformation/ReturnedInterbankSettlementAmount"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/GroupHeader/TotalReturnedInterbankSettlementAmount"
+     ]
+    ]
+   }
+  }
+ ]
+}

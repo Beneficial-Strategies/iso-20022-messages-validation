@@ -1,0 +1,59 @@
+{
+ "rule": "CreditorAndOrCreditorAccountRule",
+ "text": "If PaymentMethod is CHK, then CreditTransferTransactionInformation/CreditorAccount is not allowed. If PaymentMethod is different from CHK and if CreditTransferTransactionInformation/Creditor is not present, then CreditTransferTransactionInformation/CreditorAccount is mandatory. If PaymentMethod is different from CHK and if CreditTransferTransactionInformation/Creditor is present, then CreditTransferTransactionInformation/CreditorAccount is optional.",
+ "reading": "if PaymentMethod is CHK, no CreditTransferTransactionInformation has a CreditorAccount; otherwise one without a Creditor has a CreditorAccount",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/CreditTransferTransactionInformation[*]/CreditorAccount"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/PaymentMethod",
+      "CHK"
+     ]
+    ]
+   }
+  },
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/CreditorAccount"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "DifferentFromValue",
+      "/PaymentMethod",
+      "CHK"
+     ]
+    ]
+   },
+   "each": "/CreditTransferTransactionInformation",
+   "eachWhen": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/Creditor"
+     ]
+    ]
+   }
+  }
+ ]
+}

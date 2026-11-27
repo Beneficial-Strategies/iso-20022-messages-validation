@@ -1,0 +1,47 @@
+{
+ "rule": "AccruedInterestAmountSignRule",
+ "text": "If AccruedInterestAmount is present, then AccruedInterestAmountSign must be present. If AccruedInterestAmount is not present, then AccruedInterestAmountSign may not be present.",
+ "reading": "AccruedInterestAmountSign is present exactly when AccruedInterestAmount is",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/AccruedInterestAmountSign"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/AccruedInterestAmount"
+     ]
+    ]
+   }
+  },
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/AccruedInterestAmountSign"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/AccruedInterestAmount"
+     ]
+    ]
+   }
+  }
+ ]
+}

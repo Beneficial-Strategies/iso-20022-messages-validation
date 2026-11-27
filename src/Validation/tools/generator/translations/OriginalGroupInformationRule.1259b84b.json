@@ -1,0 +1,27 @@
+{
+ "rule": "OriginalGroupInformationRule",
+ "text": "If OriginalGroupInformation is present, then TransactionInformation/OriginalGroupInformation is not allowed.",
+ "reading": "if OriginalGroupInformation is present, no TransactionInformation has one",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/TransactionInformation[*]/OriginalGroupInformation"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/OriginalGroupInformation"
+     ]
+    ]
+   }
+  }
+ ]
+}

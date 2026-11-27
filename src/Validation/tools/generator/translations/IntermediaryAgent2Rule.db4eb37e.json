@@ -1,0 +1,27 @@
+{
+ "rule": "IntermediaryAgent2Rule",
+ "text": "If IntermediaryAgent2 is present, then IntermediaryAgent1 must be present.",
+ "reading": "if IntermediaryAgent2 is present, IntermediaryAgent1 is present",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/IntermediaryAgent1"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/IntermediaryAgent2"
+     ]
+    ]
+   }
+  }
+ ]
+}

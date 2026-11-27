@@ -1,0 +1,18 @@
+{
+ "rule": "DebtorAgentRule",
+ "text": "GroupHeader/DebtorAgent is not allowed. .",
+ "reading": "GroupHeader/DebtorAgent is absent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/GroupHeader/DebtorAgent"
+     ]
+    ]
+   }
+  }
+ ]
+}

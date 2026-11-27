@@ -1,0 +1,27 @@
+{
+ "rule": "FinancialInstrumentAttributesRule",
+ "text": "If InvestmentFundsFinancialInstrumentAttributes is present, then FinancialInstrumentAttributes is not allowed.",
+ "reading": "if InvestmentFundsFinancialInstrumentAttributes is present, FinancialInstrumentAttributes is absent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/FinancialInstrumentAttributes"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/InvestmentFundsFinancialInstrumentAttributes"
+     ]
+    ]
+   }
+  }
+ ]
+}

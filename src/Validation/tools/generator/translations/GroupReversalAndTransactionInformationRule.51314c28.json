@@ -1,0 +1,49 @@
+{
+ "rule": "GroupReversalAndTransactionInformationRule",
+ "text": "If GroupHeader/GroupReversal is true, then TransactionInformation is not allowed. If GroupHeader/GroupReversal is false, then at least one occurrence of TransactionInformation must be present.",
+ "reading": "if GroupReversal is true there is no TransactionInformation, if false there is at least one",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/TransactionInformation"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/GroupHeader/GroupReversal",
+      "true"
+     ]
+    ]
+   }
+  },
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/TransactionInformation"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/GroupHeader/GroupReversal",
+      "false"
+     ]
+    ]
+   }
+  }
+ ]
+}

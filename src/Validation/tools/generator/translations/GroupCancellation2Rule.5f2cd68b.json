@@ -1,0 +1,28 @@
+{
+ "rule": "GroupCancellation2Rule",
+ "text": "If GroupHeader/GroupCancellation is true, then OriginalGroupInformation/CancellationReasonInformation/CancellationReason must present.",
+ "reading": "if GroupCancellation is true, CancellationReason is present",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/OriginalGroupInformation/CancellationReasonInformation/CancellationReason"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/GroupHeader/GroupCancellation",
+      "true"
+     ]
+    ]
+   }
+  }
+ ]
+}

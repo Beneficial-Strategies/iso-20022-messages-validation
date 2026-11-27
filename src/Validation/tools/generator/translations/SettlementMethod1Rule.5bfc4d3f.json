@@ -1,0 +1,45 @@
+{
+ "rule": "SettlementMethod1Rule",
+ "text": "If SettlementMethod is equal to INDA or INGA then: - SettlementAccount may be present; - ReimbursementAgent(s) is(are) not allowed; - ClearingSystem is not allowed.",
+ "reading": "if SettlementMethod is INDA or INGA, ClearingSystem and the reimbursement agents are absent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/ClearingSystem"
+     ],
+     [
+      "Absence",
+      "/InstructingReimbursementAgent"
+     ],
+     [
+      "Absence",
+      "/InstructedReimbursementAgent"
+     ],
+     [
+      "Absence",
+      "/ThirdReimbursementAgent"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "OR",
+    "rules": [
+     [
+      "EqualToValue",
+      "/SettlementMethod",
+      "INDA"
+     ],
+     [
+      "EqualToValue",
+      "/SettlementMethod",
+      "INGA"
+     ]
+    ]
+   }
+  }
+ ]
+}

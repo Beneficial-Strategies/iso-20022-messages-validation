@@ -1,0 +1,27 @@
+{
+ "rule": "SettlementCurrencyRule",
+ "text": "If BulkCashSettlementDetails is present, then Currency in IndividualExecutionDetails/SettlementAmount must be the same in all occurrences of IndividualExecutionDetails.",
+ "reading": "if BulkCashSettlementDetails is present, the currency of SettlementAmount is one in all IndividualExecutionDetails",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "SameInAll",
+      "/IndividualExecutionDetails[*]/SettlementAmount/@Currency"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/BulkCashSettlementDetails"
+     ]
+    ]
+   }
+  }
+ ]
+}

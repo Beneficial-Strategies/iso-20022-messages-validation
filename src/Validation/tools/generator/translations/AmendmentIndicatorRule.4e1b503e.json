@@ -1,0 +1,49 @@
+{
+ "rule": "AmendmentIndicatorRule",
+ "text": "If AmendmentIndicator is true, then AmendementInformationDetails must be present, with amended mandate information. If AmendmentIndicator is false, then AmendmentInformationDetails is not allowed.",
+ "reading": "AmendmentInformationDetails is present exactly when AmendmentIndicator is true",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/AmendmentInformationDetails"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/AmendmentIndicator",
+      "true"
+     ]
+    ]
+   }
+  },
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/AmendmentInformationDetails"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/AmendmentIndicator",
+      "false"
+     ]
+    ]
+   }
+  }
+ ]
+}

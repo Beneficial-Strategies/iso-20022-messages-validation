@@ -20,6 +20,7 @@ Rule semantics (the reading of the RuleDefinition language used here, to be chec
 """
 import argparse
 import glob
+import hashlib
 import json
 import os
 import re
@@ -206,6 +207,8 @@ class Gen:
         self.uid = 0
         self.lists = {}
         self.ext_used = set()
+        self.vacuous_ok = False  # a rule whose condition names an element the type does not have never applies (see build())
+        self.lenient_codes = False  # see boolean(): a translation may name codes that an older version of the type lacks
 
     def var(self):
         self.uid += 1
@@ -320,12 +323,58 @@ class Gen:
             return f"RuleOps.Has({e})"  # an element of a collection of structs: it cannot be compared with null
         return f"{e} is not null"
 
+    def every_item(self, x, itype, path):
+        """the path with [*] on each collection that has no index"""
+        out, ctype = [], itype
+        for name, idx in segs(path):
+            if name.startswith("@"):
+                out.append(name)
+                continue
+            t, nullable, coll = self.member(x, ctype, name)
+            out.append(f"{name}[*]" if coll and idx is None else name + (f"[{idx}]" if idx else ""))
+            ctype = t
+        return "/" + "/".join(out)
+
+    def values_of(self, x, itype, path):
+        """all the values at a path, as an IEnumerable<object?>: [*] (or a collection) spreads into its items"""
+        cur, ctype, many = x, itype, False
+        for name, idx in segs(path):
+            if name == "@Currency":
+                return f"{cur}.Select(v => (object?)v?.Currency)" if many else f"new object?[] {{ {cur}?.Currency }}"
+            if name.startswith("@"):
+                raise Unsupported(f"attribute {name}")
+            t, nullable, coll = self.member(cur, ctype, name)
+            if not many:
+                acc = self.access(cur, ctype, name, t)
+                cur, many = (f"({acc} ?? [])", True) if coll else (acc, False)
+            else:
+                v = self.var()
+                inner = self.access(v, ctype, name, t)
+                cur = f"{cur}.SelectMany({v} => {inner} ?? [])" if coll else f"{cur}.Select({v} => {inner})"
+            ctype = t
+        return cur if many else f"new object?[] {{ {cur} }}"
+
     # ---- BooleanRule -> bool expression over x
     def boolean(self, x, itype, typ, left, right):
         if typ in ("Presence", "Absence"):
             if typ == "Presence":
-                return self.walk(x, itype, left, lambda e, t, c: self.present(e, t, c))
-            return self.walk(x, itype, left, lambda e, t, c: f"!({self.present(e, t, c)})")
+                every = self.walk(x, itype, left, lambda e, t, c: self.present(e, t, c))
+                if "[*]" in left:
+                    # "A[*]/B is present" is that every item has a B, and that there is an item: with none, B is not present
+                    return f"({every}) && ({self.walk(x, itype, left.replace('[*]', ''), lambda e, t, c: self.present(e, t, c))})"
+                return every
+            # "absent" is that no occurrence has it: every collection on the way is read as [*] when the path does not say
+            return self.walk(x, itype, self.every_item(x, itype, left), lambda e, t, c: f"!({self.present(e, t, c)})")
+        if typ == "IsBranchOf":
+            # (ours) the institution at the first path is a branch of the one at the second: see RuleOps.IsBranchOf
+            return f"RuleOps.IsBranchOf({self.expr_of(x, itype, left)[0]}, {self.expr_of(x, itype, right)[0]})"
+        if typ == "CountEquals":
+            # (ours) the number of occurrences at the path is the number on the right
+            return f"{self.values_of(x, itype, left)}.Count(v => v is not null) == {int(right)}"
+        if typ == "SameInAll":
+            # (not one of the specification's rule types) the values at the path, and at the second one if there is one, are one value
+            both = self.values_of(x, itype, left) + (f".Concat({self.values_of(x, itype, right)})" if right else "")
+            return f"RuleOps.AllSame({both})"
         if typ in ("EqualToNode", "DifferentFromNode"):
             rexpr, rtype = self.expr_of(x, itype, right)
             op = "==" if typ == "EqualToNode" else "!="
@@ -343,8 +392,8 @@ class Gen:
                     if not coll or len(ss) != 2:
                         raise Unsupported(f"aggregate {right}")
                     et, _, _ = self.member("t", ct, ss[1][0])
-                    sel = f"t.{ss[1][0]}" + (".Amount" if self.m.kind(et) == "class" else "")
-                    rhs = f"({x}.{ss[0][0]} ?? []).Sum(t => {sel})"
+                    sel = f"t?.{ss[1][0]}" + ("?.Amount" if self.m.kind(et) == "class" else "")
+                    rhs = f"({x}?.{ss[0][0]} ?? []).Sum(t => (decimal?){sel})"
                 lhs_body = self.walk(x, itype, left, lambda e, t, c: f"RuleOps.Number({e}) {'!=' if neg else '=='} {rhs}")
                 return lhs_body
             lit = right
@@ -364,6 +413,10 @@ class Gen:
                     name = lit
                     if mem is not None and lit not in mem:
                         name = enum_values(t).get(lit)  # the data writes the code (ISSU), the model names the member
+                        if name is None and self.lenient_codes:
+                            # the rule lists codes of the newest code set; an older version of the type does not have all of them,
+                            # and a code that the type cannot hold is never the value (so "equals" is false, "differs from" is true)
+                            return "true" if neg else "false"
                         if name is None:
                             raise Unsupported(f"{lit} is not a member of {t}")
                     return f"{e} {'!=' if neg else '=='} {t}.{name}"
@@ -390,7 +443,7 @@ class Gen:
     def english(self, sec):
         conn, brs = sec
         w = {"Presence": "{} is present", "Absence": "{} is absent", "EqualToNode": "{} equals {r}", "DifferentFromNode": "{} differs from {r}",
-             "EqualToValue": "{} equals {r}", "DifferentFromValue": "{} differs from {r}", "WithInList": "{} is in {r}", "NotWithInList": "{} is not in {r}"}
+             "IsBranchOf": "{} is a branch of {r}", "SameInAll": "{} is one value in all items (with {r})", "CountEquals": "{} occurs {r} time(s)", "EqualToValue": "{} equals {r}", "DifferentFromValue": "{} differs from {r}", "WithInList": "{} is in {r}", "NotWithInList": "{} is not in {r}"}
         s = [w[t].format(l.strip("/").replace("/", "."), r=(r or "")) for t, l, r in brs]
         return (" " + conn.lower() + " ").join(s)
 
@@ -421,12 +474,72 @@ def emit_code_validator(t):
     )
 
 
+TRANSLATIONS_DIR = os.path.join(HERE, "translations")  # the readings of the rules that are in prose
+
+
+def text_key(name, prose):
+    return f"{name}.{hashlib.sha1(prose.encode('utf-8')).hexdigest()[:8]}"
+
+
+def load_translation(name, prose):
+    """The reading of a rule that the specification gives in prose, written once from its text (translations/<Rule>.<hash>.json).
+    The key is the name and the text of the rule, so a change in the specification's text makes the translation not apply
+    (the rule is pending again) instead of silently applying to a rule that has changed."""
+    f = os.path.join(TRANSLATIONS_DIR, text_key(name, prose) + ".json")
+    if not os.path.exists(f):
+        return None
+    with open(f, encoding="utf-8") as fh:
+        t = json.load(fh)
+    t["file"] = os.path.basename(f)
+    def rules_of(rs):
+        return [
+            (r.get("kind", "ComplexRule" if (r.get("when") or r.get("eachWhen")) else "SimpleRule"), section_of(r["must"]),
+             section_of(r["when"]) if r.get("when") else None, r.get("each"), section_of(r["eachWhen"]) if r.get("eachWhen") else None)
+            for r in rs
+        ]
+
+    t["lenient_codes"] = bool(t.get("lenient_codes"))
+    t["vacuous"] = bool(t.get("vacuous_without_condition_element"))
+    t["rules"] = rules_of(t.get("rules", []))
+    # the same rule where the element is somewhere else in another version of the type: tried in order when the first does not fit
+    t["alternatives"] = [rules_of(a["rules"]) for a in t.get("alternatives", [])]
+    return t
+
+
+def section_of(spec):
+    """{"connector": "AND", "rules": [["Presence", "/A"], ["EqualToValue", "/B", "x"]]} -> (connector, [(type, left, right)])"""
+    return (spec.get("connector", "AND"), [(r[0], r[1], r[2] if len(r) > 2 else None) for r in spec["rules"]])
+
+
 def hand_rules_file(name):
     """the hand-written rules of a type (`<Type>Validator.Rules.cs`, next to the validator), or None"""
     for d in RULES_DIRS:
         for f in glob.glob(os.path.join(d, "**", f"{name}Validator.Rules.cs"), recursive=True):
             return f
     return None
+
+
+SCAFFOLD_DIR = None  # --scaffold: where the stubs of the rules that have no translation are written
+
+
+def scaffold(outdir, rule, prose, type_name, elems):
+    """Writes the stub of a translation for a rule that is in prose and has none (<Rule>.<hash>.json, the name the generator looks for).
+    The stub has the exact text and the members of the type to read it against, and an empty `rules`: it is filled in by a person
+    (see the README), reviewed, and moved to translations/. The members are of the first type found; the same text in another type
+    is listed under `also_in`, and one file serves them all."""
+    os.makedirs(outdir, exist_ok=True)
+    f = os.path.join(outdir, text_key(rule, prose) + ".json")
+    members = [{"name": c["name"], "min": c.get("minOccurs", "1"), "max": c.get("maxOccurs", "n")} for c in elems]
+    if os.path.exists(f):
+        with open(f, encoding="utf-8") as fh:
+            stub = json.load(fh)
+        if type_name not in stub["also_in"] and type_name != stub["first_seen_in"]:
+            stub["also_in"].append(type_name)
+    else:
+        stub = {"rule": rule, "text": prose, "reading": "", "first_seen_in": type_name, "also_in": [], "members": members, "rules": []}
+    with open(f, "w", encoding="utf-8") as fh:
+        json.dump(stub, fh, indent=1)
+        fh.write("\n")
 
 
 def emit_type(g, e, report):
@@ -438,6 +551,13 @@ def emit_type(g, e, report):
     if props is None:
         report["no_interface"].append(name)
         return None
+    # a few messages of the same name are in two business areas (PaymentStatusReportV02 is in pacs and in pain): the interface is
+    # named with its area, and the validator is in the namespace of the area
+    area = next((c["name"].split(".")[0] for c in e.get("children", []) if c.get("xmlElementName") == "messageDefinitionIdentifier"), None)
+    ns, itype_cs = "Gen", itype
+    if area and len(glob.glob(MSGS + f"MessageDefinitions/*/{itype}.cs")) > 1:
+        itype_cs = f"BeneficialStrategies.Iso20022.{area}.{itype}"
+        ns = f"Gen.{area}"
     # children of kind messageElement / messageBuildingBlock
     elems = [c for c in e.get("children", []) if c.get("xmlElementName") in ("messageElement", "messageBuildingBlock")]
     consts = [c for c in e.get("children", []) if c.get("xmlElementName") == "constraint"]
@@ -467,8 +587,10 @@ def emit_type(g, e, report):
         k = m.kind(t)
         w = f'"{name}.{mem}'
         if coll:
-            if mn >= 1:
+            if mn == 1:
                 lines.append(f'RuleFor(x => x.{mem}).NotEmpty().WithMessage({w} must have at least {mn} item(s) ({mn}..{mxs or "n"})."); ')
+            elif mn > 1:
+                lines.append(f'RuleFor(x => x.{mem}).Must(c => c is not null && c.Count() >= {mn}).WithMessage({w} must have at least {mn} item(s) ({mn}..{mxs or "n"})."); ')
             if mx is not None and mx > 1:
                 lines.append(f'RuleFor(x => x.{mem}).Must(c => c is null || c.Count() <= {mx}).WithMessage({w} may have at most {mx} items."); ')
         else:
@@ -519,34 +641,117 @@ def emit_type(g, e, report):
         rule_lines.append(f"//   {prose}")
         rule_lines.append("")
 
+    def build(rules):
+        """the C# expression of one or more rules, all of which must hold. A rule is (kind, mustBe, onCondition) or, when it is
+        about each item of a collection, (kind, mustBe, onCondition, collection, itemCondition): the collection is walked once and
+        the condition and the consequence of the item are both read on the same item."""
+        parts = []
+        g.uid = 0  # the names of the loop variables start again in each rule: a rule reads the same wherever it is
+        for r in rules:
+            kind, must, cond = r[:3]
+            each, each_cond = (r[3], r[4]) if len(r) > 3 else (None, None)
+            if g.vacuous_ok and cond is not None:
+                try:
+                    g.section("x", itype, cond)
+                except Unsupported as u:
+                    if "has no member" in str(u):
+                        continue  # "if X is present then ...", and the type has no X: the rule never applies
+                    raise
+            if each:
+                (name_, idx_), = segs(each)
+                ct, _, is_coll = g.member("x", itype, name_)
+                v = g.var()
+                inner = g.section(v, ct, must)
+                if each_cond is not None:
+                    inner = f"!({g.section(v, ct, each_cond)}) || ({inner})"
+                body = f"(x?.{name_} ?? []).All({v} => {inner})"
+                parts.append(body if cond is None else f"!({g.section('x', itype, cond)}) || ({body})")
+                continue
+            body_must = g.section("x", itype, must)
+            parts.append(body_must if (kind == "SimpleRule" or cond is None) else f"!({g.section('x', itype, cond)}) || ({body_must})")
+        if not parts:
+            return None
+        return parts[0] if len(parts) == 1 else " && ".join(f"({p})" for p in parts)
+
+    def reading(rules):
+        out = []
+        for r in rules:
+            kind, must, cond = r[:3]
+            each, each_cond = (r[3], r[4]) if len(r) > 3 else (None, None)
+            pre = ("if " + g.english(cond) + ": " if cond is not None else "")
+            if each:
+                pre += f"in each {each.strip('/')}" + (": if " + g.english(each_cond) + ": " if each_cond is not None else ": ")
+                out.append(f"{pre}{g.english(must)}")
+            else:
+                out.append(f"{pre if kind != 'SimpleRule' else ''}{g.english(must)}")
+        return "; and ".join(out)
+
     for c in consts:
         cname = c["name"]
         ex = c.get("attributes", {}).get("expression")
         prose = norm(c.get("definition"))
-        if not ex:
-            kind = "guideline" if cname.endswith("Guideline") else "prose"
-            report["prose_only" if kind == "prose" else "guidelines"].append(f"{name}.{cname}")
-            if kind == "guideline":
+        tr = load_translation(cname, prose)
+        source, rules, why = "the specification's expression", None, None
+        if ex:
+            try:
+                rules = [parse_rule(ex)]
+                build(rules)
+            except (Unsupported, ET.ParseError) as u:
+                rules, why = None, ("the expression is text, not a rule definition" if isinstance(u, ET.ParseError) else str(u))
+                report["unsupported"].append(f"{name}.{cname}: {why}")
+        else:
+            if cname.endswith("Guideline"):
+                report["guidelines"].append(f"{name}.{cname}")
                 rule_lines.append(f"// {cname}: a guideline of the specification, not a rule to check:")
                 rule_lines.append(f"//   {prose}")
                 rule_lines.append("")
-            else:
-                by_hand(cname, "the specification gives the rule in prose only", prose)
+                continue
+            report["prose_only"].append(f"{name}.{cname}")
+            why = "the specification gives the rule in prose only"
+            if tr is None and SCAFFOLD_DIR:
+                scaffold(SCAFFOLD_DIR, cname, prose, name, elems)
+        if rules is None and tr is not None and tr.get("rules"):
+            # written once from the prose, reviewed, and kept in translations/ (see the README)
+            first_error = None
+            g.lenient_codes = tr["lenient_codes"]
+            g.vacuous_ok = tr["vacuous"]
+            for candidate in [tr["rules"]] + tr["alternatives"]:
+                try:
+                    build(candidate)
+                    rules, source = candidate, f"read from the prose (translations/{tr['file']})"
+                    break
+                except Unsupported as u:
+                    first_error = first_error or u
+            if rules is None:
+                g.lenient_codes = g.vacuous_ok = False
+                report["unsupported"].append(f"{name}.{cname}: translation {tr['file']}: {first_error}")
+                why = f"translation {tr['file']} does not fit this type: {first_error}"
+        if rules is None and tr is not None and tr.get("known_issue"):
+            # a rule that cannot be checked on the message (it is about meaning, or about another message): not an error, not pending;
+            # kept in docs/KnownRuleChallenges.md
+            report["known_issues"].append(f"{name}.{cname}")
+            rule_lines.append(f"// {cname}: a known issue (docs/KnownRuleChallenges.md), not checked: {tr['known_issue']}")
+            rule_lines.append(f"//   {prose}")
+            rule_lines.append("")
             continue
-        try:
-            kind, must, cond = parse_rule(ex)
-            body_must = g.section("x", itype, must)
-            expr = body_must if (kind == "SimpleRule" or cond is None) else f"!({g.section('x', itype, cond)}) || ({body_must})"
-        except (Unsupported, ET.ParseError) as u:
-            if isinstance(u, ET.ParseError):
-                u = "the expression is text, not a rule definition"
-            report["unsupported"].append(f"{name}.{cname}: {u}")
-            by_hand(cname, str(u), prose)
+        if rules is None and tr is not None and tr.get("hand"):
+            why = tr["hand"]  # a rule that is to be written in C#, and why it cannot be a reading
+        if rules is None:
+            by_hand(cname, why, prose)
             continue
-        report["generated_rules"].append(f"{name}.{cname}")
-        cond_t = ("if " + g.english(cond) + ": " if cond is not None and kind != "SimpleRule" else "")
-        rule_lines.append(f"// ── {cname} ── {cond_t}{g.english(must)}")
+        expr = build(rules)
+        g.lenient_codes = g.vacuous_ok = False
+        if expr is None:
+            report["known_issues"].append(f"{name}.{cname}")
+            rule_lines.append(f"// {cname}: never applies to this type: its condition is about an element the type does not have (docs/KnownRuleChallenges.md).")
+            rule_lines.append(f"//   {prose}")
+            rule_lines.append("")
+            continue
+        report["generated_rules" if source.startswith("the spec") else "translated_rules"].append(f"{name}.{cname}")
+        rule_lines.append(f"// ── {cname} ── {reading(rules)}")
         rule_lines.append(f"// {prose}")
+        if not source.startswith("the spec"):
+            rule_lines.append(f"// (the rule is {source})")
         rule_lines.append("RuleFor(x => x)")
         rule_lines.append(f"    .Must(x => {expr})")
         rule_lines.append(f'    .WithName("{cname}")')
@@ -565,10 +770,10 @@ def emit_type(g, e, report):
     out = []
     out.append("// Generated by tools/generator/generate_validators.py from the ISO 20022 specification (prototype). Do not edit: regenerate.")
     out.append("")
-    out.append("namespace Gen;")
+    out.append(f"namespace {ns};")
     out.append("")
-    out.append(f"/// <summary>Validates <see cref=\"{itype}\"/> per the ISO 20022 specification.</summary>")
-    out.append(f"public {'partial ' if needs_hand else ''}class {cls} : AbstractValidator<{itype}>")
+    out.append(f"/// <summary>Validates <see cref=\"{itype_cs}\"/> per the ISO 20022 specification.</summary>")
+    out.append(f"public {'partial ' if needs_hand else ''}class {cls} : AbstractValidator<{itype_cs}>")
     out.append("{")
     if all_vals:
         out.append(f"    public {cls}(\n        {params}\n    )")
@@ -588,7 +793,7 @@ def emit_type(g, e, report):
         out.append("")
         out.append(f"    public {cls}()\n        : this({', '.join(default_for(t) for t, _ in all_vals)}) {{ }}")
     out.append("}")
-    return cls, "\n".join(out) + "\n", list(child_vals)
+    return (cls if ns == "Gen" else f"{area}.{cls}"), "\n".join(out) + "\n", list(child_vals)
 
 
 def emit_choice(g, e, report):
@@ -706,6 +911,81 @@ internal static class RuleOps
         return s is null || start > s.Length ? null : s.Substring(start - 1, Math.Min(length, s.Length - start + 1));
     }
 
+    /// <summary>The values that are there are all one value (an absent value is not a different one).</summary>
+    internal static bool AllSame(IEnumerable<object?> values) =>
+        values.Where(v => v is not null).Select(v => v!.ToString()).Distinct().Count() <= 1;
+
+    /// <summary>
+    /// Whether a financial institution is a branch of another: it is not, only when the two carry the same kind of identifier and the
+    /// identifiers differ (a BIC is compared by its first eight characters, its institution; a branch is the rest). With no kind in
+    /// common nothing can be said against it, so it is accepted.
+    /// </summary>
+    internal static bool IsBranchOf(object? branch, object? agent)
+    {
+        var a = Identifiers(branch);
+        var b = Identifiers(agent);
+        foreach (var kv in a)
+        {
+            if (b.TryGetValue(kv.Key, out var other) && !string.Equals(kv.Value, other, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static Dictionary<string, string> Identifiers(object? agent)
+    {
+        var d = new Dictionary<string, string>();
+        var fi = Get(agent, "FinancialInstitutionIdentification");
+        var bic = Get(fi, "BICFI")?.ToString();
+        if (bic is { Length: >= 8 })
+        {
+            d["BIC"] = bic.Substring(0, 8);
+        }
+
+        var lei = Get(fi, "LEI")?.ToString();
+        if (!string.IsNullOrEmpty(lei))
+        {
+            d["LEI"] = lei!;
+        }
+
+        var member = Get(fi, "ClearingSystemMemberIdentification");
+        var memberId = Get(member, "MemberIdentification")?.ToString();
+        if (!string.IsNullOrEmpty(memberId))
+        {
+            var system = Get(member, "ClearingSystemIdentification");
+            d["CLR:" + (Get(system, "Value") ?? system)?.ToString()] = memberId!;
+        }
+
+        return d;
+    }
+
+    // A member by name, whether the object is a class or a proxy of the interface.
+    private static object? Get(object? o, string name)
+    {
+        if (o is null)
+        {
+            return null;
+        }
+
+        var p = o.GetType().GetProperty(name);
+        if (p is null)
+        {
+            foreach (var i in o.GetType().GetInterfaces())
+            {
+                p = i.GetProperty(name);
+                if (p is not null)
+                {
+                    break;
+                }
+            }
+        }
+
+        return p?.GetValue(o);
+    }
+
     internal static bool Has(object? v) => v is not null;
 
     internal static bool InList(object? v, IReadOnlySet<string> names) => v is not null && names.Contains(v.ToString()!);
@@ -734,9 +1014,11 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--census", required=True, help="folder of the saved pages of the specification")
     what = ap.add_mutually_exclusive_group(required=True)
-    what.add_argument("--message", help="identifier of the message, for example pacs.008.001.14")
-    what.add_argument("--type", help="a message component or choice on its own, for example PostalAddress27 (with what it reaches)")
+    what.add_argument("--message", action="append", help="identifier of the message, for example pacs.008.001.14; repeat it for several")
+    what.add_argument("--areas", help="every message of these business areas, all versions, for example pacs,pain")
+    what.add_argument("--type", action="append", help="a message component or choice on its own, for example PostalAddress27 (with what it reaches); repeat it for several")
     ap.add_argument("--rules", action="append", help="folder of the hand-written rules (<Type>Validator.Rules.cs); the validators folder by default")
+    ap.add_argument("--scaffold", metavar="DIR", help="write a stub translation, to be filled in, for each rule that is in prose and has none (see the README)")
     ap.add_argument("--out", required=True, help="folder to write the validators to")
     ap.add_argument("--messages", default=os.path.join(REPO_ROOT, "..", "iso-20022-messages"), help="clone of iso-20022-messages")
     ap.add_argument("--primitives", default=os.path.join(REPO_ROOT, "..", "iso-20022-primitives"), help="clone of iso-20022-primitives")
@@ -747,13 +1029,22 @@ def main():
     PRIM = os.path.join(os.path.abspath(args.primitives), "src", "Primitives") + os.sep
     VAL = os.path.abspath(args.validators) + os.sep
     RULES_DIRS = [os.path.abspath(d) for d in (args.rules or [VAL])]
+    global SCAFFOLD_DIR
+    SCAFFOLD_DIR = os.path.abspath(args.scaffold) if args.scaffold else None
     outdir = args.out
     os.makedirs(outdir, exist_ok=True)
     model = Model()
-    msg_id = find_message(model.idx, args.message) if args.message else find_type(model.idx, args.type)
+    if args.areas:
+        areas = set(args.areas.split(","))
+        roots = [i for i, e in model.idx.items() for c in e.get("children", [])
+                 if c.get("xmlElementName") == "messageDefinitionIdentifier" and c["name"].split(".")[0] in areas]
+    elif args.message:
+        roots = [find_message(model.idx, m_) for m_ in args.message]
+    else:
+        roots = [find_type(model.idx, t) for t in args.type]
     g = Gen(model)
-    report = {k: [] for k in ("no_interface", "mismatch", "prose_only", "guidelines", "unsupported", "pending", "generated_rules", "generated_types", "reused_hand_validators")}
-    seen, st = {msg_id}, [msg_id]
+    report = {k: [] for k in ("no_interface", "mismatch", "prose_only", "guidelines", "unsupported", "pending", "known_issues", "generated_rules", "translated_rules", "generated_types", "reused_hand_validators")}
+    seen, st = set(roots), list(roots)
     order = []
     while st:
         i = st.pop()

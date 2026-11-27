@@ -1,0 +1,59 @@
+{
+ "rule": "GroupAndTransactionStatus2Rule",
+ "text": "If OriginalGroupInformationAndStatus/GroupStatus is present and is equal to PDNG, then TransactionInformationAndStatus/TransactionStatus must be different from RJCT. .",
+ "reading": "if GroupStatus is PDNG, no transaction status is RJCT",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "DifferentFromValue",
+      "/TransactionInformationAndStatus[*]/TransactionStatus",
+      "RJCT"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/OriginalGroupInformationAndStatus/GroupStatus",
+      "PDNG"
+     ]
+    ]
+   }
+  }
+ ],
+ "lenient_codes": true,
+ "alternatives": [
+  {
+   "reading": "if GroupStatus is PDNG, no transaction status is RJCT (the transactions are inside OriginalPaymentInformationAndStatus)",
+   "rules": [
+    {
+     "must": {
+      "connector": "AND",
+      "rules": [
+       [
+        "DifferentFromValue",
+        "/OriginalPaymentInformationAndStatus[*]/TransactionInformationAndStatus[*]/TransactionStatus",
+        "RJCT"
+       ]
+      ]
+     },
+     "when": {
+      "connector": "AND",
+      "rules": [
+       [
+        "EqualToValue",
+        "/OriginalGroupInformationAndStatus/GroupStatus",
+        "PDNG"
+       ]
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

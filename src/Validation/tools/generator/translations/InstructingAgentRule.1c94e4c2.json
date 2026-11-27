@@ -1,0 +1,27 @@
+{
+ "rule": "InstructingAgentRule",
+ "text": "If GroupHeader/InstructingAgent is present, then DirectDebitTransactionInformation/InstructingAgent is not allowed. .",
+ "reading": "if GroupHeader/InstructingAgent is present, no DirectDebitTransactionInformation has InstructingAgent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/DirectDebitTransactionInformation[*]/InstructingAgent"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/GroupHeader/InstructingAgent"
+     ]
+    ]
+   }
+  }
+ ]
+}

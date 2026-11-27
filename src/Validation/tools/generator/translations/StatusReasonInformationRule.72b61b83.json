@@ -1,0 +1,33 @@
+{
+ "rule": "StatusReasonInformationRule",
+ "text": "StatusReasonInformation/AdditionalStatusReasonInformation may only be present when GroupStatus is present and is equal to RJCTor PDNG.",
+ "reading": "AdditionalStatusReasonInformation is absent unless GroupStatus is RJCT or PDNG",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/StatusReasonInformation[*]/AdditionalStatusReasonInformation"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "DifferentFromValue",
+      "/GroupStatus",
+      "RJCT"
+     ],
+     [
+      "DifferentFromValue",
+      "/GroupStatus",
+      "PDNG"
+     ]
+    ]
+   }
+  }
+ ]
+}

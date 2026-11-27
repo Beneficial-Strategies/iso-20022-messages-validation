@@ -1,0 +1,27 @@
+{
+ "rule": "PreviousInstructingAgentAccountRule",
+ "text": "If PreviousInstructingAgent is not present, then PreviousInstructingAgentAccount is not allowed.",
+ "reading": "if PreviousInstructingAgent is absent, PreviousInstructingAgentAccount is absent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/PreviousInstructingAgentAccount"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/PreviousInstructingAgent"
+     ]
+    ]
+   }
+  }
+ ]
+}

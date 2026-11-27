@@ -1,0 +1,28 @@
+{
+ "rule": "RequestedSettlementCurrencyRule",
+ "text": "If RequestedSettlementCurrency is present, it must be the same Currency as in all occurrences of IndividualExecutionDetails/SettlementAmount.",
+ "reading": "if RequestedSettlementCurrency is present, it is the currency of every SettlementAmount of IndividualExecutionDetails",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "SameInAll",
+      "/RequestedSettlementCurrency",
+      "/IndividualExecutionDetails[*]/SettlementAmount/@Currency"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/RequestedSettlementCurrency"
+     ]
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,47 @@
+{
+ "rule": "ChargeBearerRule",
+ "text": "If ChargeBearer is present, then CreditTransferTransaction/ChargeBearer is not allowed. If CreditTransferTransaction/ChargeBearer is present, then ChargeBearer is not allowed. CreditTransferTransaction/ChargeBearer and ChargeBearer may both be absent.",
+ "reading": "ChargeBearer is at the top or in CreditTransferTransaction, not both",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/CreditTransferTransaction[*]/ChargeBearer"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/ChargeBearer"
+     ]
+    ]
+   }
+  },
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/ChargeBearer"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/CreditTransferTransaction/ChargeBearer"
+     ]
+    ]
+   }
+  }
+ ]
+}

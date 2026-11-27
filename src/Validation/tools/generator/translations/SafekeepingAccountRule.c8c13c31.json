@@ -1,0 +1,51 @@
+{
+ "rule": "SafekeepingAccountRule",
+ "text": "SafekeepingAccount must be present or Modification(*)/SafekeepingAccount must be present, but not both.",
+ "reading": "SafekeepingAccount is present, or Modification has SafekeepingAccount in every item, and not both",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/Modification"
+     ],
+     [
+      "Presence",
+      "/Modification[*]/SafekeepingAccount"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/SafekeepingAccount"
+     ]
+    ]
+   }
+  },
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/Modification[*]/SafekeepingAccount"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/SafekeepingAccount"
+     ]
+    ]
+   }
+  }
+ ]
+}

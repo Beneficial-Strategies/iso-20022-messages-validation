@@ -1,0 +1,28 @@
+{
+ "rule": "InstructionForCreditorAgentRule",
+ "text": "If InstructionForCreditorAgent/Code contains CHQB, then CreditorAccount is not allowed.",
+ "reading": "if an InstructionForCreditorAgent has the code CHQB, CreditorAccount is absent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/CreditorAccount"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/InstructionForCreditorAgent/Code",
+      "CHQB"
+     ]
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,33 @@
+{
+ "rule": "ChequeMaturityDateRule",
+ "text": "If ChequeType is present and is DRFT or ELDR, then ChequeMaturityDate is optional. If ChequeType is not present or is different from DRFT or ELDR, then ChequeMaturityDate is not allowed. Rule rationale: ChequeMaturityDate may be present only when ChequeType is DRFT or ELDR.",
+ "reading": "if ChequeType is neither DRFT nor ELDR (or absent), ChequeMaturityDate is absent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/ChequeMaturityDate"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "DifferentFromValue",
+      "/ChequeType",
+      "DRFT"
+     ],
+     [
+      "DifferentFromValue",
+      "/ChequeType",
+      "ELDR"
+     ]
+    ]
+   }
+  }
+ ]
+}

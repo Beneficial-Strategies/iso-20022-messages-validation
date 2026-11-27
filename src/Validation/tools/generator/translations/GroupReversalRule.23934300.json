@@ -1,0 +1,29 @@
+{
+ "rule": "GroupReversalRule",
+ "text": "If GroupHeader/GroupReversal is false, then GroupHeader/NumberOfTransactions must equal the number of occurrences of TransactionInformation.",
+ "reading": "if GroupReversal is false, NumberOfTransactions is the number of TransactionInformation",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/GroupHeader/NumberOfTransactions",
+      "number of occurrences of TransactionInformation"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/GroupHeader/GroupReversal",
+      "false"
+     ]
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,51 @@
+{
+ "rule": "CashSettlementDateRule",
+ "text": "Either CashSettlementDate is present or all occurrences of IndividualOrderDetails/CashSettlementDate are present, but not both.",
+ "reading": "CashSettlementDate is present, or there are items and all have one, and not both",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/IndividualOrderDetails"
+     ],
+     [
+      "Presence",
+      "/IndividualOrderDetails[*]/CashSettlementDate"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/CashSettlementDate"
+     ]
+    ]
+   }
+  },
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/IndividualOrderDetails[*]/CashSettlementDate"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/CashSettlementDate"
+     ]
+    ]
+   }
+  }
+ ]
+}

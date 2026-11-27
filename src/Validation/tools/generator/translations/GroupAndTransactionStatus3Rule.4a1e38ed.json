@@ -1,0 +1,119 @@
+{
+ "rule": "GroupAndTransactionStatus3Rule",
+ "text": "If OriginalGroupInformationAndStatus/GroupStatus is present and is equal to RJCT, then TransactionInformationAndStatus/TransactionStatus must be different from ACTC, ACCP, ACSP, ACSC, ACCR, ACWC or PDNG.",
+ "reading": "if GroupStatus is RJCT, no transaction status is accepted or pending",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "DifferentFromValue",
+      "/TransactionInformationAndStatus[*]/TransactionStatus",
+      "ACTC"
+     ],
+     [
+      "DifferentFromValue",
+      "/TransactionInformationAndStatus[*]/TransactionStatus",
+      "ACCP"
+     ],
+     [
+      "DifferentFromValue",
+      "/TransactionInformationAndStatus[*]/TransactionStatus",
+      "ACSP"
+     ],
+     [
+      "DifferentFromValue",
+      "/TransactionInformationAndStatus[*]/TransactionStatus",
+      "ACSC"
+     ],
+     [
+      "DifferentFromValue",
+      "/TransactionInformationAndStatus[*]/TransactionStatus",
+      "ACCR"
+     ],
+     [
+      "DifferentFromValue",
+      "/TransactionInformationAndStatus[*]/TransactionStatus",
+      "ACWC"
+     ],
+     [
+      "DifferentFromValue",
+      "/TransactionInformationAndStatus[*]/TransactionStatus",
+      "PDNG"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/OriginalGroupInformationAndStatus/GroupStatus",
+      "RJCT"
+     ]
+    ]
+   }
+  }
+ ],
+ "lenient_codes": true,
+ "alternatives": [
+  {
+   "reading": "if GroupStatus is RJCT, no transaction status is accepted or pending (the transactions are inside OriginalPaymentInformationAndStatus)",
+   "rules": [
+    {
+     "must": {
+      "connector": "AND",
+      "rules": [
+       [
+        "DifferentFromValue",
+        "/OriginalPaymentInformationAndStatus[*]/TransactionInformationAndStatus[*]/TransactionStatus",
+        "ACTC"
+       ],
+       [
+        "DifferentFromValue",
+        "/OriginalPaymentInformationAndStatus[*]/TransactionInformationAndStatus[*]/TransactionStatus",
+        "ACCP"
+       ],
+       [
+        "DifferentFromValue",
+        "/OriginalPaymentInformationAndStatus[*]/TransactionInformationAndStatus[*]/TransactionStatus",
+        "ACSP"
+       ],
+       [
+        "DifferentFromValue",
+        "/OriginalPaymentInformationAndStatus[*]/TransactionInformationAndStatus[*]/TransactionStatus",
+        "ACSC"
+       ],
+       [
+        "DifferentFromValue",
+        "/OriginalPaymentInformationAndStatus[*]/TransactionInformationAndStatus[*]/TransactionStatus",
+        "ACCR"
+       ],
+       [
+        "DifferentFromValue",
+        "/OriginalPaymentInformationAndStatus[*]/TransactionInformationAndStatus[*]/TransactionStatus",
+        "ACWC"
+       ],
+       [
+        "DifferentFromValue",
+        "/OriginalPaymentInformationAndStatus[*]/TransactionInformationAndStatus[*]/TransactionStatus",
+        "PDNG"
+       ]
+      ]
+     },
+     "when": {
+      "connector": "AND",
+      "rules": [
+       [
+        "EqualToValue",
+        "/OriginalGroupInformationAndStatus/GroupStatus",
+        "RJCT"
+       ]
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

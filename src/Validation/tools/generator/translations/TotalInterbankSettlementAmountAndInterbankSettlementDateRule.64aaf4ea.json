@@ -1,0 +1,27 @@
+{
+ "rule": "TotalInterbankSettlementAmountAndInterbankSettlementDateRule",
+ "text": "If TotalInterbankSettlementAmount is present, then InterbankSettlementDate must be present.",
+ "reading": "if TotalInterbankSettlementAmount is present, InterbankSettlementDate is present",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/InterbankSettlementDate"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/TotalInterbankSettlementAmount"
+     ]
+    ]
+   }
+  }
+ ]
+}

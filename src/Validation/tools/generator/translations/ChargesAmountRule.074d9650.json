@@ -1,0 +1,28 @@
+{
+ "rule": "ChargesAmountRule",
+ "text": "If ChargesInformation/ChargesAmount is present, then the currency of ChargesInformation/ChargesAmount must be the same as the currency of InterbankSettlementAmount.",
+ "reading": "if ChargesInformation/ChargesAmount is present, its currency is that of InterbankSettlementAmount",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "SameInAll",
+      "/ChargesInformation[*]/ChargesAmount/@Currency",
+      "/InterbankSettlementAmount/@Currency"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/ChargesInformation/ChargesAmount"
+     ]
+    ]
+   }
+  }
+ ]
+}

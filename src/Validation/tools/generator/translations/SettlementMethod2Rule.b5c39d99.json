@@ -1,0 +1,57 @@
+{
+ "rule": "SettlementMethod2Rule",
+ "text": "If SettlementMethod is equal to COVE then: - SettlementAccount is not allowed; - Reimbursement agent(s) must be present; - ClearingSystem is not allowed.",
+ "reading": "if SettlementMethod is COVE, SettlementAccount and ClearingSystem are absent and a reimbursement agent (instructing or instructed) is present",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/SettlementAccount"
+     ],
+     [
+      "Absence",
+      "/ClearingSystem"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/SettlementMethod",
+      "COVE"
+     ]
+    ]
+   }
+  },
+  {
+   "must": {
+    "connector": "OR",
+    "rules": [
+     [
+      "Presence",
+      "/InstructingReimbursementAgent"
+     ],
+     [
+      "Presence",
+      "/InstructedReimbursementAgent"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/SettlementMethod",
+      "COVE"
+     ]
+    ]
+   }
+  }
+ ]
+}

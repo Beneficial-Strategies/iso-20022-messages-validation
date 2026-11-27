@@ -1,0 +1,28 @@
+{
+ "rule": "TotalAmountAndAmount2Rule",
+ "text": "If TotalAmount is present, then it must equal the sum of all occurrences of Item/Amount.",
+ "reading": "if TotalAmount is present, it equals the sum of Item/Amount",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/TotalAmount",
+      "sum of Item/Amount"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/TotalAmount"
+     ]
+    ]
+   }
+  }
+ ]
+}

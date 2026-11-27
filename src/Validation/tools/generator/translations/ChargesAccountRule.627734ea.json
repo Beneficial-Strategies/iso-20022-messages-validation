@@ -1,0 +1,27 @@
+{
+ "rule": "ChargesAccountRule",
+ "text": "If ChargesAccountAgent is present, then ChargesAccount must be present.",
+ "reading": "if ChargesAccountAgent is present, ChargesAccount is present",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/ChargesAccount"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/ChargesAccountAgent"
+     ]
+    ]
+   }
+  }
+ ]
+}

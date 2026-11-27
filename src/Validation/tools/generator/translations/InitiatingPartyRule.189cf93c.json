@@ -1,0 +1,18 @@
+{
+ "rule": "InitiatingPartyRule",
+ "text": "GroupHeader/InitiatingParty is not allowed. .",
+ "reading": "GroupHeader/InitiatingParty is absent",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Absence",
+      "/GroupHeader/InitiatingParty"
+     ]
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,27 @@
+{
+ "rule": "ChargesInformationAndReversedInstructedAmountRule",
+ "text": "If ChargesInformation/ChargesAmount is present, then ReversedInstructedAmount must be present.",
+ "reading": "if ChargesInformation/ChargesAmount is present, ReversedInstructedAmount is present",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/ReversedInstructedAmount"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/ChargesInformation/ChargesAmount"
+     ]
+    ]
+   }
+  }
+ ]
+}

@@ -32,8 +32,9 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--census", required=True)
     what = ap.add_mutually_exclusive_group(required=True)
-    what.add_argument("--message", help="for example pacs.008.001.14")
-    what.add_argument("--type", help="a component or choice on its own, for example PostalAddress27")
+    what.add_argument("--message", action="append", help="for example pacs.008.001.14; repeat it for several")
+    what.add_argument("--areas", help="every message of these business areas, all versions, for example pacs,pain")
+    what.add_argument("--type", action="append", help="a component or choice on its own, for example PostalAddress27; repeat it for several")
     ap.add_argument("--rules", action="append", help="folder of the hand-written rules (<Type>Validator.Rules.cs); the validators folder by default")
     ap.add_argument("--messages", default=os.path.join(REPO, "..", "iso-20022-messages"))
     ap.add_argument("--primitives", default=os.path.join(REPO, "..", "iso-20022-primitives"))
@@ -46,7 +47,7 @@ def main():
 
     subprocess.run(
         [sys.executable, os.path.join(HERE, "generate_validators.py"), "--census", args.census,
-         *(["--message", args.message] if args.message else ["--type", args.type]),
+         *(["--areas", args.areas] if args.areas else [a for m_ in args.message for a in ("--message", m_)] if args.message else [a for t in args.type for a in ("--type", t)]),
          *[a for d in (args.rules or []) for a in ("--rules", d)],
          "--out", out, "--messages", args.messages, "--primitives", args.primitives],
         check=True,
@@ -60,6 +61,11 @@ def main():
             if t in types:
                 text = re.sub(r"^namespace [\w.]+;", "namespace Gen;", open(f, encoding="utf-8").read(), flags=re.M)
                 open(os.path.join(out, os.path.basename(f)), "w", encoding="utf-8").write(text)
+
+    # the tests of the helpers the generated rules read through
+    # (kept as .cs.txt: a .cs file under src/ would be compiled into the package)
+    for f in glob.glob(os.path.join(HERE, "oracle_tests", "*.cs.txt")):
+        shutil.copy(f, os.path.join(work, "oracle", os.path.basename(f)[: -len(".txt")]))
 
     copied, no_test = 0, []
     for t in types:
@@ -119,7 +125,7 @@ def main():
     root = ET.parse(os.path.join(work, "TestResults", "results.trx")).getroot()
     results = root.findall(".//t:UnitTestResult", ns)
     failed = sorted(r.get("testName") for r in results if r.get("outcome") == "Failed")
-    known_file = os.path.join(HERE, "known_differences", (args.message or args.type) + ".tsv")
+    known_file = os.path.join(HERE, "known_differences", ("+".join(args.message) if args.message else args.areas if args.areas else "+".join(args.type)) + ".tsv")
     known = {}
     if os.path.exists(known_file):
         for line in open(known_file, encoding="utf-8"):

@@ -1,0 +1,5 @@
+{
+ "rule": "SupplementaryDataRule",
+ "text": "The SupplementaryData building block at message level must not be used to provide additional information about a transaction. The SupplementaryData element at transaction level should be used for that purpose.",
+ "known_issue": "whether the information is about a transaction is a matter of meaning, not of the message's data"
+}

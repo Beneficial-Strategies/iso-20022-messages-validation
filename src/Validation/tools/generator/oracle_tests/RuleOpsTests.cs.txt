@@ -1,0 +1,70 @@
+// Tests of the helpers the generated rules read through (RuleOps.cs, written by generate_validators.py). Copied into the oracle project.
+
+using Xunit;
+
+namespace Gen;
+
+public class RuleOpsTests
+{
+    private sealed record Institution(string? BICFI = null, string? LEI = null, Member? ClearingSystemMemberIdentification = null);
+
+    private sealed record Member(string? MemberIdentification, string? ClearingSystemIdentification);
+
+    private sealed record Agent(Institution? FinancialInstitutionIdentification);
+
+    private static Agent Bic(string bic) => new(new Institution(BICFI: bic));
+
+    [Fact]
+    public void ABranchOfTheSameInstitution_HasTheSameFirstEightCharactersOfTheBic()
+    {
+        Assert.True(RuleOps.IsBranchOf(Bic("DEUTDEFF500"), Bic("DEUTDEFFXXX")));
+    }
+
+    [Fact]
+    public void AnotherInstitution_IsNotABranch()
+    {
+        Assert.False(RuleOps.IsBranchOf(Bic("BNPAFRPPXXX"), Bic("DEUTDEFFXXX")));
+    }
+
+    [Fact]
+    public void WithNoKindOfIdentifierInCommon_NothingCanBeSaidAgainstIt()
+    {
+        var byLei = new Agent(new Institution(LEI: "529900T8BM49AURSDO55"));
+        Assert.True(RuleOps.IsBranchOf(byLei, Bic("DEUTDEFFXXX")));
+        Assert.True(RuleOps.IsBranchOf(new Agent(new Institution()), Bic("DEUTDEFFXXX")));
+        Assert.True(RuleOps.IsBranchOf(Bic("DEUTDEFFXXX"), null));
+    }
+
+    [Fact]
+    public void TheLeiAndTheClearingMemberAreComparedToo()
+    {
+        Assert.False(RuleOps.IsBranchOf(new Agent(new Institution(LEI: "A")), new Agent(new Institution(LEI: "B"))));
+        Assert.True(RuleOps.IsBranchOf(
+            new Agent(new Institution(ClearingSystemMemberIdentification: new Member("123", "USABA"))),
+            new Agent(new Institution(ClearingSystemMemberIdentification: new Member("123", "USABA")))));
+        Assert.False(RuleOps.IsBranchOf(
+            new Agent(new Institution(ClearingSystemMemberIdentification: new Member("123", "USABA"))),
+            new Agent(new Institution(ClearingSystemMemberIdentification: new Member("456", "USABA")))));
+        // the same number in another clearing system is not a common identifier
+        Assert.True(RuleOps.IsBranchOf(
+            new Agent(new Institution(ClearingSystemMemberIdentification: new Member("123", "USABA"))),
+            new Agent(new Institution(ClearingSystemMemberIdentification: new Member("456", "GBDSC")))));
+    }
+
+    [Fact]
+    public void ValuesThatArePresentAreAllSame_AndAbsentOnesDoNotCount()
+    {
+        Assert.True(RuleOps.AllSame(new object?[] { "EUR", null, "EUR" }));
+        Assert.False(RuleOps.AllSame(new object?[] { "EUR", "USD" }));
+        Assert.True(RuleOps.AllSame(new object?[] { }));
+    }
+
+    [Fact]
+    public void Substring_IsOneBased_AndStopsAtTheEnd()
+    {
+        Assert.Equal("pacs.003", RuleOps.Substring("pacs.003.001.10", 1, 8));
+        Assert.Equal("10", RuleOps.Substring("pacs.003.001.10", 14, 8));
+        Assert.Null(RuleOps.Substring("abc", 5, 2));
+        Assert.Null(RuleOps.Substring(null, 1, 2));
+    }
+}

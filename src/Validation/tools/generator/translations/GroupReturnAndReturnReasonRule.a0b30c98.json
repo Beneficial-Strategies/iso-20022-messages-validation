@@ -1,0 +1,28 @@
+{
+ "rule": "GroupReturnAndReturnReasonRule",
+ "text": "If GroupHeader/GroupReturn is true, then OriginalGroupInformation/ReturnReasonInformation/ReturnReason must be present.",
+ "reading": "if GroupReturn is true, ReturnReason is present",
+ "rules": [
+  {
+   "must": {
+    "connector": "AND",
+    "rules": [
+     [
+      "Presence",
+      "/OriginalGroupInformation/ReturnReasonInformation/ReturnReason"
+     ]
+    ]
+   },
+   "when": {
+    "connector": "AND",
+    "rules": [
+     [
+      "EqualToValue",
+      "/GroupHeader/GroupReturn",
+      "true"
+     ]
+    ]
+   }
+  }
+ ]
+}
