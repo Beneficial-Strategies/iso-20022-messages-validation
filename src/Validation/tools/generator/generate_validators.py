@@ -20,13 +20,14 @@ Rule semantics (the reading of the RuleDefinition language used here, to be chec
 """
 import argparse
 import glob
-import hashlib
 import json
 import os
 import re
 import sys
-import xml.etree.ElementTree as ET
 from collections import OrderedDict
+
+import rules_ir as ri
+from rules_ir import XSI, norm, parse_rule, text_key  # noqa: F401  (re-exported: the tests and rule_coverage.py read them here)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.abspath(os.path.join(HERE, "..", "..", "..", ".."))
@@ -36,7 +37,6 @@ MSGS = None
 PRIM = None
 RULES_DIRS = []  # where the hand-written rules (<Type>Validator.Rules.cs) are
 VAL = os.path.join(REPO_ROOT, "src", "Validation", "Validators") + os.sep
-XSI = "{http://www.w3.org/2001/XMLSchema-instance}type"
 
 
 # ----------------------------------------------------------------------------- inputs
@@ -162,24 +162,6 @@ class Model:
 # ----------------------------------------------------------------------------- rules (IR)
 class Unsupported(Exception):
     pass
-
-
-def parse_rule(xml):
-    root = ET.fromstring(xml)
-    rule = root[0]
-    kind = rule.get(XSI) or rule.tag
-
-    def section(tag):
-        s = rule.find(tag)
-        if s is None:
-            return None
-        conn = (s.findtext("connector") or "AND").strip()
-        brs = []
-        for br in s.findall("BooleanRule"):
-            brs.append((br.get(XSI), (br.findtext("leftOperand") or "").strip(), (br.findtext("rightOperand") or "").strip() or None))
-        return conn, brs
-
-    return kind, section("mustBe"), section("onCondition")
 
 
 # Misspellings in the specification's own expressions (the member of the model is spelled correctly). Each is a mistake of the
@@ -452,10 +434,6 @@ def cs_str(s):
     return s.replace("\\", "\\\\").replace('"', '\\"')
 
 
-def norm(s):
-    return re.sub(r"\s+", " ", s or "").strip()
-
-
 # ----------------------------------------------------------------------------- emitting
 def code_validator_new(m, t):
     """`new XValidator()`: the hand-written one of the code set if there is one, else the generated one"""
@@ -474,36 +452,27 @@ def emit_code_validator(t):
     )
 
 
-TRANSLATIONS_DIR = os.path.join(HERE, "translations")  # the readings of the rules that are in prose
+def rule_tuple(r):
+    """a rule R of the IR (rules_ir.py) as the tuple the emitter reads: (kind, mustBe, onCondition, collection, itemCondition)"""
+    return (r.get("kind", "ComplexRule" if (r.get("when") or r.get("eachWhen")) else "SimpleRule"), section_of(r["must"]),
+            section_of(r["when"]) if r.get("when") else None, r.get("each"), section_of(r["eachWhen"]) if r.get("eachWhen") else None)
 
 
-def text_key(name, prose):
-    return f"{name}.{hashlib.sha1(prose.encode('utf-8')).hexdigest()[:8]}"
+def translation_of(t):
+    """the translation of the IR with its rules as tuples (None when there is none)"""
+    if t is None:
+        return None
+    t = dict(t)
+    t["lenient_codes"] = bool(t.get("lenient_codes"))
+    t["vacuous"] = bool(t.get("vacuous_without_condition_element"))
+    t["rules"] = [rule_tuple(r) for r in t.get("rules", [])]
+    # the same rule where the element is somewhere else in another version of the type: tried in order when the first does not fit
+    t["alternatives"] = [[rule_tuple(r) for r in a["rules"]] for a in t.get("alternatives", [])]
+    return t
 
 
 def load_translation(name, prose):
-    """The reading of a rule that the specification gives in prose, written once from its text (translations/<Rule>.<hash>.json).
-    The key is the name and the text of the rule, so a change in the specification's text makes the translation not apply
-    (the rule is pending again) instead of silently applying to a rule that has changed."""
-    f = os.path.join(TRANSLATIONS_DIR, text_key(name, prose) + ".json")
-    if not os.path.exists(f):
-        return None
-    with open(f, encoding="utf-8") as fh:
-        t = json.load(fh)
-    t["file"] = os.path.basename(f)
-    def rules_of(rs):
-        return [
-            (r.get("kind", "ComplexRule" if (r.get("when") or r.get("eachWhen")) else "SimpleRule"), section_of(r["must"]),
-             section_of(r["when"]) if r.get("when") else None, r.get("each"), section_of(r["eachWhen"]) if r.get("eachWhen") else None)
-            for r in rs
-        ]
-
-    t["lenient_codes"] = bool(t.get("lenient_codes"))
-    t["vacuous"] = bool(t.get("vacuous_without_condition_element"))
-    t["rules"] = rules_of(t.get("rules", []))
-    # the same rule where the element is somewhere else in another version of the type: tried in order when the first does not fit
-    t["alternatives"] = [rules_of(a["rules"]) for a in t.get("alternatives", [])]
-    return t
+    return translation_of(ri.load_translation(name, prose))
 
 
 def section_of(spec):
@@ -517,29 +486,6 @@ def hand_rules_file(name):
         for f in glob.glob(os.path.join(d, "**", f"{name}Validator.Rules.cs"), recursive=True):
             return f
     return None
-
-
-SCAFFOLD_DIR = None  # --scaffold: where the stubs of the rules that have no translation are written
-
-
-def scaffold(outdir, rule, prose, type_name, elems):
-    """Writes the stub of a translation for a rule that is in prose and has none (<Rule>.<hash>.json, the name the generator looks for).
-    The stub has the exact text and the members of the type to read it against, and an empty `rules`: it is filled in by a person
-    (see the README), reviewed, and moved to translations/. The members are of the first type found; the same text in another type
-    is listed under `also_in`, and one file serves them all."""
-    os.makedirs(outdir, exist_ok=True)
-    f = os.path.join(outdir, text_key(rule, prose) + ".json")
-    members = [{"name": c["name"], "min": c.get("minOccurs", "1"), "max": c.get("maxOccurs", "n")} for c in elems]
-    if os.path.exists(f):
-        with open(f, encoding="utf-8") as fh:
-            stub = json.load(fh)
-        if type_name not in stub["also_in"] and type_name != stub["first_seen_in"]:
-            stub["also_in"].append(type_name)
-    else:
-        stub = {"rule": rule, "text": prose, "reading": "", "first_seen_in": type_name, "also_in": [], "members": members, "rules": []}
-    with open(f, "w", encoding="utf-8") as fh:
-        json.dump(stub, fh, indent=1)
-        fh.write("\n")
 
 
 def emit_type(g, e, report):
@@ -560,7 +506,7 @@ def emit_type(g, e, report):
         ns = f"Gen.{area}"
     # children of kind messageElement / messageBuildingBlock
     elems = [c for c in e.get("children", []) if c.get("xmlElementName") in ("messageElement", "messageBuildingBlock")]
-    consts = [c for c in e.get("children", []) if c.get("xmlElementName") == "constraint"]
+    consts = ri.type_rules(e)
     child_vals = OrderedDict()  # interface -> param name
     code_vals = OrderedDict()  # external code type -> param name
     lines = []
@@ -688,19 +634,23 @@ def emit_type(g, e, report):
 
     for c in consts:
         cname = c["name"]
-        ex = c.get("attributes", {}).get("expression")
-        prose = norm(c.get("definition"))
-        tr = load_translation(cname, prose)
+        prose = c["text"]
+        tr = translation_of(c["translation"])
+        ex = c["expression"]
         source, rules, why = "the specification's expression", None, None
         if ex:
-            try:
-                rules = [parse_rule(ex)]
-                build(rules)
-            except (Unsupported, ET.ParseError) as u:
-                rules, why = None, ("the expression is text, not a rule definition" if isinstance(u, ET.ParseError) else str(u))
+            if "error" in ex:
+                why = ex["error"]
                 report["unsupported"].append(f"{name}.{cname}: {why}")
+            else:
+                try:
+                    rules = [rule_tuple(ex["rule"])]
+                    build(rules)
+                except Unsupported as u:
+                    rules, why = None, str(u)
+                    report["unsupported"].append(f"{name}.{cname}: {why}")
         else:
-            if cname.endswith("Guideline"):
+            if c["guideline"]:
                 report["guidelines"].append(f"{name}.{cname}")
                 rule_lines.append(f"// {cname}: a guideline of the specification, not a rule to check:")
                 rule_lines.append(f"//   {prose}")
@@ -708,8 +658,6 @@ def emit_type(g, e, report):
                 continue
             report["prose_only"].append(f"{name}.{cname}")
             why = "the specification gives the rule in prose only"
-            if tr is None and SCAFFOLD_DIR:
-                scaffold(SCAFFOLD_DIR, cname, prose, name, elems)
         if rules is None and tr is not None and tr.get("rules"):
             # written once from the prose, reviewed, and kept in translations/ (see the README)
             first_error = None
@@ -1009,6 +957,24 @@ def find_message(idx, identifier):
     sys.exit(f"no message {identifier} in the pages of the specification")
 
 
+def write_ir(outdir, model, order):
+    """<Type>.json for every type: its members as the specification has them, and its rules as rules_ir.type_rules gives them.
+    A message that has the same name in two business areas gets the area in the file name."""
+    os.makedirs(outdir, exist_ok=True)
+    for e in order:
+        area = next((c["name"].split(".")[0] for c in e.get("children", []) if c.get("xmlElementName") == "messageDefinitionIdentifier"), None)
+        members = []
+        for c in e.get("children", []):
+            if c.get("xmlElementName") in ("messageElement", "messageBuildingBlock"):
+                ref = next((r.get("name") for r in c.get("references", []) if r["relation"] in ("complexType", "type", "simpleType")), None)
+                members.append({"name": c["name"], "type": ref, "min": c.get("minOccurs", "1"), "max": c.get("maxOccurs", "n")})
+        ir = {"type": e["name"], "area": area, "members": members, "rules": ri.type_rules(e)}
+        clash = sum(1 for o in order if o["name"] == e["name"]) > 1
+        with open(os.path.join(outdir, e["name"] + (f".{area}" if clash and area else "") + ".json"), "w", encoding="utf-8") as fh:
+            json.dump(ir, fh, indent=1, ensure_ascii=False)
+            fh.write("\n")
+
+
 def main():
     global CENSUS, MSGS, PRIM, VAL, RULES_DIRS
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -1019,6 +985,7 @@ def main():
     what.add_argument("--type", action="append", help="a message component or choice on its own, for example PostalAddress27 (with what it reaches); repeat it for several")
     ap.add_argument("--rules", action="append", help="folder of the hand-written rules (<Type>Validator.Rules.cs); the validators folder by default")
     ap.add_argument("--scaffold", metavar="DIR", help="write a stub translation, to be filled in, for each rule that is in prose and has none (see the README)")
+    ap.add_argument("--ir", metavar="DIR", help="also write the language-neutral IR of every type reached, one JSON file each (see rules_ir.py)")
     ap.add_argument("--out", required=True, help="folder to write the validators to")
     ap.add_argument("--messages", default=os.path.join(REPO_ROOT, "..", "iso-20022-messages"), help="clone of iso-20022-messages")
     ap.add_argument("--primitives", default=os.path.join(REPO_ROOT, "..", "iso-20022-primitives"), help="clone of iso-20022-primitives")
@@ -1029,8 +996,7 @@ def main():
     PRIM = os.path.join(os.path.abspath(args.primitives), "src", "Primitives") + os.sep
     VAL = os.path.abspath(args.validators) + os.sep
     RULES_DIRS = [os.path.abspath(d) for d in (args.rules or [VAL])]
-    global SCAFFOLD_DIR
-    SCAFFOLD_DIR = os.path.abspath(args.scaffold) if args.scaffold else None
+    ri.SCAFFOLD_DIR = os.path.abspath(args.scaffold) if args.scaffold else None
     outdir = args.out
     os.makedirs(outdir, exist_ok=True)
     model = Model()
@@ -1058,6 +1024,8 @@ def main():
                 if r["relation"] in ("complexType", "type") and r["id"] not in seen:
                     seen.add(r["id"])
                     st.append(r["id"])
+    if args.ir:
+        write_ir(args.ir, model, order)
     for e in order:
         isch = e["id"] in model.idx and model.is_choice("I" + e["name"])
         if isch:
