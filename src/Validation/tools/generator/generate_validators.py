@@ -519,6 +519,29 @@ def hand_rules_file(name):
     return None
 
 
+SCAFFOLD_DIR = None  # --scaffold: where the stubs of the rules that have no translation are written
+
+
+def scaffold(outdir, rule, prose, type_name, elems):
+    """Writes the stub of a translation for a rule that is in prose and has none (<Rule>.<hash>.json, the name the generator looks for).
+    The stub has the exact text and the members of the type to read it against, and an empty `rules`: it is filled in by a person
+    (see the README), reviewed, and moved to translations/. The members are of the first type found; the same text in another type
+    is listed under `also_in`, and one file serves them all."""
+    os.makedirs(outdir, exist_ok=True)
+    f = os.path.join(outdir, text_key(rule, prose) + ".json")
+    members = [{"name": c["name"], "min": c.get("minOccurs", "1"), "max": c.get("maxOccurs", "n")} for c in elems]
+    if os.path.exists(f):
+        with open(f, encoding="utf-8") as fh:
+            stub = json.load(fh)
+        if type_name not in stub["also_in"] and type_name != stub["first_seen_in"]:
+            stub["also_in"].append(type_name)
+    else:
+        stub = {"rule": rule, "text": prose, "reading": "", "first_seen_in": type_name, "also_in": [], "members": members, "rules": []}
+    with open(f, "w", encoding="utf-8") as fh:
+        json.dump(stub, fh, indent=1)
+        fh.write("\n")
+
+
 def emit_type(g, e, report):
     m = g.m
     name = e["name"]
@@ -685,6 +708,8 @@ def emit_type(g, e, report):
                 continue
             report["prose_only"].append(f"{name}.{cname}")
             why = "the specification gives the rule in prose only"
+            if tr is None and SCAFFOLD_DIR:
+                scaffold(SCAFFOLD_DIR, cname, prose, name, elems)
         if rules is None and tr is not None and tr.get("rules"):
             # written once from the prose, reviewed, and kept in translations/ (see the README)
             first_error = None
@@ -993,6 +1018,7 @@ def main():
     what.add_argument("--areas", help="every message of these business areas, all versions, for example pacs,pain")
     what.add_argument("--type", action="append", help="a message component or choice on its own, for example PostalAddress27 (with what it reaches); repeat it for several")
     ap.add_argument("--rules", action="append", help="folder of the hand-written rules (<Type>Validator.Rules.cs); the validators folder by default")
+    ap.add_argument("--scaffold", metavar="DIR", help="write a stub translation, to be filled in, for each rule that is in prose and has none (see the README)")
     ap.add_argument("--out", required=True, help="folder to write the validators to")
     ap.add_argument("--messages", default=os.path.join(REPO_ROOT, "..", "iso-20022-messages"), help="clone of iso-20022-messages")
     ap.add_argument("--primitives", default=os.path.join(REPO_ROOT, "..", "iso-20022-primitives"), help="clone of iso-20022-primitives")
@@ -1003,6 +1029,8 @@ def main():
     PRIM = os.path.join(os.path.abspath(args.primitives), "src", "Primitives") + os.sep
     VAL = os.path.abspath(args.validators) + os.sep
     RULES_DIRS = [os.path.abspath(d) for d in (args.rules or [VAL])]
+    global SCAFFOLD_DIR
+    SCAFFOLD_DIR = os.path.abspath(args.scaffold) if args.scaffold else None
     outdir = args.out
     os.makedirs(outdir, exist_ok=True)
     model = Model()

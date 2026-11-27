@@ -324,6 +324,26 @@ class TranslationTests(unittest.TestCase):
         report, _ = self.emit(self.translation("/Coll[*]/X"), text_changed=True)
         self.assertEqual(report["pending"], ["E.ProseRule"])
 
+    def test_a_rule_without_a_translation_gets_a_stub_named_as_the_generator_looks_for_it(self):
+        with tempfile.TemporaryDirectory() as empty, tempfile.TemporaryDirectory() as out:
+            old, gv.TRANSLATIONS_DIR, gv.SCAFFOLD_DIR = gv.TRANSLATIONS_DIR, empty, out
+            try:
+                m = FakeModel()
+                m.ifaces["IE"] = OrderedDict(Name=("Max35Text", False, False), Coll=("IB", False, True))
+                for name in ("E", "F"):  # the same text in two types: one file
+                    entity = json.loads(json.dumps(self.ENTITY))
+                    entity["name"] = name
+                    m.ifaces["I" + name] = m.ifaces["IE"]
+                    report = {k: [] for k in ("no_interface", "mismatch", "prose_only", "guidelines", "unsupported", "pending", "generated_rules", "translated_rules")}
+                    gv.emit_type(gv.Gen(m), entity, report)
+            finally:
+                gv.TRANSLATIONS_DIR, gv.SCAFFOLD_DIR = old, None
+            files = os.listdir(out)
+            self.assertEqual(files, [gv.text_key("ProseRule", self.PROSE) + ".json"])
+            stub = json.load(open(os.path.join(out, files[0])))
+            self.assertEqual((stub["first_seen_in"], stub["also_in"], stub["rules"], stub["text"]), ("E", ["F"], [], self.PROSE))
+            self.assertEqual([x["name"] for x in stub["members"]], ["Name"])
+
     def test_the_same_value_in_all_items_ignores_absent_values(self):
         g = gv.Gen(FakeModel())
         e = g.section("x", "IA", ("AND", [("SameInAll", "/Coll[*]/X", None)]))

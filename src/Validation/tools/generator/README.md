@@ -55,6 +55,11 @@ does not have, so the rule never applies). A file with `known_issue` is a rule t
   type does not have, which is a mistake in the specification's text for that type), the rule stays pending for that type, with
   the reason, and is settled there by hand.
 * A rule that cannot be a reading but can be checked is written in C# (next section; a file with `"hand": "why"` says so).
+* **A new rule in prose** (a snapshot added a type, or changed a text) is pending. `generate_validators.py ... --scaffold DIR` writes
+  one stub per such rule into `DIR`, already named as the generator looks for it: the exact text, the first type that has it (and
+  `also_in`), that type's members with their cardinalities, and an empty `rules`. To settle it: write `reading` and `rules` (or
+  `known_issue`, or `hand`), move the file into `translations/`, run the generator and the oracle, and add a test for the reading.
+  `rule_coverage.py --list pending` shows what is left. The stub is not read until it is in `translations/`.
 * Each reading is reviewed against its text before it is kept, and the validators that use it get tests when they replace the
   existing ones.
 
