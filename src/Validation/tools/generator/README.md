@@ -28,6 +28,17 @@ The output is a set of files meant to be **checked in**: a regeneration is a dif
 for one message can be seen to touch another. The loop variables are numbered again in each file for that reason, and two runs
 give identical files.
 
+## Front end and back end
+
+The generator is in two parts. `rules_ir.py` is the **front end**: for each type it gives, as plain data, the members as the
+specification has them and each rule (the specification's expression, or its reading of the prose from `translations/`, or a
+guideline), with no C# in it. The format is described at the top of that file. `generate_validators.py --ir DIR` writes it, one
+`<Type>.json` per type (`<Type>.<area>.json` for a message of the same name in two business areas). `generate_validators.py` is the C#
+**back end**: it reads those records and the interfaces of the model, and writes the validators. A back end for another language
+needs the records and its own mapping from the specification's types to the language's; the meaning of every operator and the
+decisions on absence, presence and `[*]` are in this README and in `docs/KnownRuleChallenges.md`. Moving the generator to the
+front end changed no generated file (the output of all 214 pacs and pain messages is byte-identical).
+
 ## Rules read from the prose
 
 Most of the rules that the specification gives only in prose are plain: one element is present or absent depending on another, two

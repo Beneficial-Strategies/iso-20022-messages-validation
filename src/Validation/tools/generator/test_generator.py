@@ -9,6 +9,7 @@ import unittest
 from collections import OrderedDict
 
 import generate_validators as gv
+import rules_ir as ri
 
 XSI = 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"'
 
@@ -295,7 +296,7 @@ class TranslationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             with open(os.path.join(d, gv.text_key("ProseRule", self.PROSE) + ".json"), "w") as f:
                 json.dump(translation, f)
-            old, gv.TRANSLATIONS_DIR, gv.RULES_DIRS = gv.TRANSLATIONS_DIR, d, [d]
+            old, ri.TRANSLATIONS_DIR, gv.RULES_DIRS = ri.TRANSLATIONS_DIR, d, [d]
             try:
                 m = FakeModel()
                 m.ifaces["IE"] = OrderedDict(Name=("Max35Text", False, False), Coll=("IB", False, True))
@@ -305,7 +306,7 @@ class TranslationTests(unittest.TestCase):
                 report = {k: [] for k in ("no_interface", "mismatch", "prose_only", "guidelines", "unsupported", "pending", "generated_rules", "translated_rules")}
                 return report, gv.emit_type(gv.Gen(m), entity, report)[1]
             finally:
-                gv.TRANSLATIONS_DIR, gv.RULES_DIRS = old, []
+                ri.TRANSLATIONS_DIR, gv.RULES_DIRS = old, []
 
     def test_the_translation_becomes_a_rule_and_says_where_it_comes_from(self):
         report, code = self.emit(self.translation("/Coll[*]/X"))
@@ -326,7 +327,7 @@ class TranslationTests(unittest.TestCase):
 
     def test_a_rule_without_a_translation_gets_a_stub_named_as_the_generator_looks_for_it(self):
         with tempfile.TemporaryDirectory() as empty, tempfile.TemporaryDirectory() as out:
-            old, gv.TRANSLATIONS_DIR, gv.SCAFFOLD_DIR = gv.TRANSLATIONS_DIR, empty, out
+            old, ri.TRANSLATIONS_DIR, ri.SCAFFOLD_DIR = ri.TRANSLATIONS_DIR, empty, out
             try:
                 m = FakeModel()
                 m.ifaces["IE"] = OrderedDict(Name=("Max35Text", False, False), Coll=("IB", False, True))
@@ -337,12 +338,32 @@ class TranslationTests(unittest.TestCase):
                     report = {k: [] for k in ("no_interface", "mismatch", "prose_only", "guidelines", "unsupported", "pending", "generated_rules", "translated_rules")}
                     gv.emit_type(gv.Gen(m), entity, report)
             finally:
-                gv.TRANSLATIONS_DIR, gv.SCAFFOLD_DIR = old, None
+                ri.TRANSLATIONS_DIR, ri.SCAFFOLD_DIR = old, None
             files = os.listdir(out)
             self.assertEqual(files, [gv.text_key("ProseRule", self.PROSE) + ".json"])
             stub = json.load(open(os.path.join(out, files[0])))
             self.assertEqual((stub["first_seen_in"], stub["also_in"], stub["rules"], stub["text"]), ("E", ["F"], [], self.PROSE))
             self.assertEqual([x["name"] for x in stub["members"]], ["Name"])
+
+    def test_the_ir_of_a_type_is_plain_data_with_the_expression_and_the_reading(self):
+        entity = json.loads(json.dumps(self.ENTITY))
+        entity["children"].append({"name": "ExprRule", "xmlElementName": "constraint", "definition": "Name must be present.",
+                                   "attributes": {"expression": "<r><SimpleRule><mustBe><connector>AND</connector><BooleanRule xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"Presence\"><leftOperand>/Name</leftOperand></BooleanRule></mustBe></SimpleRule></r>"}})
+        entity["children"].append({"name": "SomeGuideline", "xmlElementName": "constraint", "definition": "Advice."})
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, gv.text_key("ProseRule", self.PROSE) + ".json"), "w") as f:
+                json.dump(self.translation("/Coll[*]/X"), f)
+            old, ri.TRANSLATIONS_DIR = ri.TRANSLATIONS_DIR, d
+            try:
+                recs = json.loads(json.dumps(ri.type_rules(entity)))  # nothing in it that JSON cannot carry
+            finally:
+                ri.TRANSLATIONS_DIR = old
+        prose, expr, guide = recs
+        self.assertEqual(prose["translation"]["rules"][0]["must"]["rules"], [["Absence", "/Coll[*]/X"]])
+        self.assertIsNone(prose["expression"])
+        self.assertEqual(expr["expression"]["rule"]["must"], {"connector": "AND", "rules": [["Presence", "/Name", None]]})
+        self.assertEqual(expr["expression"]["rule"]["kind"], "SimpleRule")
+        self.assertTrue(guide["guideline"])
 
     def test_the_same_value_in_all_items_ignores_absent_values(self):
         g = gv.Gen(FakeModel())
@@ -354,17 +375,17 @@ class TranslationFilesTests(unittest.TestCase):
     """The files in translations/ are data that a generator run trusts, so they are checked as such."""
 
     def files(self):
-        return sorted(f for f in os.listdir(gv.TRANSLATIONS_DIR) if f.endswith(".json"))
+        return sorted(f for f in os.listdir(ri.TRANSLATIONS_DIR) if f.endswith(".json"))
 
     def test_each_file_is_named_by_its_rule_and_the_hash_of_its_text(self):
         for f in self.files():
-            with open(os.path.join(gv.TRANSLATIONS_DIR, f), encoding="utf-8") as fh:
+            with open(os.path.join(ri.TRANSLATIONS_DIR, f), encoding="utf-8") as fh:
                 t = json.load(fh)
             self.assertEqual(f, gv.text_key(t["rule"], t["text"]) + ".json", f)
 
     def test_each_file_says_what_it_is_or_why_it_is_not_a_reading(self):
         for f in self.files():
-            with open(os.path.join(gv.TRANSLATIONS_DIR, f), encoding="utf-8") as fh:
+            with open(os.path.join(ri.TRANSLATIONS_DIR, f), encoding="utf-8") as fh:
                 t = json.load(fh)
             self.assertTrue(t.get("rules") or t.get("known_issue") or t.get("hand"), f)
             if t.get("rules"):
@@ -374,7 +395,7 @@ class TranslationFilesTests(unittest.TestCase):
         known = {"Presence", "Absence", "EqualToValue", "DifferentFromValue", "EqualToNode", "DifferentFromNode", "WithInList",
                  "NotWithInList", "SameInAll", "CountEquals", "IsBranchOf"}
         for f in self.files():
-            with open(os.path.join(gv.TRANSLATIONS_DIR, f), encoding="utf-8") as fh:
+            with open(os.path.join(ri.TRANSLATIONS_DIR, f), encoding="utf-8") as fh:
                 raw = json.load(fh)
             for r in raw.get("rules", []) + [x for a in raw.get("alternatives", []) for x in a["rules"]]:
                 for sec in ("must", "when", "eachWhen"):
